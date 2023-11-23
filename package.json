@@ -9,21 +9,43 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "extension.runVercors",
-        "title": "Run Vercors"
+        "title": "Run Vercors",
+        "icon": {
+					"light": "resources\\run.svg",
+					"dark": "resources\\run.svg"
+				}
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "vercorsplugin",
-          "title": "VerCorsPlugin",
-          "icon": "resources\\Screenshot 2023-11-20 173159.png"
+					"id": "vercors-plugin",
+					"title": "VerCors Plugin",
+          "icon": "resources\\mountain_pc.png"
+        }
+      ]
+    },
+		"views": {
+			"vercors-plugin": [
+				{
+					"id": "vcpView",
+					"name": "Plugin View",
+					"icon":"resources\\mountain_pc.png",
+					"contextualTitle": "VerCors"
+				}
+			]
+		},
+    "menus": {
+			"view/title": [
+				{
+					"command": "extension.runVercors",
+					"when": "view == vcpView",
+          "group": "navigation"
         }
       ]
     }
