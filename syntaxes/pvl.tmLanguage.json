@@ -1,0 +1,316 @@
+{
+  "scopeName": "source.pvl",
+  "fileTypes": "pvl",
+  "patterns": [
+    {  
+      "name": "comment.block",
+      "begin": "\\/\\*",
+      "end": "\\*\\/",
+      "patterns": [ 
+        {  
+          "name": "constant.character.escape.untitled",
+          "match": "\\."
+        }
+      ]
+    },
+    {
+      "name": "comment.line.double-slash",
+      "begin": "\\/\\/",
+      "end": "\\\n",
+      "patterns": [
+        {
+          "name": "constant.character.escape.untitled",
+          "match": "\\."
+        }
+      ]
+    },
+    {
+      "name": "keyword.other",
+      "match": "\\b(?:inline)\\b"
+    },
+    {
+      "name": "keyword.other",
+      "match": "\\b(?:assert)\\b"
+    },
+    {
+      "name": "meta.",
+      "match": "\\b(?:package)\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\?"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\!"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\&\\&"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\|\\|"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\|"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\^\\^"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\>\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\<\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\=\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\!\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\+"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\-"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\*"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\/"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\%"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\+\\+"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\-\\-"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\:\\:"
+    },
+    {
+      "name": "storage.type",
+      "match": "\\b(?:enum)\\b"
+    },
+    {
+      "name": "storage.type",
+      "match": "\\b(?:class)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:seq_program)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:kernel)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:barrier)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:invariant)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:constructor)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:run)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:thread)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:if)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:else)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:while)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:for)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:goto)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:return)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:vec)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:par)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:and)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:parallel)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:sequential)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:block)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:lock)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:unlock)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:wait)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:notify)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:fork)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:join)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:this)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:null)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:true)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:false)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:current_thread)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\\\\\b(?:current_thread)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\\\\\b(?:owner)\\b"
+    },
+    {
+      "name": "storage.modifier",
+      "match": "\\b(?:global)\\b"
+    },
+    {
+      "name": "storage.modifier",
+      "match": "\\b(?:local)\\b"
+    },
+    {
+      "name": "storage.modifier",
+      "match": "\\b(?:static)\\b"
+    },
+    {
+      "name": "storage.modifier",
+      "match": "\\b(?:final)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\\\\\b(?:unfolding)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:unfolding)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\\\\\b(?:in)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:in)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:new)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:id)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:boolean)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:void)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:int)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:char)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:float32)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:float64)\\b"
+    }
+  ]
+}

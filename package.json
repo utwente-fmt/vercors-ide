@@ -11,6 +11,26 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "languages": [
+      {
+        "id": "pvl",
+        "extensions": [
+          ".pvl"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "pvl",
+        "scopeName": "source.pvl",
+        "path": "./syntaxes/pvl.tmLanguage.json"
+      },
+      {
+        "path": "./syntaxes/spec_injection_grammar.tmLanguage.json",
+        "scopeName": "specification",
+        "injectTo": ["source.pvl"] 
+      }
+    ],
     "commands": [
       {
         "command": "extension.runVercors",
