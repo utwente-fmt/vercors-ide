@@ -11,6 +11,14 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "properties": {
+        "vercorsplugin.vercorsPath": {
+          "type": "string",
+          "description": "Path to the VerCors bin directory"
+        }
+      }
+    },
     "languages": [
       {
         "id": "pvl",
@@ -39,6 +47,14 @@
 					"light": "resources\\run.svg",
 					"dark": "resources\\run.svg"
 				}
+      },
+      {
+        "command": "extension.setVercorsPath",
+        "title": "Set VerCors Path"
+      },
+      {
+        "command": "extension.refreshEntry",
+        "title": "Refresh"
       }
     ],
     "viewsContainers": {

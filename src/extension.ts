@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+import {VerCorsPathProvider} from './settingsView'
+
 let outputChannel: vscode.OutputChannel;
 
 /**
@@ -16,6 +18,20 @@ function activate(context: vscode.ExtensionContext) {
   
 	// Add the disposable to the context so it can be disposed of later
 	context.subscriptions.push(disposable);
+
+	let disposableSetPath = vscode.commands.registerCommand('extension.setVercorsPath', () => {
+		setVercorsPath();
+	});
+	
+	context.subscriptions.push(disposableSetPath);
+
+	const vercorsPathProvider = new VerCorsPathProvider();
+	vscode.window.registerTreeDataProvider('vcpView', vercorsPathProvider);
+
+	vscode.commands.registerCommand('extension.refreshEntry', () =>
+    vercorsPathProvider.refresh()
+  );
+  
   }
   
   /**
@@ -38,7 +54,10 @@ function activate(context: vscode.ExtensionContext) {
 	// Get the URI (Uniform Resource Identifier) of the current file
 	const uri = editor!.document.uri;
 	const filePath = uri.fsPath;
-	const command = `C:\\Users\\naumt\\Downloads\\vercors-2.0.0-windows\\vercors-2.0.0\\bin\\vercors ${filePath}`;
+	const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string;
+	const command = `${vercorsPath}\\vercors ${filePath}`;
+
+	
 
 	// Create the output channel if it doesn't exist
     if (!outputChannel) {
@@ -46,7 +65,7 @@ function activate(context: vscode.ExtensionContext) {
 	  }
   
 	  // Clear previous content in the output channel
-	  outputChannel.clear();
+	outputChannel.clear();
 
     // Execute the command and send output to the output channel
     const childProcess = require('child_process');
@@ -62,4 +81,20 @@ function activate(context: vscode.ExtensionContext) {
 
     // Show the output channel
     outputChannel.show(vscode.ViewColumn.Three); // Change the ViewColumn as needed
+  }
+
+
+  function setVercorsPath() {
+	vscode.window.showInputBox({
+	  prompt: "Enter the path to the VerCors bin directory",
+	  placeHolder: "C:\\path\\to\\vercors\\bin",
+	  validateInput: (text) => {
+		// Optional: Add validation logic here if needed
+		return text.trim().length === 0 ? "Path cannot be empty" : null;
+	  }
+	}).then((path) => {
+	  if (path !== undefined) {
+		vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', path, true);
+	  }
+	});
   }
