@@ -11,6 +11,11 @@ let outputChannel: vscode.OutputChannel;
  * @param {vscode.ExtensionContext} context
  */
 function activate(context: vscode.ExtensionContext) {
+	// Check if the VerCors path is set
+    const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string;
+    if (!vercorsPath) {
+        vscode.window.showWarningMessage('VerCors binary path is not set. Please set it to run the tool.');
+    }
 	// Register the 'extension.runVercors' command
 	let disposable = vscode.commands.registerCommand('extension.runVercors', () => {
 	  executeVercorsCommand();

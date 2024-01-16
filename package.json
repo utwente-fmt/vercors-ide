@@ -62,7 +62,7 @@
         {
 					"id": "vercors-plugin",
 					"title": "VerCors Plugin",
-          "icon": "resources\\mountain_pc.png"
+          "icon": "resources\\mountain-icon.svg"
         }
       ]
     },
@@ -71,7 +71,7 @@
 				{
 					"id": "vcpView",
 					"name": "Plugin View",
-					"icon":"resources\\mountain_pc.png",
+					"icon":"resources\\mountain-icon.svg",
 					"contextualTitle": "VerCors"
 				}
 			]
