@@ -17,14 +17,14 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
         webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
 
-        // // Handle messages from the webview
-        // webviewView.webview.onDidReceiveMessage(data => {
-        //     switch (data.command) {
-        //         case 'updateOption':
-        //             this.updateOption(data.option, data.value);
-        //             return;
-        //     }
-        // });
+        // Handle messages from the webview
+        webviewView.webview.onDidReceiveMessage(data => {
+            switch (data.command) {
+                case 'updateOption':
+                    this.updateOption(data.option, data.value);
+                    return;
+            }
+        });
     }
 
     private getHtmlForWebview(webview: vscode.Webview) {
@@ -34,12 +34,41 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         <html lang="en">
         <head>
             <meta charset="UTF-8">
-            <title>Cat Colors</title>
+            <title>VerCors Options</title>
+            <!-- You can add style here or link to an external stylesheet -->
         </head>
         <body>
-            <button class="add-color-button">Add Color</button>
+            <h1>VerCors Options</h1>
+            <form id="options-form">
+                <div>
+                    <input type="checkbox" id="quiet" name="quiet">
+                    <label for="quiet">Quiet Mode (--quiet)</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="verbose" name="verbose">
+                    <label for="verbose">Verbose Mode (--verbose)</label>
+                </div>
+                <!-- Add more checkboxes for other options -->
+                <button type="button" id="submit">Apply</button>
+            </form>
+        
+            <script>
+                const vscode = acquireVsCodeApi();
+        
+                document.getElementById('submit').addEventListener('click', () => {
+                    const quiet = document.getElementById('quiet').checked;
+                    const verbose = document.getElementById('verbose').checked;
+                    // Gather other options similarly
+        
+                    vscode.postMessage({
+                        command: 'updateOptions',
+                        options: { quiet, verbose /*, ... other options */ }
+                    });
+                });
+            </script>
         </body>
-        </html>`;
+        </html>
+        `;
     }
 
     private updateOption(option: string, value: boolean) {
