@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 
 import {VerCorsPathProvider} from './settingsView'
+import {VerCorsWebViewProvider} from './VerCors-CLI-UI'
 
 let outputChannel: vscode.OutputChannel;
 
@@ -30,12 +31,17 @@ function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(disposableSetPath);
 
+	const optionsProvider = new VerCorsWebViewProvider();
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider('vercorsOptionsView', optionsProvider)
+	);
+
 	const vercorsPathProvider = new VerCorsPathProvider();
 	vscode.window.registerTreeDataProvider('vcpView', vercorsPathProvider);
 
 	vscode.commands.registerCommand('extension.refreshEntry', () =>
     vercorsPathProvider.refresh()
-  );
+  	);
   
   }
   

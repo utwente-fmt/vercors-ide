@@ -71,9 +71,13 @@
 				{
 					"id": "vcpView",
 					"name": "Plugin View",
-					"icon":"resources\\mountain-icon.svg",
 					"contextualTitle": "VerCors"
-				}
+				},
+        {
+					"type": "webview",
+          "id": "vercorsOptionsView",
+          "name": "Options"
+        }
 			]
 		},
     "menus": {
