@@ -79,7 +79,7 @@ function activate(context: vscode.ExtensionContext) {
 
     const fileOptions = vercorsOptionsMap.get(filePath) || {};
 
-	const command = `${vercorsPath}\\vercors ${filePath}`;
+	const command = `${vercorsPath}\\vercors ${filePath} ` + fileOptions;
 
 	
 
