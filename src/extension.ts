@@ -6,6 +6,7 @@ import {VerCorsPathProvider} from './settingsView'
 import {VerCorsWebViewProvider} from './VerCors-CLI-UI'
 
 let outputChannel: vscode.OutputChannel;
+const vercorsOptionsMap = new Map();
 
 /**
  * Method called when the extension is activated
@@ -31,7 +32,7 @@ function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(disposableSetPath);
 
-	const optionsProvider = new VerCorsWebViewProvider(context);
+	const optionsProvider = new VerCorsWebViewProvider(context, vercorsOptionsMap);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider('vercorsOptionsView', optionsProvider)
 	);
@@ -42,6 +43,14 @@ function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('extension.refreshEntry', () =>
     vercorsPathProvider.refresh()
   	);
+	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
+	if (editor) {
+		const filePath = editor.document.uri.fsPath;
+		const options = vercorsOptionsMap.get(filePath) || {};
+
+		optionsProvider.updateView(options);
+	}
+	}));
   
   }
   
@@ -66,6 +75,9 @@ function activate(context: vscode.ExtensionContext) {
 	const uri = editor!.document.uri;
 	const filePath = uri.fsPath;
 	const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string;
+
+    const fileOptions = vercorsOptionsMap.get(filePath) || {};
+
 	const command = `${vercorsPath}\\vercors ${filePath}`;
 
 	

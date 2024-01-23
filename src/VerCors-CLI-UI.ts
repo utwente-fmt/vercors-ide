@@ -3,10 +3,13 @@ import * as vscode from 'vscode';
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
 
+    private _vercorsOptionsMap;
+
     private readonly _extensionUri: vscode.Uri;
 
-    constructor(private context: vscode.ExtensionContext) {
+    constructor(private context: vscode.ExtensionContext, private optionsMap: Map<String, String>) {
         this._extensionUri = context.extensionUri;
+        this._vercorsOptionsMap = optionsMap;
     }
 
     public async resolveWebviewView(
@@ -24,11 +27,11 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.html = await this.getHtmlForWebview(webviewView.webview);
 
         // Handle messages from the webview
-        webviewView.webview.onDidReceiveMessage(data => {
-            switch (data.command) {
-                case 'updateOption':
-                    this.updateOption(data.option, data.value);
-                    return;
+        webviewView.webview.onDidReceiveMessage(message => {
+            if (message.command === 'updateOptions') {
+                console.log("we have changed the options for this file");
+                const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+                this._vercorsOptionsMap.set(filePath!, message.options);
             }
         });
     }
@@ -50,5 +53,11 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private updateOption(option: string, value: boolean) {
         // Update your extension's settings or state based on the option selected
         console.log(`Option ${option} set to ${value}`);
+    }
+
+    public updateView(options: any) {
+        if (this._view) {
+            this._view.webview.postMessage({ command: 'setOptions', options });
+        }
     }
 }
