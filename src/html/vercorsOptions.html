@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <style>
+                .custom-checkbox {
+                    /* Adjust width and height as needed */
+                    width: 15px;
+                    height: 15px;
+                    vertical-align: middle;
+                    margin-right: 10px;
+                }
+                
+                .checkbox-container {
+                    margin-bottom: 10px;
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                }
+            
+                .custom-checkbox:checked + label {
+                    /* Styles when the checkbox is checked */
+                    color: #e4e4e4; /* Change font color */
+                }
+            
+                /* You can also style the label directly */
+                label {
+                    margin-left: 5px;
+                }
+            </style>
+            <meta charset="UTF-8">
+            <title>VerCors Options</title>
+            <!-- You can add style here or link to an external stylesheet -->
+        </head>
+        <body>
+            <h1>VerCors Options</h1>
+            <form id="options-form">
+                <div class="checkbox-container" > 
+                    <input type="checkbox" id="quiet" name="quiet" class="custom-checkbox">
+                    <label for="quiet">Quiet Mode (--quiet)</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="verbose" name="verbose" class="custom-checkbox">
+                    <label for="verbose">Verbose Mode (--verbose)</label>
+                </div>
+                <!-- Add more checkboxes for other options -->
+                <button type="button" id="submit">Apply</button>
+            </form>
+        </body>
+        <script>
+            document.querySelectorAll('.checkbox-container').forEach(container => {
+                container.addEventListener('click', function(event) {
+                    // Find the checkbox inside this container
+                    const checkbox = this.querySelector('.custom-checkbox');
+        
+                    // Check if the click is on the container or any of its children
+                    if (event.currentTarget === this) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change')); // Manually dispatch change event
+                    }
+                });
+        
+                // Separate event listener for the checkbox change
+                const checkbox = container.querySelector('.custom-checkbox');
+                checkbox.addEventListener('change', function() {
+                    if(this.checked) {
+                        // Styles to apply when the checkbox is checked
+                        container.style.backgroundColor = 'var(--vscode-checkbox-background)';
+                        container.style.borderLeft = '5px solid #4CAF50';
+                    } else {
+                        // Revert styles when the checkbox is not checked
+                        container.style.backgroundColor = '';
+                        container.style.borderLeft = '';
+                    }
+                });
+            });
+        </script>
+        </html>

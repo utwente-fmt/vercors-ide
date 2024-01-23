@@ -31,7 +31,7 @@ function activate(context: vscode.ExtensionContext) {
 	
 	context.subscriptions.push(disposableSetPath);
 
-	const optionsProvider = new VerCorsWebViewProvider();
+	const optionsProvider = new VerCorsWebViewProvider(context);
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider('vercorsOptionsView', optionsProvider)
 	);

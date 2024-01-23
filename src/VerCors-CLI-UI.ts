@@ -3,7 +3,13 @@ import * as vscode from 'vscode';
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
 
-    public resolveWebviewView(
+    private readonly _extensionUri: vscode.Uri;
+
+    constructor(private context: vscode.ExtensionContext) {
+        this._extensionUri = context.extensionUri;
+    }
+
+    public async resolveWebviewView(
         webviewView: vscode.WebviewView,
         context: vscode.WebviewViewResolveContext,
         token: vscode.CancellationToken
@@ -15,7 +21,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
             enableScripts: true
         };
 
-        webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+        webviewView.webview.html = await this.getHtmlForWebview(webviewView.webview);
 
         // Handle messages from the webview
         webviewView.webview.onDidReceiveMessage(data => {
@@ -27,48 +33,18 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         });
     }
 
-    private getHtmlForWebview(webview: vscode.Webview) {
-        // Your HTML content goes here
-        // You'll create a form with checkboxes for each CLI option
-        return `<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>VerCors Options</title>
-            <!-- You can add style here or link to an external stylesheet -->
-        </head>
-        <body>
-            <h1>VerCors Options</h1>
-            <form id="options-form">
-                <div>
-                    <input type="checkbox" id="quiet" name="quiet">
-                    <label for="quiet">Quiet Mode (--quiet)</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="verbose" name="verbose">
-                    <label for="verbose">Verbose Mode (--verbose)</label>
-                </div>
-                <!-- Add more checkboxes for other options -->
-                <button type="button" id="submit">Apply</button>
-            </form>
+    private async getHtmlForWebview(webview: vscode.Webview) {
+        // Use a path relative to the extension's installation directory
+        const htmlPath = vscode.Uri.joinPath(this._extensionUri, '/src/html/vercorsOptions.html');
         
-            <script>
-                const vscode = acquireVsCodeApi();
+        // Read the file's content
+        const htmlContent = await vscode.workspace.fs.readFile(htmlPath);
         
-                document.getElementById('submit').addEventListener('click', () => {
-                    const quiet = document.getElementById('quiet').checked;
-                    const verbose = document.getElementById('verbose').checked;
-                    // Gather other options similarly
+        // Decode the byte array to a string
+        const htmlString = Buffer.from(htmlContent).toString('utf8');
         
-                    vscode.postMessage({
-                        command: 'updateOptions',
-                        options: { quiet, verbose /*, ... other options */ }
-                    });
-                });
-            </script>
-        </body>
-        </html>
-        `;
+        // Return the HTML content for the webview
+        return htmlString;
     }
 
     private updateOption(option: string, value: boolean) {
