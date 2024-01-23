@@ -177,6 +177,8 @@
             </form>
         </body>
         <script>
+            
+        const vscode = acquireVsCodeApi();
 
         function generateOptionsString() {
             let optionsString = "";
@@ -206,17 +208,19 @@
     
             // Separate event listener for the checkbox change
             const checkbox = container.querySelector('.custom-checkbox');
-            checkbox.addEventListener('change', function() {
-                if(this.checked) {
-                    // Styles to apply when the checkbox is checked
-                    container.style.backgroundColor = 'var(--vscode-checkbox-background)';
-                    container.style.borderLeft = '5px solid #4CAF50';
-                } else {
-                    // Revert styles when the checkbox is not checked
-                    container.style.backgroundColor = '';
-                    container.style.borderLeft = '';
-                }
-            });
+            if (checkbox) {
+                checkbox.addEventListener('change', function() {
+                    if(this.checked) {
+                        // Styles to apply when the checkbox is checked
+                        container.style.backgroundColor = 'var(--vscode-checkbox-background)';
+                        container.style.borderLeft = '5px solid #4CAF50';
+                    } else {
+                        // Revert styles when the checkbox is not checked
+                        container.style.backgroundColor = '';
+                        container.style.borderLeft = '';
+                    }
+                });
+            }
         });
 
     // Attach change event listeners to checkboxes
@@ -231,6 +235,52 @@
                 options: options
             });
         });
+    });
+
+    function uncheckAllCheckboxes() {
+        const checkboxes = document.querySelectorAll('.custom-checkbox');
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                checkbox.checked = false;
+                checkbox.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+
+    function loadOptions(options) {
+        savedOptions = options.split(' ').map(option => option.replace(/^--/, ''));
+        
+        const checkboxes = document.querySelectorAll('.custom-checkbox');
+        checkboxes.forEach(checkbox => {
+            if (savedOptions.includes(checkbox.id)) {
+                if (!checkbox.checked) {
+                    console.log("enable " + checkbox.id)
+                    checkbox.checked = true;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            } else {
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    checkbox.dispatchEvent(new Event('change'));
+                }
+            }
+        })
+    }
+
+    // Listen for messages from the extension
+    window.addEventListener('message', event => {
+        const message = event.data;
+        if (message.command === 'uncheckAllCheckboxes') {
+            uncheckAllCheckboxes();
+        }
+    });
+
+    // Listen for messages from the extension
+    window.addEventListener('message', event => {
+        const message = event.data;
+        if (message.command === 'loadOptions') {
+            loadOptions(message.options);
+        }
     });
     </script>
 </html>

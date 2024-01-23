@@ -45,6 +45,7 @@ function activate(context: vscode.ExtensionContext) {
   	);
 	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
 	if (editor) {
+		console.log("changed active window");
 		const filePath = editor.document.uri.fsPath;
 		const options = vercorsOptionsMap.get(filePath) || {};
 
