@@ -1,3 +1,4 @@
+import path from 'path';
 import * as vscode from 'vscode';
 
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
@@ -32,6 +33,10 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(message => {
             if (message.command === 'updateOptions') {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+                if (path.extname(filePath!).toLowerCase() !== '.pvl') {
+                    vscode.window.showErrorMessage('The active file is not a .pvl file. Please focus the editor on the PVL file.');
+                    return; // Exit early if the file is not a .pvl
+                }
                 console.log("we have changed the options for this file" + filePath);
                 this._vercorsOptionsMap.set(filePath!, message.options);
             }

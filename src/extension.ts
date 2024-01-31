@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import {VerCorsPathProvider} from './settingsView'
 import {VerCorsWebViewProvider} from './VerCors-CLI-UI'
@@ -45,11 +46,12 @@ function activate(context: vscode.ExtensionContext) {
   	);
 	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
 	if (editor) {
-		console.log("changed active window");
 		const filePath = editor.document.uri.fsPath;
-		const options = vercorsOptionsMap.get(filePath) || {};
-
-		optionsProvider.updateView(options);
+		if (path.extname(filePath) === '.pvl') {
+			console.log("changed active window");
+			const options = vercorsOptionsMap.get(filePath) || {};
+			optionsProvider.updateView(options);
+		}
 	}
 	}));
   
@@ -75,18 +77,29 @@ function activate(context: vscode.ExtensionContext) {
 	// Get the URI (Uniform Resource Identifier) of the current file
 	const uri = editor!.document.uri;
 	const filePath = uri.fsPath;
+
+	if (path.extname(filePath).toLowerCase() !== '.pvl') {
+        vscode.window.showErrorMessage('The active file is not a .pvl file.');
+        return; // Exit early if the file is not a .pvl
+    }
+
 	const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string;
-
     const fileOptions = vercorsOptionsMap.get(filePath) || {};
-
-	const command = `${vercorsPath}\\vercors ${filePath} ` + fileOptions;
+	let command;
+	if (vercorsOptionsMap.get(filePath)) {
+		command = `${vercorsPath}\\vercors ${filePath} ` + fileOptions;
+	} else {
+		command = `${vercorsPath}\\vercors ${filePath}`;
+	}
+	console.log(command)
+	
 
 	
 
 	// Create the output channel if it doesn't exist
     if (!outputChannel) {
 		outputChannel = vscode.window.createOutputChannel('Vercors Output');
-	  }
+	}
   
 	  // Clear previous content in the output channel
 	outputChannel.clear();
@@ -104,7 +117,7 @@ function activate(context: vscode.ExtensionContext) {
     });
 
     // Show the output channel
-    outputChannel.show(vscode.ViewColumn.Three); // Change the ViewColumn as needed
+    outputChannel.show(vscode.ViewColumn.Three, true); // Change the ViewColumn as needed
   }
 
 
