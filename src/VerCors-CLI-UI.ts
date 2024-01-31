@@ -45,7 +45,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     private async getHtmlForWebview(webview: vscode.Webview) {
         // Use a path relative to the extension's installation directory
-        const htmlPath = vscode.Uri.joinPath(this._extensionUri, '/src/html/vercorsOptions.html');
+        const htmlPath = vscode.Uri.joinPath(this._extensionUri, '/resources/html/vercorsOptions.html');
         
         // Read the file's content
         const htmlContent = await vscode.workspace.fs.readFile(htmlPath);

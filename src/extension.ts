@@ -6,8 +6,9 @@ import * as path from 'path';
 import {VerCorsPathProvider} from './settingsView'
 import {VerCorsWebViewProvider} from './VerCors-CLI-UI'
 
+
 let outputChannel: vscode.OutputChannel;
-const vercorsOptionsMap = new Map();
+const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
 
 /**
  * Method called when the extension is activated
@@ -53,7 +54,9 @@ function activate(context: vscode.ExtensionContext) {
 			optionsProvider.updateView(options);
 		}
 	}
-	}));
+	})
+	);
+	context.subscriptions.push(documentLinkProviderDisposable);
   
   }
   
@@ -79,6 +82,7 @@ function activate(context: vscode.ExtensionContext) {
 	const filePath = uri.fsPath;
 
 	if (path.extname(filePath).toLowerCase() !== '.pvl') {
+		console.log(filePath)
         vscode.window.showErrorMessage('The active file is not a .pvl file.');
         return; // Exit early if the file is not a .pvl
     }
@@ -92,18 +96,13 @@ function activate(context: vscode.ExtensionContext) {
 		command = `${vercorsPath}\\vercors ${filePath}`;
 	}
 	console.log(command)
-	
-
-	
-
 	// Create the output channel if it doesn't exist
     if (!outputChannel) {
-		outputChannel = vscode.window.createOutputChannel('Vercors Output');
+		outputChannel = vscode.window.createOutputChannel("vercors-output", "vercors-output");
 	}
   
-	  // Clear previous content in the output channel
+	// Clear previous content in the output channel
 	outputChannel.clear();
-
     // Execute the command and send output to the output channel
     const childProcess = require('child_process');
     const process = childProcess.spawn(command, [], { shell: true });
@@ -111,11 +110,6 @@ function activate(context: vscode.ExtensionContext) {
     process.stdout.on('data', (data: Buffer | string) => {
       outputChannel.appendLine(data.toString());
     });
-
-    process.stderr.on('data', (data: Buffer | string) => {
-      outputChannel.appendLine(data.toString());
-    });
-
     // Show the output channel
     outputChannel.show(vscode.ViewColumn.Three, true); // Change the ViewColumn as needed
   }
@@ -135,3 +129,32 @@ function activate(context: vscode.ExtensionContext) {
 	  }
 	});
   }
+
+  const documentLinkProviderDisposable = vscode.languages.registerDocumentLinkProvider(
+	{ language: "vercors-output" }, // Use the language ID
+	{
+	  provideDocumentLinks: (doc, token) => {
+		const links: vscode.ProviderResult<vscode.DocumentLink[]> = [];
+		const regex = /^.*( )(.*):(\d+):(\d+):/gm; // Adjust regex as needed
+		let match;
+		let lines = doc.getText().split("\n");
+		lines.forEach((line, line_index) => {
+			match = regex.exec(line);
+			if (match) {
+				const filePath = match[2];
+				const lineNum = parseInt(match[3], 10);
+				const char = parseInt(match[4], 10);
+				
+				// Create a range for the document link
+				const range = new vscode.Range(line_index, 4, line_index, line.length);
+				// Create a URI to the file
+				const uri = vscode.Uri.file(filePath).with({fragment:`L${lineNum},${char}`});
+				// Add a new DocumentLink to the array
+				links.push(new vscode.DocumentLink(range, uri));
+				console.log(new vscode.DocumentLink(range, uri))
+			}
+		})
+		return links;
+	  }
+	}
+  );

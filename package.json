@@ -16,7 +16,12 @@
         "vercorsplugin.vercorsPath": {
           "type": "string",
           "description": "Path to the VerCors bin directory"
-        }
+        },
+        "vercorsplugin.optionsMap": {
+          "type": "Map<String, String>",
+          "default": {},
+          "description": "Options map for my extension."
+      }
       }
     },
     "languages": [
@@ -25,6 +30,11 @@
         "extensions": [
           ".pvl"
         ]
+      },
+      {
+        "id": "vercors-output",
+        "aliases": ["My Output Channel"],
+        "extensions": [".myoutput"]
       }
     ],
     "grammars": [
