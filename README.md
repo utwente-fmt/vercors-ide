@@ -13,7 +13,7 @@ This plugin allows has the following features:
 
 ## Requirements
 
-The only requirement is having `npm` installed
+The only requirement is having `npm` installed. The plugin is known to work with `npm` version 10.2.4. For installing `npm` one option is `nvm`: <https://github.com/nvm-sh/nvm>.
 
 ## Known Issues
 
@@ -22,7 +22,9 @@ The only requirement is having `npm` installed
 ## Building and Running instructions
 
 First execute:
+
 ### `npm install`
+
 Then
 - Press ▷ to run the launch config (F5).
 
