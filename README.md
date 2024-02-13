@@ -32,6 +32,14 @@ Then
 
 ### `code --install-extension vercorsplugin-0.0.1.vsix`
 
+
+## To export a .vsix file:
+
+### `npm install @vscode/vsce`
+Then use
+### `vsce package`
+
+
 ## Testing
 
 There are currently no automatic tests for this plugin.
