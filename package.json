@@ -21,7 +21,7 @@
           "type": "Map<String, String>",
           "default": {},
           "description": "Options map for my extension."
-      }
+        }
       }
     },
     "languages": [
@@ -33,8 +33,12 @@
       },
       {
         "id": "vercors-output",
-        "aliases": ["My Output Channel"],
-        "extensions": [".myoutput"]
+        "aliases": [
+          "My Output Channel"
+        ],
+        "extensions": [
+          ".myoutput"
+        ]
       }
     ],
     "grammars": [
@@ -46,7 +50,9 @@
       {
         "path": "./syntaxes/spec_injection_grammar.tmLanguage.json",
         "scopeName": "specification",
-        "injectTo": ["source.pvl"] 
+        "injectTo": [
+          "source.pvl"
+        ]
       }
     ],
     "commands": [
@@ -54,9 +60,9 @@
         "command": "extension.runVercors",
         "title": "Run Vercors",
         "icon": {
-					"light": "resources\\run.svg",
-					"dark": "resources\\run.svg"
-				}
+          "light": "resources\\run.svg",
+          "dark": "resources\\run.svg"
+        }
       },
       {
         "command": "extension.setVercorsPath",
@@ -70,31 +76,31 @@
     "viewsContainers": {
       "activitybar": [
         {
-					"id": "vercors-plugin",
-					"title": "VerCors Plugin",
+          "id": "vercors-plugin",
+          "title": "VerCors Plugin",
           "icon": "resources\\mountain-icon.svg"
         }
       ]
     },
-		"views": {
-			"vercors-plugin": [
-				{
-					"id": "vcpView",
-					"name": "Plugin View",
-					"contextualTitle": "VerCors"
-				},
+    "views": {
+      "vercors-plugin": [
         {
-					"type": "webview",
+          "id": "vcpView",
+          "name": "Plugin View",
+          "contextualTitle": "VerCors"
+        },
+        {
+          "type": "webview",
           "id": "vercorsOptionsView",
           "name": "Options"
         }
-			]
-		},
+      ]
+    },
     "menus": {
-			"view/title": [
-				{
-					"command": "extension.runVercors",
-					"when": "view == vcpView",
+      "view/title": [
+        {
+          "command": "extension.runVercors",
+          "when": "view == vcpView",
           "group": "navigation"
         }
       ]
@@ -106,18 +112,22 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "build": "vsce package"
   },
   "devDependencies": {
-    "@types/vscode": "^1.84.0",
     "@types/mocha": "^10.0.3",
     "@types/node": "18.x",
+    "@types/vscode": "^1.84.0",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
     "@typescript-eslint/parser": "^6.9.0",
+    "@vscode/test-electron": "^2.3.6",
     "eslint": "^8.52.0",
     "glob": "^10.3.10",
     "mocha": "^10.2.0",
-    "typescript": "^5.2.2",
-    "@vscode/test-electron": "^2.3.6"
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@vscode/vsce": "^2.23.0"
   }
 }
