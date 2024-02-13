@@ -81,7 +81,7 @@ function executeVercorsCommand() {
     }
     // Get the URI (Uniform Resource Identifier) of the current file
     const uri = editor!.document.uri;
-    const filePath = '"' + uri.fsPath + '"';
+    const filePath = uri.fsPath;
 
     if (path.extname(filePath).toLowerCase() !== '.pvl') {
         console.log(filePath);
@@ -89,15 +89,16 @@ function executeVercorsCommand() {
         return; // Exit early if the file is not a .pvl
     }
 
-    const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string;
-    let command = `"${vercorsPath}\\vercors"`;
-    let args;
+    const vercorsPath = path.normalize(
+        vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string + path.sep
+    ) + "vercors";
+
+    let command = '"' + vercorsPath + '"';
+
     const fileOptions = vercorsOptionsMap.get(filePath);
-    if (fileOptions) {
-        args =  [filePath] + fileOptions;
-    } else {
-        args = [filePath];
-    }
+    let inputFile = '"' + filePath + '"';
+    let args = fileOptions ? ([inputFile].concat(fileOptions)) : [inputFile];
+
     console.log(command);
     console.log(args);
     // Create the output channel if it doesn't exist
