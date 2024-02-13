@@ -21,7 +21,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         token: vscode.CancellationToken
     ) {
         this._view = webviewView;
-        
+
         webviewView.webview.options = {
             // Enable scripts in the webview
             enableScripts: true
@@ -46,15 +46,15 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private async getHtmlForWebview(webview: vscode.Webview) {
         // Use a path relative to the extension's installation directory
         const htmlPath = vscode.Uri.joinPath(this._extensionUri, '/resources/html/vercorsOptions.html');
-        
+
         // Read the file's content
         const htmlContent = await vscode.workspace.fs.readFile(htmlPath);
-        
+
         // Decode the byte array to a string
         const htmlString = Buffer.from(htmlContent).toString('utf8');
 
         this._HTMLContent = htmlString;
-        
+
         // Return the HTML content for the webview
         return htmlString;
     }
@@ -66,10 +66,10 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     public updateView(options: any) {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-        const fileOptions = this._vercorsOptionsMap.get(filePath!)
+        const fileOptions = this._vercorsOptionsMap.get(filePath!);
         if (fileOptions) {
             // set the fields based on the saved options
-            this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions});
+            this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions });
         } else {
             // load the default options page, since this file has no options associated with it
             this._view!.webview.postMessage({ command: 'uncheckAllCheckboxes' });
