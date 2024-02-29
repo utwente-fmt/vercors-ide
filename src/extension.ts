@@ -5,11 +5,12 @@ import * as path from 'path';
 
 import { VerCorsPathProvider } from './settingsView';
 import { VerCorsWebViewProvider } from './VerCors-CLI-UI';
+import { ChildProcess } from 'child_process';
 
 
 let outputChannel: vscode.OutputChannel;
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
-
+let vercorsProcessPid = -1;
 /**
  * Method called when the extension is activated
  * @param {vscode.ExtensionContext} context
@@ -116,18 +117,40 @@ function executeVercorsCommand() {
     outputChannel.clear();
     // Execute the command and send output to the output channel
     const childProcess = require('child_process');
-    const process = childProcess.spawn(command, args, { shell: true });
-
-    process.stdout.on('data', (data: Buffer | string) => {
+    const vercorsProcess = childProcess.spawn(command, args, { shell: true });
+    vercorsProcessPid = vercorsProcess.pid;
+    vercorsProcess.stdout.on('data', (data: Buffer | string) => {
         outputChannel.appendLine(data.toString());
     });
+    vercorsProcess.on('SIGINT', () => {
+        vercorsProcess.exit(2);
+      });
+
+    vercorsProcess.on('exit', function() {
+        if(vercorsProcess.exitCode === 2){
+            outputChannel.appendLine("Vercors was killed")
+        }
+        vercorsProcessPid = -1;
+      })
+      
     // Show the output channel
     outputChannel.show(vscode.ViewColumn.Three, true); // Change the ViewColumn as needed
 }
 
 function stopVercorsCommand(){
-    vscode.window.showInformationMessage('Stop Vercors!');
-    //TODO: make a stop command
+
+    //TODO: LOOK at vercors again, should be able to exit it cleanly
+
+    if (vercorsProcessPid === -1){ //check if vercors is running
+        vscode.window.showInformationMessage('Vercors is not running');
+        return;
+    }
+    vscode.window.showInformationMessage('Vercors is being closed');
+    process.kill(vercorsProcessPid,'SIGINT')
+
+
+    
+
 }
 
 function setVercorsPath() {
