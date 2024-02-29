@@ -65,6 +65,10 @@
         }
       },
       {
+        "command": "extension.stopVercors",
+        "title": "Stop Vercors"
+      },
+      {
         "command": "extension.setVercorsPath",
         "title": "Set VerCors Path"
       },

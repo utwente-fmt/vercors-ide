@@ -21,12 +21,18 @@ function activate(context: vscode.ExtensionContext) {
         vscode.window.showWarningMessage('VerCors binary path is not set. Please set it to run the tool.');
     }
     // Register the 'extension.runVercors' command
-    let disposable = vscode.commands.registerCommand('extension.runVercors', () => {
+    let disposableStartCommand = vscode.commands.registerCommand('extension.runVercors', () => {
         executeVercorsCommand();
     });
 
+    // Register the 'extension.stopVercors' command
+    let disposableStopCommand = vscode.commands.registerCommand('extension.stopVercors', () => {
+        stopVercorsCommand();
+    });
+
     // Add the disposable to the context so it can be disposed of later
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(disposableStartCommand);
+    context.subscriptions.push(disposableStopCommand);
 
     let disposableSetPath = vscode.commands.registerCommand('extension.setVercorsPath', () => {
         setVercorsPath();
@@ -119,6 +125,10 @@ function executeVercorsCommand() {
     outputChannel.show(vscode.ViewColumn.Three, true); // Change the ViewColumn as needed
 }
 
+function stopVercorsCommand(){
+    vscode.window.showInformationMessage('Stop Vercors!');
+    //TODO: make a stop command
+}
 
 function setVercorsPath() {
     vscode.window.showInputBox({
