@@ -33,8 +33,8 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(message => {
             if (message.command === 'updateOptions') {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-                if (path.extname(filePath!).toLowerCase() !== '.pvl') {
-                    vscode.window.showErrorMessage('The active file is not a .pvl file. Please focus the editor on the PVL file.');
+                if (path.extname(filePath!).toLowerCase() !== '.pvl' && path.extname(filePath!).toLowerCase() !== '.java') {
+                    vscode.window.showErrorMessage('The active file is not a .pvl or .java file. Please focus the editor on a PVL or Java file.');
                     return; // Exit early if the file is not a .pvl
                 }
                 console.log("we have changed the options for this file" + filePath);

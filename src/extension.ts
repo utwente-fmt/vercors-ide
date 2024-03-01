@@ -83,9 +83,9 @@ function executeVercorsCommand() {
     const uri = editor!.document.uri;
     const filePath = uri.fsPath;
 
-    if (path.extname(filePath).toLowerCase() !== '.pvl') {
+    if (path.extname(filePath).toLowerCase() !== '.pvl' && path.extname(filePath).toLowerCase() !== '.java') {
         console.log(filePath);
-        vscode.window.showErrorMessage('The active file is not a .pvl file.');
+        vscode.window.showErrorMessage('The active file is not a .pvl or .java file.');
         return; // Exit early if the file is not a .pvl
     }
 
