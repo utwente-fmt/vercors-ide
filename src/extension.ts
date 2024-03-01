@@ -122,16 +122,11 @@ function executeVercorsCommand() {
     vercorsProcess.stdout.on('data', (data: Buffer | string) => {
         outputChannel.appendLine(data.toString());
     });
-    vercorsProcess.on('SIGINT', () => {
-        vercorsProcess.exit(2);
-      });
 
     vercorsProcess.on('exit', function() {
-        if(vercorsProcess.exitCode === 2){
-            outputChannel.appendLine("Vercors was killed")
-        }
         vercorsProcessPid = -1;
       })
+
       
     // Show the output channel
     outputChannel.show(vscode.ViewColumn.Three, true); // Change the ViewColumn as needed
@@ -145,12 +140,16 @@ function stopVercorsCommand(){
         vscode.window.showInformationMessage('Vercors is not running');
         return;
     }
-    vscode.window.showInformationMessage('Vercors is being closed');
-    process.kill(vercorsProcessPid,'SIGINT')
-
-
     
-
+    var kill = require('tree-kill');
+    kill(vercorsProcessPid, 'SIGINT', function(err: string) {
+        if(err === null){
+            vscode.window.showInformationMessage('Vercors has been succesfully stopped');
+        }
+        else{
+            vscode.window.showInformationMessage('An error occured while trying to stop Vercors: ' + err);
+        }
+    });
 }
 
 function setVercorsPath() {
