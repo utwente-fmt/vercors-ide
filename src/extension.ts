@@ -5,6 +5,7 @@ import * as path from "path";
 
 import { VerCorsPathProvider } from "./settingsView";
 import { VerCorsWebViewProvider } from "./VerCors-CLI-UI";
+import { GoDefinitionProvider } from "./pvlGoToDefinition";
 
 let outputChannel: vscode.OutputChannel;
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence
@@ -195,25 +196,6 @@ const documentLinkProviderDisposable =
     }
   );
 
-//trigger on ctrl-click
-vscode.languages.registerDefinitionProvider("pvl", {
-  provideDefinition(
-    document: vscode.TextDocument,
-    position: vscode.Position,
-    token: vscode.CancellationToken
-  ): Thenable<vscode.Location> {
-    console.log(position);
-    return new Promise((resolve) => {
-      console.log(document);
-      if (vscode.window.activeTextEditor) {
-        const location = new vscode.Location(
-          document.uri,
-          new vscode.Position(3, 3)
-        );
+const provider = new GoDefinitionProvider();
 
-        console.log(location);
-        return resolve(location);
-      }
-    });
-  },
-});
+vscode.languages.registerDefinitionProvider("pvl", provider);
