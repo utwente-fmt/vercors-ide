@@ -1,0 +1,22 @@
+{
+  "scopeName": "java-comment-spec.injection",
+  "injectionSelector": "comment.block",
+  "patterns": [
+    {
+      "include": "#enclosing-ats"
+    }
+  ],
+  "repository": {
+    "enclosing-ats": {
+      "name": "specification",
+      "begin": "@",
+      "end": "@",
+      "patterns": [
+        {
+          "name": "constant.character.escape.untitled",
+          "match": "\\."
+        }
+      ]
+    }
+  }
+}
