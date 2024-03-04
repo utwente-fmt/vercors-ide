@@ -1,6 +1,6 @@
 {
     "scopeName": "source.java.specification",
-    "injectionSelector": "block, line",
+    "injectionSelector": "java-comment-spec.injection",
     "patterns": [
       {
         "name": "keyword.spec",
