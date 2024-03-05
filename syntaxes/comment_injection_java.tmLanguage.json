@@ -8,7 +8,7 @@
   ],
   "repository": {
     "enclosing-ats": {
-      "name": "specification",
+      "name": "specification.injection",
       "begin": "@",
       "end": "@",
       "patterns": [

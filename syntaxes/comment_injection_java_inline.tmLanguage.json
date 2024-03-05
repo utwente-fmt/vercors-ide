@@ -1,0 +1,15 @@
+{
+    "scopeName": "java-comment-spec.injection",
+    "injectionSelector": "L:comment.line.double-slash",
+    "patterns": [
+      {
+        "include": "#single-at"
+      }
+    ],
+    "repository": {
+      "single-at": {
+        "name": "specification.injection",
+        "match": "@"
+      }
+    }
+  }
