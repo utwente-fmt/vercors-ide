@@ -65,6 +65,14 @@
         }
       },
       {
+        "command": "extension.stopVercors",
+        "title": "Stop Vercors",
+        "icon": {
+          "light": "resources\\stop.svg",
+          "dark": "resources\\stop.svg"
+        }
+      },
+      {
         "command": "extension.setVercorsPath",
         "title": "Set VerCors Path"
       },
@@ -102,6 +110,11 @@
           "command": "extension.runVercors",
           "when": "view == vcpView",
           "group": "navigation"
+        },
+        {
+          "command": "extension.stopVercors",
+          "when": "view == vcpView",
+          "group": "navigation"
         }
       ]
     }
@@ -128,6 +141,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@vscode/vsce": "^2.23.0"
+    "@vscode/vsce": "^2.23.0",
+    "tree-kill": "^1.2.2"
   }
 }
