@@ -41,6 +41,9 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 this._vercorsOptionsMap.set(filePath!, message.options);
             }
         });
+
+        const data = await this.fetchCommandLineOptions();
+        this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
     }
 
     private async getHtmlForWebview(webview: vscode.Webview) {
@@ -57,6 +60,12 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
         // Return the HTML content for the webview
         return htmlString;
+    }
+
+    private async fetchCommandLineOptions() {
+        const optionsPath = vscode.Uri.joinPath(this._extensionUri, '/resources/command-line-options.json');
+        const optionsContent = await vscode.workspace.fs.readFile(optionsPath);
+        return JSON.parse(Buffer.from(optionsContent).toString('utf8'));
     }
 
     private updateOption(option: string, value: boolean) {
