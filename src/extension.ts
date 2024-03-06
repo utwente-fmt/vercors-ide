@@ -6,6 +6,7 @@ import * as path from 'path';
 import { VerCorsPathProvider } from './settingsView';
 import { VerCorsWebViewProvider } from './VerCors-CLI-UI';
 import { ChildProcess } from 'child_process';
+import * as fs from "fs";
 
 
 let outputChannel: vscode.OutputChannel;
@@ -100,6 +101,11 @@ function executeVercorsCommand() {
         vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string + path.sep
     ) + "vercors";
 
+    if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
+        vscode.window.showErrorMessage("Could not find VerCors but expected at the given path: " + vercorsPath);
+        return;
+    }
+
     let command = '"' + vercorsPath + '"';
 
     const fileOptions = vercorsOptionsMap.get(filePath);
@@ -123,13 +129,13 @@ function executeVercorsCommand() {
         outputChannel.appendLine(data.toString());
     });
 
-    vercorsProcess.on('exit', function() {
+    vercorsProcess.on('exit', function () {
         vercorsProcessPid = -1;
-      })
+    });
 
       
     // Show the output channel
-    outputChannel.show(vscode.ViewColumn.Three, true); // Change the ViewColumn as needed
+    outputChannel.show(true); // Change the ViewColumn as needed
 }
 
 function stopVercorsCommand(){
@@ -156,9 +162,25 @@ function setVercorsPath() {
     vscode.window.showInputBox({
         prompt: "Enter the path to the VerCors bin directory",
         placeHolder: "C:\\path\\to\\vercors\\bin",
+        value: vscode.workspace.getConfiguration().has('vercorsplugin.vercorsPath')
+            ? vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath')
+            : "",
         validateInput: (text) => {
-            // Optional: Add validation logic here if needed
-            return text.trim().length === 0 ? "Path cannot be empty" : null;
+            let trimmed : string = text.trim();
+            if (trimmed.length === 0) {
+                return "Path cannot be empty";
+            }
+
+            if (!fs.existsSync(trimmed) || !fs.lstatSync(trimmed).isDirectory()) {
+                return "Given path is not a valid directory";
+            }
+
+            let vercorsPath = trimmed + path.sep + "vercors";
+            if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
+                return "Could not find VerCors at the given path";
+            }
+
+            return null;
         }
     }).then((path) => {
         if (path !== undefined) {
