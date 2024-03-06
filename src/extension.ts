@@ -98,6 +98,9 @@ function executeVercorsCommand() {
     const fileOptions = vercorsOptionsMap.get(filePath);
     let inputFile = '"' + filePath + '"';
     let args = fileOptions ? ([inputFile].concat(fileOptions)) : [inputFile];
+    // Always execute in progress & verbose mode for extension features to work.
+    args.push("--progress");
+    args.push("--verbose");
 
     console.log(command);
     console.log(args);
