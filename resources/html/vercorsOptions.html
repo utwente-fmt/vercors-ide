@@ -195,10 +195,13 @@
 
     function generateOptionsString() {
         let optionsString = "";
-        for (const checkbox of document.getElementsByClassName('custom-checkbox')) {
-            if (checkbox.checked) {
+        for (const checkbox of document.getElementsByClassName('checkbox-container')) {
+            if (checkbox.querySelector('input[type="checkbox"]').checked) {
+                console.log("test");
+                const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
+                console.log(args);
                 // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
-                optionsString += `--${checkbox.id} `;
+                optionsString += `--${checkbox.querySelector('input[type="checkbox"]').id} ${args}`;
             }
         }
         return optionsString.trim();
@@ -362,12 +365,10 @@
                 checkbox.addEventListener('change', function () {
                     // Generate the options string
                     const options = generateOptionsString();
-                    const args = null;
                     // Post the message to the extension with the generated string
                     vscode.postMessage({
                         command: 'updateOptions',
-                        options: options,
-                        args: args
+                        options: options
                     });
 
                     // Hide option if it's not pinned and not checked anymore.
@@ -376,6 +377,20 @@
                         parent.classList.remove("show");
                     }
                     updateCategoryHeaders();
+                });
+            });
+
+            // Attach change event listeners to input fields
+            document.querySelectorAll('.argument-input').forEach(checkbox => {
+                checkbox.addEventListener('input', function () {
+                    console.log("triggered!");
+                    // Generate the options string
+                    const options = generateOptionsString();
+                    // Post the message to the extension with the generated string
+                    vscode.postMessage({
+                        command: 'updateOptions',
+                        options: options,
+                    });
                 });
             });
 
