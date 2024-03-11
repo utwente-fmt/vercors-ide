@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="end">
+<head>
+<style>
+    button {
+        background-color: var(--vscode-button-background);
+        color: var(--vscode-button-foreground);
+        border-color: var(--vscode-button-border);
+        border-radius: 0;
+        cursor: pointer;
+        width: 100%;
+    }
+    
+    button:hover {
+        background-color: var(--vscode-button-hoverBackground);
+    }
+</style>
+</head>
+<body>
+    <h1>VerCors Versions</h1>
+    <button id="button">Add VerCors</button>
+    <ul id="path-list">
+    </ul>
+</body>
+<script>
+    (function() {
+        const vscode = acquireVsCodeApi();
+
+        const button = document.getElementById("button");
+        button.addEventListener('click', event => {
+            vscode.postMessage({
+                command: 'select-path'
+            });
+        });
+    }())
+</script>
+</html>

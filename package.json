@@ -93,14 +93,14 @@
     "views": {
       "vercors-plugin": [
         {
-          "id": "vcpView",
-          "name": "Plugin View",
-          "contextualTitle": "VerCors"
+          "id": "vercorsPathView",
+          "name": "VerCors Versions",
+          "type": "webview"
         },
         {
-          "type": "webview",
           "id": "vercorsOptionsView",
-          "name": "Options"
+          "name": "Options",
+          "type": "webview"
         }
       ]
     },
@@ -108,12 +108,12 @@
       "view/title": [
         {
           "command": "extension.runVercors",
-          "when": "view == vcpView",
+          "when": "view == vercorsPathView",
           "group": "navigation"
         },
         {
           "command": "extension.stopVercors",
-          "when": "view == vcpView",
+          "when": "view == vercorsPathView",
           "group": "navigation"
         }
       ]

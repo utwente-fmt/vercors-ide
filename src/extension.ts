@@ -4,7 +4,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { VerCorsPathProvider } from './settingsView';
-import { VerCorsWebViewProvider } from './VerCors-CLI-UI';
+import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './VerCors-CLI-UI';
+import { VerCorsWebViewProvider as VerCorsPathWebViewProvider } from './VerCors-Path-UI';
 import { ChildProcess } from 'child_process';
 import * as fs from "fs";
 
@@ -42,28 +43,31 @@ function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(disposableSetPath);
 
-    const optionsProvider = new VerCorsWebViewProvider(context, vercorsOptionsMap);
+    const optionsProvider = new VerCorsCLIWebViewProvider(context, vercorsOptionsMap);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('vercorsOptionsView', optionsProvider)
     );
-
-    const vercorsPathProvider = new VerCorsPathProvider();
-    vscode.window.registerTreeDataProvider('vcpView', vercorsPathProvider);
-
-    vscode.commands.registerCommand('extension.refreshEntry', () =>
-        vercorsPathProvider.refresh()
-    );
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-            if (editor) {
-                const filePath = editor.document.uri.fsPath;
-                if (path.extname(filePath) === '.pvl') {
-                    console.log("changed active window");
-                    const options = vercorsOptionsMap.get(filePath) || {};
-                    optionsProvider.updateView(options);
-                }
+        if (editor) {
+            const filePath = editor.document.uri.fsPath;
+            if (path.extname(filePath) === '.pvl') {
+                console.log("changed active window");
+                const options = vercorsOptionsMap.get(filePath) || {};
+                optionsProvider.updateView(options);
             }
-        })
+        }
+    }));
+
+    const vercorsPathProvider = new VerCorsPathWebViewProvider(context);
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider('vercorsPathView', vercorsPathProvider)
     );
+
+    // vscode.commands.registerCommand('extension.refreshEntry', () =>
+    //     vercorsPathProvider.refresh()
+    // );
+
+    
     context.subscriptions.push(documentLinkProviderDisposable);
 
 }
