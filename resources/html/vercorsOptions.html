@@ -124,9 +124,11 @@
             vertical-align: middle;
             margin-right: 10px;
             color: white;
+            box-sizing: border-box;
         }
 
         .checkbox-container {
+            box-sizing: border-box;
             margin-bottom: 15px;
             display: none;
             align-items: center;
@@ -139,6 +141,7 @@
             color: #e4e4e4; /* Change font color */
         }
         .checkbox-pin-container {
+            box-sizing: border-box;
             display: none;
             align-items: center;
             margin-left: auto; /* Align pin container to the right */
@@ -151,6 +154,11 @@
             vertical-align: middle;
             margin-right: 10px;
             color: white;
+        }
+        .argument-input {
+            align-items: center;
+            float: right;
+            width: 100px;
         }
         .option-category {
             display: none;
@@ -169,8 +177,8 @@
 </head>
 <body>
     <h1>VerCors Options</h1>
-    <form id="options-form">
-        <div class="checkbox-container" style="display:table;" title="Set the backend to verify with (default: silicon)">
+    <form id="options-form" style="min-width: 350px">
+        <div style="display:table; margin-bottom: 20px;" title="Set the backend to verify with (default: silicon)">
             <span class="backend-label"
                   style="padding-right: 15px; display: table-cell; vertical-align: middle;">Backend: </span>
             <label class="switch btn-color-mode-switch">
@@ -298,10 +306,12 @@
                 for (const [key, value] of Object.entries(options)) {
                     if (value.skip === true) continue;
                     const tooltip = value.description + (value.requirements && value.requirements.length > 0 ? `\nRequires ${value.requirements.toString()}` : ``);
+                    const arguments = value.arguments ? `<input type="text" name="${key}" class="argument-input">` : ``;
                     const content =
                         `<div class="checkbox-container ${category}" title="${tooltip}">
                             <input type="checkbox" id="${key}" name="${key}" class="custom-checkbox">
                             <label for="${key}">${value.name}</label>
+                            ${arguments}
                             <div class="checkbox-pin-container">
                                 <input type="checkbox" id="${key}-pin" name="${key}-pin" class="checkbox-pin">
                                 <label for="${key}-pin">Pin</label>
