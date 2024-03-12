@@ -15,12 +15,13 @@ let vercorsProcessPid = -1;
  * Method called when the extension is activated
  * @param {vscode.ExtensionContext} context
  */
-function activate(context: vscode.ExtensionContext) {
+async function activate(context: vscode.ExtensionContext) {
     // Check if the VerCors path is set
-    const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath');
-    if (!vercorsPath) {
-        vscode.window.showWarningMessage('VerCors binary path is not set. Please set it to run the tool.');
+    const vercorsPaths = await VerCorsPaths.getPathList();
+    if (!vercorsPaths.length) {
+        vscode.window.showWarningMessage('No VerCors binary paths are provided. Please provide one to run the tool.');
     }
+
     // Register the 'extension.runVercors' command
     let disposableStartCommand = vscode.commands.registerCommand('extension.runVercors', () => {
         executeVercorsCommand();
