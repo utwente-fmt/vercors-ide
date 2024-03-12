@@ -14,11 +14,61 @@
     button:hover {
         background-color: var(--vscode-button-hoverBackground);
     }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        width: 100%;
+    }
+
+    .option {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 2px 5px;
+        margin: 0;
+        background-color: var(--vscode-button-secondaryBackground);
+        color: var(--vscode-button-secondaryForeground);
+    }
+
+    .option:hover {
+        background-color: var(--vscode-button-secondaryHoverBackground);
+    }
+
+    .option--path {
+        padding: 5px;
+        overflow-wrap: break-word;
+    }
+
+    .option--button {
+        font-size: 15px;
+        color: var(--vscode-button-secondaryForeground);
+        height: 25px;
+        width: 25px;
+        display: flex;
+        flex-grow: 0;
+        flex-shrink: 0;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .option--button:hover {
+        color: #f43131;
+    }
+
+    .selected, .selected:hover {
+        background-color: rgb(86, 127, 86);
+    }
+
 </style>
 </head>
 <body>
-    <h1>VerCors Versions</h1>
-    <button id="button">Add VerCors</button>
+    <button id="button">Add VerCors Version</button>
     <ul id="path-list">
     </ul>
 </body>
@@ -26,12 +76,60 @@
     (function() {
         const vscode = acquireVsCodeApi();
 
+        const pathList = document.getElementById("path-list");
+
         const button = document.getElementById("button");
         button.addEventListener('click', event => {
-            vscode.postMessage({
-                command: 'select-path'
-            });
+            vscode.postMessage({command: 'add-path'});
         });
+
+        window.addEventListener('message', event => {
+            const message = event.data;
+
+            switch (message.command) {
+                case 'add-paths':
+                    addPaths(message.paths);
+                    break;
+            }
+        });
+
+        function addPaths(paths) {
+            pathList.innerHTML = '';
+            paths.forEach(addPath);
+            Array.from(document.getElementsByClassName("option--button")).forEach(button => {
+                button.addEventListener('click', function(event) {
+                    path = this.parentElement.getAttribute("title");
+                    vscode.postMessage({command: 'remove', path: path});
+                });
+            });
+            Array.from(document.getElementsByClassName("option")).forEach(option => {
+                option.addEventListener('click', function(event) {
+                    if (event.target !== this && !event.target.classList.contains("option--path")) {
+                        return;
+                    }
+                    path = this.getAttribute("title");
+                    vscode.postMessage({command: 'select', path: path});
+                })
+            })
+        }
+
+        function addPath(entry) {
+            const element = createPathListElement(entry);
+            pathList.insertAdjacentHTML('beforeend', element);
+        }
+
+        function createPathListElement(entry) {
+            path = entry[0]
+            selected = entry[1] ? "selected" : "";
+            split = path.split("\\");
+            short = '.../' + split.slice(split.length-3, split.length).join('/');
+            return `<li title="${path}" class="option ${selected}">
+                <div class="option--button" title="Remove"><span class="option--button--icon">✕</span></div>
+                <div class="option--path">${short}</div>
+            </li>`;
+        }
+
+        vscode.postMessage({command: 'ready'});
     }())
 </script>
 </html>

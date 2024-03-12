@@ -14,11 +14,12 @@
     "configuration": {
       "properties": {
         "vercorsplugin.vercorsPath": {
-          "type": "string",
-          "description": "Path to the VerCors bin directory"
+          "type": ["object", "null"],
+          "default": {},
+          "description": "Paths to the VerCors bin directory"
         },
         "vercorsplugin.optionsMap": {
-          "type": "Map<String, String>",
+          "type": ["object", "null"],
           "default": {},
           "description": "Options map for my extension."
         }

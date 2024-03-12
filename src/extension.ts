@@ -19,7 +19,7 @@ let vercorsProcessPid = -1;
  */
 function activate(context: vscode.ExtensionContext) {
     // Check if the VerCors path is set
-    const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string;
+    const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath');
     if (!vercorsPath) {
         vscode.window.showWarningMessage('VerCors binary path is not set. Please set it to run the tool.');
     }
@@ -37,11 +37,11 @@ function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposableStartCommand);
     context.subscriptions.push(disposableStopCommand);
 
-    let disposableSetPath = vscode.commands.registerCommand('extension.setVercorsPath', () => {
-        setVercorsPath();
-    });
+    // let disposableSetPath = vscode.commands.registerCommand('extension.setVercorsPath', () => {
+    //     setVercorsPath();
+    // });
 
-    context.subscriptions.push(disposableSetPath);
+    // context.subscriptions.push(disposableSetPath);
 
     const optionsProvider = new VerCorsCLIWebViewProvider(context, vercorsOptionsMap);
     context.subscriptions.push(
@@ -101,9 +101,29 @@ function executeVercorsCommand() {
         return; // Exit early if the file is not a .pvl
     }
 
-    const vercorsPath = path.normalize(
-        vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string + path.sep
-    ) + "vercors";
+    const vercorsPaths = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as Object;
+    if (!vercorsPaths) {
+        vscode.window.showErrorMessage("No VerCors paths have been specified yet");
+        return;
+    }
+
+    console.log(Object.entries(vercorsPaths));
+
+    let binPath;
+
+    for (let [p, selected] of Object.entries(vercorsPaths)) {
+        if (selected) {
+            binPath = p;
+            break;
+        }
+    }
+
+    if (!binPath) {
+        vscode.window.showErrorMessage("No VerCors path has been selected");
+        return;
+    }
+
+    const vercorsPath = path.normalize(binPath + path.sep) + "vercors";
 
     if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
         vscode.window.showErrorMessage("Could not find VerCors but expected at the given path: " + vercorsPath);
@@ -162,36 +182,36 @@ function stopVercorsCommand(){
     });
 }
 
-function setVercorsPath() {
-    vscode.window.showInputBox({
-        prompt: "Enter the path to the VerCors bin directory",
-        placeHolder: "C:\\path\\to\\vercors\\bin",
-        value: vscode.workspace.getConfiguration().has('vercorsplugin.vercorsPath')
-            ? vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath')
-            : "",
-        validateInput: (text) => {
-            let trimmed : string = text.trim();
-            if (trimmed.length === 0) {
-                return "Path cannot be empty";
-            }
+// function setVercorsPath() {
+//     vscode.window.showInputBox({
+//         prompt: "Enter the path to the VerCors bin directory",
+//         placeHolder: "C:\\path\\to\\vercors\\bin",
+//         value: vscode.workspace.getConfiguration().has('vercorsplugin.vercorsPath')
+//             ? vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath')
+//             : "",
+//         validateInput: (text) => {
+//             let trimmed : string = text.trim();
+//             if (trimmed.length === 0) {
+//                 return "Path cannot be empty";
+//             }
 
-            if (!fs.existsSync(trimmed) || !fs.lstatSync(trimmed).isDirectory()) {
-                return "Given path is not a valid directory";
-            }
+//             if (!fs.existsSync(trimmed) || !fs.lstatSync(trimmed).isDirectory()) {
+//                 return "Given path is not a valid directory";
+//             }
 
-            let vercorsPath = trimmed + path.sep + "vercors";
-            if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
-                return "Could not find VerCors at the given path";
-            }
+//             let vercorsPath = trimmed + path.sep + "vercors";
+//             if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
+//                 return "Could not find VerCors at the given path";
+//             }
 
-            return null;
-        }
-    }).then((path) => {
-        if (path !== undefined) {
-            vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', path, true);
-        }
-    });
-}
+//             return null;
+//         }
+//     }).then((path) => {
+//         if (path !== undefined) {
+//             vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', path, true);
+//         }
+//     });
+// }
 
 const documentLinkProviderDisposable = vscode.languages.registerDocumentLinkProvider(
     { language: "vercors-output" }, // Use the language ID
