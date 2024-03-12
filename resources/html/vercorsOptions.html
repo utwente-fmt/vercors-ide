@@ -119,17 +119,17 @@
         /*checkbox styles*/
         .custom-checkbox {
             /* Adjust width and height as needed */
-            width: 15px;
-            height: 15px;
+            width: 21px;
+            height: 21px;
             vertical-align: middle;
-            margin-right: 10px;
+            margin-right: 5px;
             color: white;
             box-sizing: border-box;
         }
 
         .checkbox-container {
             box-sizing: border-box;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             display: none;
             align-items: center;
             cursor: pointer;
@@ -140,6 +140,9 @@
             align-items: center;
             width: 100%;
             height: 100%;
+        }
+        .input-label {
+            user-select: none;
         }
 
         .custom-checkbox:checked {
@@ -155,10 +158,10 @@
             color: #ffffff;
         }
         .checkbox-pin {
-            width: 15px;
-            height: 15px;
+            width: 21px;
+            height: 21px;
             vertical-align: middle;
-            margin-right: 10px;
+            margin-right: 5px;
             color: white;
         }
         .argument-input {
@@ -175,6 +178,16 @@
         .showAll {
             display: flex !important;
         }
+        #edit-options-button {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border-color: var(--vscode-button-border);
+            border-radius: 0;
+            cursor: pointer;
+            width: calc(100% - 20px);
+            margin: 0 10px;
+            padding: 5px;
+        }
     </style>
     <meta charset="UTF-8">
     <title>VerCors Options</title>
@@ -182,8 +195,8 @@
 </head>
 <body>
     <h1>VerCors Options</h1>
-    <form id="options-form" style="min-width: 350px">
-        <div style="display:table; margin-bottom: 20px;" title="Set the backend to verify with (default: silicon)">
+    <form id="options-form" style="min-width: 355px">
+        <div style="display:table; margin-bottom: 15px;" title="Set the backend to verify with (default: silicon)">
             <span class="backend-label"
                   style="padding-right: 15px; display: table-cell; vertical-align: middle;">Backend: </span>
             <label class="switch btn-color-mode-switch">
@@ -197,6 +210,7 @@
 <script>
 
     const vscode = acquireVsCodeApi();
+    let loaded = false;
 
     function generateOptionsString() {
         let optionsString = "";
@@ -244,6 +258,7 @@
      * Toggle visibility of all category headings, their options and their respective pin checkboxes.
      */
     function toggleAllOptions(button) {
+        if (!loaded) return
         const checkboxes = document.querySelectorAll(".checkbox-container");
         const isHideOptions = button.textContent === "Hide options";
 
@@ -324,17 +339,18 @@
                         `<div class="checkbox-container ${category}" title="${tooltip}">
                             <div class="option-container">
                                 <input type="checkbox" id="${key}" name="${key}" class="custom-checkbox">
-                                <label for="${key}">${value.name}</label>
+                                <label class="input-label" for="${key}">${value.name}</label>
                             </div>
                             ${arguments}
                             <div class="checkbox-pin-container">
                                 <input type="checkbox" id="${key}-pin" name="${key}-pin" class="checkbox-pin">
-                                <label for="${key}-pin">Pin</label>
+                                <label class="input-label" for="${key}-pin">Pin</label>
                             </div>
                         </div>`;
                     form.innerHTML += content;
                 }
             }
+            loaded = true;
 
             // Attach listener for clicks on the entire checkbox container for convenience
             document.querySelectorAll('.option-container').forEach(container => {
