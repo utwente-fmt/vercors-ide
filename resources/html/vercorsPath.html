@@ -9,6 +9,7 @@
         border-radius: 0;
         cursor: pointer;
         width: 100%;
+        min-height: 30px;
     }
     
     button:hover {
@@ -121,7 +122,8 @@
         function createPathListElement(entry) {
             path = entry[0]
             selected = entry[1] ? "selected" : "";
-            split = path.split("\\");
+            split = path.split(/(?:\\|\/)/);
+            console.log(split);
             short = '.../' + split.slice(split.length-3, split.length).join('/');
             return `<li title="${path}" class="option ${selected}">
                 <div class="option--button" title="Remove"><span class="option--button--icon">✕</span></div>
