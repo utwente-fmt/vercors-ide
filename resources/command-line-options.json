@@ -2,28 +2,23 @@
   "General" : {
     "help": {
       "name": "Help",
-      "description": "Prints this usage text",
-      "skip": true
+      "description": "Prints this usage text"
     },
     "help-hidden": {
       "name": "Help Hidden",
-      "description": "Show hidden options (intended for VerCors experts, proceed with caution!)",
-      "skip": true
+      "description": "Show hidden options (intended for VerCors experts, proceed with caution!)"
     },
     "version": {
       "name": "Version",
-      "description": "Prints version and build information",
-      "skip": true
+      "description": "Prints version and build information"
     },
     "help-passes": {
       "name": "Help Passes",
-      "description": "Lists the pass keys available for options that take a pass key.",
-      "skip": true
+      "description": "Lists the pass keys available for options that take a pass key."
     },
     "quiet": {
       "name": "Quiet Mode",
-      "description": "Instruct VerCors to only log errors.",
-      "skip": true
+      "description": "Instruct VerCors to only log errors."
     }
   },
 
@@ -39,8 +34,9 @@
     },
     "lang": {
       "name": "Language",
-      "description": "{silver|pvl|llvm|i|java|c|systemc} Do not detect the language from the file extension, but force a specific language parser for all files",
-      "arguments": true
+      "description": "{silver, pvl, llvm, i, java, c, systemc} Do not detect the language from the file extension, but force a specific language parser for all files",
+      "pinned": true,
+      "arguments": "silver, pvl, llvm, i, java, c, systemc"
     },
     "backend-file-base": {
       "name": "Backend File Base",
@@ -53,17 +49,17 @@
     "output-after-pass": {
       "name": "Output After Pass",
       "description": "<pass>=<path> Print the AST after a pass key",
-      "arguments": true
+      "arguments": "<pass>=<path>"
     },
     "output-before-pass": {
       "name": "Output Before Pass",
       "description": "<pass>=<path> Print the AST before a pass key",
-      "arguments": true
+      "arguments": "<pass>=<path>"
     },
     "backend-option": {
       "name": "Custom Flags",
       "description": "Provide custom flags to Viper",
-      "arguments": true
+      "arguments": "custom flags"
     },
     "skip-backend": {
       "name": "Skip Backend",
@@ -76,17 +72,17 @@
     "skip-translation-after ": {
       "name": "Skip Translation",
       "description": "<pass> Stop VerCors successfully after executing the transformation pass with the supplied key",
-      "arguments": true
+      "arguments": "<pass>"
     },
     "skip-pass": {
       "name": "Skip Pass",
       "description": "<pass> Skip the passes that have the supplied keys",
-      "arguments": true
+      "arguments": "<pass>"
     },
     "silicon-print-quantifier-stats": {
       "name": "Print Quantifier Stats",
       "description": "<amount> Print quantifier instantiation statistics from Z3 via silicon, every <amount> instantiations, every 5 seconds. \nImplies --dev-silicon-num-verifiers 1",
-      "arguments": true,
+      "arguments": "<amount>",
       "requirements": ["backend=silicon", "dev-silicon-num-verifiers=1"]
     },
     "silicon-quiet": {
@@ -97,37 +93,37 @@
     "bip-report-file": {
       "name": "JavaBIP report",
       "description": "<path> Write JavaBIP verification report to file, or standard out if \"-\" is used",
-      "arguments": true
+      "arguments": "<path>"
     },
     "c-define": {
       "name": "-D Options",
       "description": "<macro>=<defn>,... Pass -D options to the C preprocessor",
-      "arguments": true
+      "arguments": "<macro>=<defn>,..."
     },
     "paths-simplify": {
       "name": "Simplify paths",
       "description": "<simplify.pvl>,... Specify a chain of files to use that contain axiomatic simplification rules",
-      "arguments": true
+      "arguments": "<simplify.pvl>,..."
     },
     "paths-simplify-after-relations": {
       "name": "Simplify Path after relations",
       "description": "<simplify.pvl>,... Specify a chain of files to use the contain axiomatic simplification rules, which will be applied after quantified integer relations are simplified",
-      "arguments": true
+      "arguments": "<simplify.pvl>,..."
     },
     "path-adt": {
       "name": "ADT Path",
       "description": "<path> Use a custom directory that contains definitions for all internal types encoded as axiomatic datatypes (array, option, any, etc.)",
-      "arguments": true
+      "arguments": "<path>"
     },
     "path-cc": {
       "name": "C compiler path",
       "description": "<path> Set the C compiler to use for preprocessing",
-      "arguments": true
+      "arguments": "<path>"
     },
     "path-c-system": {
       "name": "System Headers path",
       "description": "<path> Set the include path for system headers (-isystem)",
-      "arguments": true
+      "arguments": "<path>"
     },
     "no-std-class-path": {
       "name": "No STD class path",
@@ -136,22 +132,22 @@
     "class-path": {
       "name": "Class path",
       "description": "<path>|@jre|@source Add an entry to the sources class path",
-      "arguments": true
+      "arguments": "<path>|@jre|@source"
     },
     "path-z3": {
       "name": "Z3 path",
       "description": "<path> Set the location of the z3 binary",
-      "arguments": true
+      "arguments": "<path>"
     },
     "path-boogie": {
       "name": "Bookie path",
       "description": "<path> Set the location of the boogie binary",
-      "arguments": true
+      "arguments": "<path>"
     },
     "path-c-preprocessor": {
       "name": "C Preprocessor path",
       "description": "<path> Set the location of the C preprocessor binary",
-      "arguments": true
+      "arguments": "<path>"
     }
   },
   "VeyMont" : {
@@ -162,7 +158,7 @@
     "veymont-output": {
       "name": "Output path",
       "description": "<path> Output path for VeyMont",
-      "arguments": true,
+      "arguments": "<path>",
       "requirements": ["veymont"]
     }
   },
@@ -175,27 +171,27 @@
     "test-dir": {
       "name": "Testing Directory",
       "description": "<path> The directory from which to run all tests",
-      "arguments": true
+      "arguments": "<path>"
     },
     "test-filter-backend": {
       "name": "Filter Backend",
       "description": "<backend>,...",
-      "arguments": true
+      "arguments": "<backend>,..."
     },
     "test-filter-include-suite": {
       "name": "Filter include suites",
       "description": "<suite>,...",
-      "arguments": true
+      "arguments": "<suite>,..."
     },
     "test-filter-exclude-suite": {
       "name": "Filter exclude suites",
       "description": "<suite>,...",
-      "arguments": true
+      "arguments": "<suite>,..."
     },
     "test-workers": {
       "name": "Workers #",
       "description": "<value> Number of threads to start to run tests (default: 1)",
-      "arguments": true
+      "arguments": "<value>"
     },
     "test-coverage": {
       "name": "Coverage report",

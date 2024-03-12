@@ -30,7 +30,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.html = await this.getHtmlForWebview(webviewView.webview);
 
         // Handle messages from the webview
-        webviewView.webview.onDidReceiveMessage(message => {
+        webviewView.webview.onDidReceiveMessage(async message => {
             if (message.command === 'updateOptions') {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
                 if (path.extname(filePath!).toLowerCase() !== '.pvl') {
@@ -39,11 +39,11 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 }
                 console.log("we have changed the options for this file" + filePath);
                 this._vercorsOptionsMap.set(filePath!, message.options);
+            } else if (message.command === 'viewLoaded') {
+                const data = await this.fetchCommandLineOptions();
+                this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
             }
         });
-
-        const data = await this.fetchCommandLineOptions();
-        this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
     }
 
     private async getHtmlForWebview(webview: vscode.Webview) {

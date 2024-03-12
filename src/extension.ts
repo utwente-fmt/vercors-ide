@@ -83,6 +83,7 @@ function executeVercorsCommand() {
     const uri = editor!.document.uri;
     const filePath = uri.fsPath;
 
+    // TODO: bypass this if --language is enabled
     if (path.extname(filePath).toLowerCase() !== '.pvl') {
         console.log(filePath);
         vscode.window.showErrorMessage('The active file is not a .pvl file.');
