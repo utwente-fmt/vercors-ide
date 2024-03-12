@@ -133,6 +133,7 @@
     }
 
 </style>
+    <title></title>
 </head>
 <body>
     <button id="button">Add VerCors Version</button>
@@ -150,7 +151,7 @@
         const loading = document.getElementById("loading");
 
         const button = document.getElementById("button");
-        button.addEventListener('click', event => {
+        button.addEventListener('click', () => {
             vscode.postMessage({command: 'add-path'});
         });
 
@@ -178,8 +179,8 @@
             paths.forEach(entry => addPath(entry, versionSet));
 
             Array.from(document.getElementsByClassName("option--button")).forEach(button => {
-                button.addEventListener('click', function(event) {
-                    path = this.parentElement.getAttribute("title");
+                button.addEventListener('click', function() {
+                    const path = this.parentElement.getAttribute("title");
                     vscode.postMessage({command: 'remove', path: path});
                 });
             });
@@ -189,7 +190,7 @@
                     if (event.target !== this && !event.target.classList.contains("option--path")) {
                         return;
                     }
-                    path = this.getAttribute("title");
+                    const path = this.getAttribute("title");
                     vscode.postMessage({command: 'select', path: path});
                 })
             })
@@ -201,13 +202,13 @@
         }
 
         function createPathListElement(entry, versionSet) {
-            path = entry.path;
-            selected = entry.selected ? "selected" : "";
+            const path = entry.path;
+            const selected = entry.selected ? "selected" : "";
 
             let displayedPath;
             if (versionSet.has(entry.version)) {
-                split = path.split(/(?:\\|\/)/);
-                shortPath = '.../' + split.slice(split.length-3, split.length).join('/');
+                const split = path.split(/(?:\\|\/)/);
+                const shortPath = '.../' + split.slice(split.length-3, split.length).join('/');
                 displayedPath = `<br>${shortPath}`;
             } else {
                 displayedPath = '';
