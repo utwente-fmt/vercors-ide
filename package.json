@@ -14,8 +14,8 @@
     "configuration": {
       "properties": {
         "vercorsplugin.vercorsPath": {
-          "type": ["object", "null"],
-          "default": {},
+          "type": ["array", "null"],
+          "default": [],
           "description": "Paths to the VerCors bin directory"
         },
         "vercorsplugin.optionsMap": {

@@ -2,6 +2,28 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import path from 'path';
 
+type VercorsPath = {
+    path: string,
+    version: string,
+    selected: boolean
+};
+
+export class VerCorsPaths {
+
+    public static async getPathList() : Promise<VercorsPath[]> {
+        const vercorsPaths = await vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as VercorsPath[];
+        if (!vercorsPaths) { // if null
+            return [];
+        }
+        return vercorsPaths;
+    }
+
+    public static async storePathList(vercorsPaths : VercorsPath[]) : Promise<void> {
+        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', vercorsPaths, true);
+    }
+
+}
+
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
 
@@ -25,7 +47,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
             enableScripts: true
         };
 
-        webviewView.webview.html = await this.getHtmlForWebview(webviewView.webview);
+        webviewView.webview.html = await this.getHtmlForWebview();
 
         webviewView.webview.onDidReceiveMessage(
             message => {
@@ -35,7 +57,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                         break;
                     case 'add-path':
                         // Open folder dialog
-                        this.selectNewVercorsPath()
+                        this.selectNewVercorsPath(webviewView.webview)
                             .then(path => {
                                 if (path) {
                                     this.sendPathsToWebview(webviewView.webview);
@@ -62,7 +84,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     }
 
     private async sendPathsToWebview(webview : vscode.Webview) {
-        this.getVercorsPaths()
+        VerCorsPaths.getPathList()
             .then(paths => {
                 webview.postMessage({
                     command: 'add-paths',
@@ -72,25 +94,24 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     }
 
     private async deleteVercorsPath(path : string) : Promise<void> {
-        const vercorsPaths = await this.getPathsMap();
-        vercorsPaths.delete(path);
-        await this.storePathsMap(vercorsPaths);
+        let vercorsPaths = await VerCorsPaths.getPathList();
+        vercorsPaths = vercorsPaths.filter(vercorsPath => vercorsPath.path !== path);
+        await VerCorsPaths.storePathList(vercorsPaths);
     }
 
     private async selectVercorsPath(path : string) : Promise<void> {
-        const vercorsPaths = await this.getPathsMap();
-        if (!vercorsPaths.has(path)) {
-            return;
-        }
-        const newMap = new Map<string, boolean>();
-        for (let key of vercorsPaths.keys()) {
-            newMap.set(key, false);
-        }
-        newMap.set(path, true);
-        await this.storePathsMap(newMap);
+        const vercorsPaths = await VerCorsPaths.getPathList();
+        vercorsPaths.forEach(vercorsPath => {
+            if (vercorsPath.path === path) {
+                vercorsPath.selected = true;
+            } else {
+                vercorsPath.selected = false;
+            }
+        });
+        await VerCorsPaths.storePathList(vercorsPaths);
     }
 
-    private async selectNewVercorsPath() : Promise<[string, boolean] | undefined> {
+    private async selectNewVercorsPath(webview : vscode.Webview) : Promise<VercorsPath | undefined> {
         return vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,
@@ -101,30 +122,40 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 return;
             }
 
-            let binPath = folderUri![0].fsPath;
-            let vercorsPath = binPath + path.sep + "vercors";
+            const binPath = folderUri![0].fsPath;
+            const vercorsPath = binPath + path.sep + "vercors";
             if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
                 vscode.window.showErrorMessage("Could not find VerCors at the given path");
                 return;
             }
 
-            const vercorsPaths = await this.getPathsMap();
-            if (vercorsPaths.has(binPath)) {
+            const vercorsPaths = await VerCorsPaths.getPathList();
+            if (vercorsPaths.find(vercorsPath => vercorsPath.path === binPath)) {
                 vscode.window.showWarningMessage("VerCors version already added");
                 return;
             }
-            vercorsPaths.set(binPath, false);
-            await this.storePathsMap(vercorsPaths);
 
-            return [binPath, false];
+            webview.postMessage({command: 'loading'});
+
+            const version = await this.getVercorsVersion(vercorsPath);
+            if (!version) {
+                webview.postMessage({command: 'cancel-loading'});
+                return;
+            }
+
+            const pathObject = {
+                path: binPath,
+                version: version,
+                selected: false
+            };
+            vercorsPaths.push(pathObject);
+            await VerCorsPaths.storePathList(vercorsPaths);
+
+            return pathObject;
         });
     }
 
-    private async getVercorsPaths() : Promise<[string, boolean][]> {
-        return Array.of(...(await this.getPathsMap()).entries());
-    }
-
-    private async getHtmlForWebview(webview: vscode.Webview) : Promise<string> {
+    private async getHtmlForWebview() : Promise<string> {
         // Use a path relative to the extension's installation directory
         const htmlPath = vscode.Uri.joinPath(this._extensionUri, '/resources/html/vercorsPath.html');
 
@@ -140,18 +171,32 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         return htmlString;
     }
 
-    private async getPathsMap() : Promise<Map<string, boolean>> {
-        let vercorsPathsObject = await vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as Object;
-        if (!vercorsPathsObject) { // if null
-            return new Map<string, boolean>();
-        } else {
-            return new Map<string, boolean>(Object.entries(vercorsPathsObject));
-        }
-    }
+    private async getVercorsVersion(vercorsExecutablePath : string) : Promise<string | undefined> {
+        return new Promise<string>((resolve, reject) => {
+            try {
+                const childProcess = require('child_process');
+                let command = '"' + vercorsExecutablePath + '"';
+                const vercorsProcess = childProcess.spawn(command, ["--version"], { shell: true });
 
-    private async storePathsMap(vercorsPaths : Map<string, boolean>) : Promise<void> {
-        let vercorsPathsObject = Object.fromEntries(vercorsPaths.entries());
-        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', vercorsPathsObject, true);
+                vercorsProcess.stdout.on('data', (data: Buffer | string) => {
+                    const str = data.toString();
+                    if (str.startsWith("Vercors")) {
+                        // remove newlines
+                        resolve(str.replace(/(\r\n|\n|\r)/gm, ""));
+                    }
+                });
+
+                vercorsProcess.stderr.on('data', (data: Buffer | string) => {
+                    reject(data.toString());
+                });
+            } catch (_e) {
+                reject(_e);
+            }
+        })
+        .catch(reason => {
+            vscode.window.showErrorMessage(reason.toString());
+            return undefined;
+        });
     }
     
 }

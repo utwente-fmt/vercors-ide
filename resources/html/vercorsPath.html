@@ -5,8 +5,7 @@
     button {
         background-color: var(--vscode-button-background);
         color: var(--vscode-button-foreground);
-        border-color: var(--vscode-button-border);
-        border-radius: 0;
+        border: none;
         cursor: pointer;
         width: 100%;
         min-height: 30px;
@@ -25,12 +24,12 @@
     .option {
         cursor: pointer;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         width: 100%;
         box-sizing: border-box;
-        padding: 2px 5px;
-        margin: 0;
+        padding: 0;
+        margin: 0 0 1px 0;
         background-color: var(--vscode-button-secondaryBackground);
         color: var(--vscode-button-secondaryForeground);
     }
@@ -39,9 +38,9 @@
         background-color: var(--vscode-button-secondaryHoverBackground);
     }
 
-    .option--path {
-        padding: 5px;
-        overflow-wrap: break-word;
+    .option--content {
+        padding: 5px 5px 5px 0;
+        word-break: break-all;
     }
 
     .option--button {
@@ -62,8 +61,75 @@
         color: #f43131;
     }
 
+    .option--version {
+        font-weight: bold;
+        color: var(--vscode-foreground);
+    }
+
+    .option--path {
+        color: var(--vscode-descriptionForeground);
+    }
+
     .selected, .selected:hover {
-        background-color: rgb(86, 127, 86);
+        outline: 1px solid var(--vscode-button-background);
+    }
+
+    /* LOADING SPINNER */
+
+    .lds-ellipsis {
+        margin: 0 auto;
+        position: relative;
+        width: 40px;
+        height: 20px;
+    }
+    .lds-ellipsis div {
+        position: absolute;
+        top: 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--vscode-descriptionForeground);
+        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+    }
+    .lds-ellipsis div:nth-child(1) {
+        left: 4px;
+        animation: lds-ellipsis1 0.6s infinite;
+    }
+    .lds-ellipsis div:nth-child(2) {
+        left: 4px;
+        animation: lds-ellipsis2 0.6s infinite;
+    }
+    .lds-ellipsis div:nth-child(3) {
+        left: 16px;
+        animation: lds-ellipsis2 0.6s infinite;
+    }
+    .lds-ellipsis div:nth-child(4) {
+        left: 28px;
+        animation: lds-ellipsis3 0.6s infinite;
+    }
+    @keyframes lds-ellipsis1 {
+        0% {
+            transform: scale(0);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    @keyframes lds-ellipsis3 {
+        0% {
+            transform: scale(1);
+        }
+        100% {
+            transform: scale(0);
+        }
+    }
+    @keyframes lds-ellipsis2 {
+        0% {
+            transform: translate(0, 0);
+        }
+        100% {
+            transform: translate(12px, 0);
+        }
     }
 
 </style>
@@ -72,12 +138,16 @@
     <button id="button">Add VerCors Version</button>
     <ul id="path-list">
     </ul>
+    <div id="loading" style="display:none;">
+        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    </div>
 </body>
 <script>
     (function() {
         const vscode = acquireVsCodeApi();
 
         const pathList = document.getElementById("path-list");
+        const loading = document.getElementById("loading");
 
         const button = document.getElementById("button");
         button.addEventListener('click', event => {
@@ -89,20 +159,31 @@
 
             switch (message.command) {
                 case 'add-paths':
+                    stopLoading();
                     addPaths(message.paths);
+                    break;
+                case 'loading':
+                    startLoading();
+                    break;
+                case 'cancel-loading':
+                    stopLoading();
                     break;
             }
         });
 
         function addPaths(paths) {
             pathList.innerHTML = '';
-            paths.forEach(addPath);
+            const versionList = paths.map((entry) => entry.version);
+            const versionSet = getDuplicates(versionList);
+            paths.forEach(entry => addPath(entry, versionSet));
+
             Array.from(document.getElementsByClassName("option--button")).forEach(button => {
                 button.addEventListener('click', function(event) {
                     path = this.parentElement.getAttribute("title");
                     vscode.postMessage({command: 'remove', path: path});
                 });
             });
+
             Array.from(document.getElementsByClassName("option")).forEach(option => {
                 option.addEventListener('click', function(event) {
                     if (event.target !== this && !event.target.classList.contains("option--path")) {
@@ -114,21 +195,46 @@
             })
         }
 
-        function addPath(entry) {
-            const element = createPathListElement(entry);
+        function addPath(entry, versionSet) {
+            const element = createPathListElement(entry, versionSet);
             pathList.insertAdjacentHTML('beforeend', element);
         }
 
-        function createPathListElement(entry) {
-            path = entry[0]
-            selected = entry[1] ? "selected" : "";
-            split = path.split(/(?:\\|\/)/);
-            console.log(split);
-            short = '.../' + split.slice(split.length-3, split.length).join('/');
+        function createPathListElement(entry, versionSet) {
+            path = entry.path;
+            selected = entry.selected ? "selected" : "";
+
+            let displayedPath;
+            if (versionSet.has(entry.version)) {
+                split = path.split(/(?:\\|\/)/);
+                shortPath = '.../' + split.slice(split.length-3, split.length).join('/');
+                displayedPath = `<br>${shortPath}`;
+            } else {
+                displayedPath = '';
+            }
+            
             return `<li title="${path}" class="option ${selected}">
                 <div class="option--button" title="Remove"><span class="option--button--icon">✕</span></div>
-                <div class="option--path">${short}</div>
+                <div class="option--content">
+                    <span class="option--version">${entry.version}</span>
+                    <span class="option--path">${displayedPath}</span>
+                </div>
             </li>`;
+        }
+
+        function startLoading() {
+            loading.style.display = "block";
+        }
+
+        function stopLoading() {
+            loading.style.display = "none";
+        }
+
+        function getDuplicates(list) {
+            const d = list.reduce((result, value) => ({...result,
+                [value]: (result[value] || 0) + 1
+            }), {});
+            return new Set(Object.keys(d).filter(i => d[i] > 1));
         }
 
         vscode.postMessage({command: 'ready'});
