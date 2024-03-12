@@ -106,7 +106,7 @@ async function executeVercorsCommand() {
     }
 
     // remove possible double backslash
-    const vercorsPath = path.normalize(binPath + path.sep) + "vercors";
+    const vercorsPath = path.normalize(binPath.path + path.sep) + "vercors";
 
     if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
         vscode.window.showErrorMessage("Could not find VerCors but expected at the given path: " + vercorsPath);
