@@ -141,7 +141,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 const pathObject = {
                     path: binPath,
                     version: version,
-                    selected: false
+                    selected: vercorsPaths.length === 0
                 };
                 vercorsPaths.push(pathObject);
                 await VerCorsPaths.storePathList(vercorsPaths);
