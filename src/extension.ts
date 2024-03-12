@@ -5,11 +5,13 @@ import * as path from 'path';
 
 import { VerCorsPathProvider } from './settingsView';
 import { VerCorsWebViewProvider } from './VerCors-CLI-UI';
+import { ChildProcess } from 'child_process';
+import * as fs from "fs";
 
 
 let outputChannel: vscode.OutputChannel;
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
-
+let vercorsProcessPid = -1;
 /**
  * Method called when the extension is activated
  * @param {vscode.ExtensionContext} context
@@ -21,12 +23,18 @@ function activate(context: vscode.ExtensionContext) {
         vscode.window.showWarningMessage('VerCors binary path is not set. Please set it to run the tool.');
     }
     // Register the 'extension.runVercors' command
-    let disposable = vscode.commands.registerCommand('extension.runVercors', () => {
+    let disposableStartCommand = vscode.commands.registerCommand('extension.runVercors', () => {
         executeVercorsCommand();
     });
 
+    // Register the 'extension.stopVercors' command
+    let disposableStopCommand = vscode.commands.registerCommand('extension.stopVercors', () => {
+        stopVercorsCommand();
+    });
+
     // Add the disposable to the context so it can be disposed of later
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(disposableStartCommand);
+    context.subscriptions.push(disposableStopCommand);
 
     let disposableSetPath = vscode.commands.registerCommand('extension.setVercorsPath', () => {
         setVercorsPath();
@@ -94,6 +102,11 @@ function executeVercorsCommand() {
         vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string + path.sep
     ) + "vercors";
 
+    if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
+        vscode.window.showErrorMessage("Could not find VerCors but expected at the given path: " + vercorsPath);
+        return;
+    }
+
     let command = '"' + vercorsPath + '"';
 
     const fileOptions = vercorsOptionsMap.get(filePath);
@@ -114,23 +127,64 @@ function executeVercorsCommand() {
     outputChannel.clear();
     // Execute the command and send output to the output channel
     const childProcess = require('child_process');
-    const process = childProcess.spawn(command, args, { shell: true });
-
-    process.stdout.on('data', (data: Buffer | string) => {
+    const vercorsProcess = childProcess.spawn(command, args, { shell: true });
+    vercorsProcessPid = vercorsProcess.pid;
+    vercorsProcess.stdout.on('data', (data: Buffer | string) => {
         outputChannel.appendLine(data.toString());
     });
+
+    vercorsProcess.on('exit', function () {
+        vercorsProcessPid = -1;
+    });
+
+      
     // Show the output channel
-    outputChannel.show(vscode.ViewColumn.Three, true); // Change the ViewColumn as needed
+    outputChannel.show(true); // Change the ViewColumn as needed
 }
 
+function stopVercorsCommand(){
+
+    //TODO: LOOK at vercors again, should be able to exit it cleanly
+
+    if (vercorsProcessPid === -1){ //check if vercors is running
+        vscode.window.showInformationMessage('Vercors is not running');
+        return;
+    }
+    
+    var kill = require('tree-kill');
+    kill(vercorsProcessPid, 'SIGINT', function(err: string) {
+        if(err === null){
+            vscode.window.showInformationMessage('Vercors has been succesfully stopped');
+        }
+        else{
+            vscode.window.showInformationMessage('An error occured while trying to stop Vercors: ' + err);
+        }
+    });
+}
 
 function setVercorsPath() {
     vscode.window.showInputBox({
         prompt: "Enter the path to the VerCors bin directory",
         placeHolder: "C:\\path\\to\\vercors\\bin",
+        value: vscode.workspace.getConfiguration().has('vercorsplugin.vercorsPath')
+            ? vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath')
+            : "",
         validateInput: (text) => {
-            // Optional: Add validation logic here if needed
-            return text.trim().length === 0 ? "Path cannot be empty" : null;
+            let trimmed : string = text.trim();
+            if (trimmed.length === 0) {
+                return "Path cannot be empty";
+            }
+
+            if (!fs.existsSync(trimmed) || !fs.lstatSync(trimmed).isDirectory()) {
+                return "Given path is not a valid directory";
+            }
+
+            let vercorsPath = trimmed + path.sep + "vercors";
+            if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
+                return "Could not find VerCors at the given path";
+            }
+
+            return null;
         }
     }).then((path) => {
         if (path !== undefined) {

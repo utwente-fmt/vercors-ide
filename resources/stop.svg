@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 300 300">
+  <!-- Outer Circle -->
+  <circle cx="150" cy="150" r="145" fill="none" stroke="#E74C3C" stroke-width="10"/>
+  
+  <!-- Inner Rectangle -->
+  <rect x="90" y="90" width="120" height="120" fill="none" stroke="#E74C3C" stroke-width="10"/>
+</svg>
