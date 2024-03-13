@@ -355,10 +355,6 @@
             // Attach listener for clicks on the entire checkbox container for convenience
             document.querySelectorAll('.option-container').forEach(container => {
                 container.addEventListener('click', function (event) {
-                    // disable clicking on the entire div if all options are shown
-                    if (container.classList.contains("showAll")) {
-                        return;
-                    }
                     // Find the checkbox inside this container
                     const checkbox = this.querySelector('.custom-checkbox');
                     const label = this.querySelector('label');
@@ -400,7 +396,7 @@
                     });
 
                     // Hide option if it's not pinned and not checked anymore.
-                    const parent = checkbox.parentNode;
+                    const parent = checkbox.parentNode.parentNode;
                     if (!parent.classList.contains("pinned") && !checkbox.checked)  {
                         parent.classList.remove("show");
                     }
