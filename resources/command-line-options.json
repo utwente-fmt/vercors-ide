@@ -2,23 +2,28 @@
   "General" : {
     "help": {
       "name": "Help",
-      "description": "Prints this usage text"
+      "description": "Prints this usage text",
+      "skip": true
     },
     "help-hidden": {
       "name": "Help Hidden",
-      "description": "Show hidden options (intended for VerCors experts, proceed with caution!)"
+      "description": "Show hidden options (intended for VerCors experts, proceed with caution!)",
+      "skip": true
     },
     "version": {
       "name": "Version",
-      "description": "Prints version and build information"
+      "description": "Prints version and build information",
+      "skip": true
     },
     "help-passes": {
       "name": "Help Passes",
-      "description": "Lists the pass keys available for options that take a pass key."
+      "description": "Lists the pass keys available for options that take a pass key.",
+      "skip": true
     },
     "quiet": {
       "name": "Quiet Mode",
-      "description": "Instruct VerCors to only log errors."
+      "description": "Instruct VerCors to only log errors.",
+      "skip": true
     }
   },
 
@@ -35,7 +40,6 @@
     "lang": {
       "name": "Language",
       "description": "{silver, pvl, llvm, i, java, c, systemc} Do not detect the language from the file extension, but force a specific language parser for all files",
-      "pinned": true,
       "arguments": "silver, pvl, llvm, i, java, c, systemc"
     },
     "backend-file-base": {
@@ -82,13 +86,11 @@
     "silicon-print-quantifier-stats": {
       "name": "Print Quantifier Stats",
       "description": "<amount> Print quantifier instantiation statistics from Z3 via silicon, every <amount> instantiations, every 5 seconds. \nImplies --dev-silicon-num-verifiers 1",
-      "arguments": "<amount>",
-      "requirements": ["backend=silicon", "dev-silicon-num-verifiers=1"]
+      "arguments": "<amount>"
     },
     "silicon-quiet": {
       "name": "Silicon Quiet Mode",
-      "description": "Disable various diagnostics of the silicon backend.",
-      "requirements": ["backend=silicon"]
+      "description": "Disable various diagnostics of the silicon backend."
     },
     "bip-report-file": {
       "name": "JavaBIP report",
@@ -158,8 +160,7 @@
     "veymont-output": {
       "name": "Output path",
       "description": "<path> Output path for VeyMont",
-      "arguments": "<path>",
-      "requirements": ["veymont"]
+      "arguments": "<path>"
     }
   },
 
@@ -207,8 +208,7 @@
     },
     "test-ci-output": {
       "name": "CI Output",
-      "description": "Tailor the logging output for a CI run",
-      "skip": true
+      "description": "Tailor the logging output for a CI run"
     }
   }
 }
