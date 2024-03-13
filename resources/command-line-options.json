@@ -23,7 +23,7 @@
     "quiet": {
       "name": "Quiet Mode",
       "description": "Instruct VerCors to only log errors.",
-      "skip": true
+      "skip": false
     }
   },
 
