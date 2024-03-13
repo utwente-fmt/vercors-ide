@@ -172,26 +172,37 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 const childProcess = require('child_process');
                 let command = '"' + vercorsExecutablePath + '"';
                 const vercorsProcess = childProcess.spawn(command, ["--version"], { shell: true });
+                const pid : number = vercorsProcess.pid;
 
                 vercorsProcess.stdout.on('data', (data: Buffer | string) => {
                     const str = data.toString();
+                    this.killPid(pid);
                     if (str.startsWith("Vercors")) {
                         // remove newlines
                         resolve(str.replace(/(\r\n|\n|\r)/gm, ""));
+                    } else {
+                        reject('Could not get VerCors version: ' + str);
                     }
                 });
 
                 vercorsProcess.stderr.on('data', (data: Buffer | string) => {
-                    reject(data.toString());
+                    const str = data.toString();
+                    this.killPid(pid);
+                    reject(str);
                 });
             } catch (_e) {
                 reject(_e);
             }
         })
-            .catch(reason => {
-                vscode.window.showErrorMessage(reason.toString());
-                return undefined;
-            });
+        .catch(reason => {
+            vscode.window.showErrorMessage(reason.toString());
+            return undefined;
+        });
+    }
+
+    private killPid(pid : number) : void {
+        const kill = require('tree-kill');
+        kill(pid, 'SIGINT');
     }
 
 }
