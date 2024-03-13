@@ -14,11 +14,12 @@
     "configuration": {
       "properties": {
         "vercorsplugin.vercorsPath": {
-          "type": "string",
-          "description": "Path to the VerCors bin directory"
+          "type": ["array", "null"],
+          "default": [],
+          "description": "Paths to the VerCors bin directory"
         },
         "vercorsplugin.optionsMap": {
-          "type": "Map<String, String>",
+          "type": ["object", "null"],
           "default": {},
           "description": "Options map for my extension."
         }
@@ -93,14 +94,14 @@
     "views": {
       "vercors-plugin": [
         {
-          "id": "vcpView",
-          "name": "Plugin View",
-          "contextualTitle": "VerCors"
+          "id": "vercorsPathView",
+          "name": "VerCors Versions",
+          "type": "webview"
         },
         {
-          "type": "webview",
           "id": "vercorsOptionsView",
-          "name": "Options"
+          "name": "Options",
+          "type": "webview"
         }
       ]
     },
@@ -108,12 +109,12 @@
       "view/title": [
         {
           "command": "extension.runVercors",
-          "when": "view == vcpView",
+          "when": "view == vercorsPathView",
           "group": "navigation"
         },
         {
           "command": "extension.stopVercors",
-          "when": "view == vcpView",
+          "when": "view == vercorsPathView",
           "group": "navigation"
         }
       ]
