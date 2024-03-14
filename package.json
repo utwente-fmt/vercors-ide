@@ -62,10 +62,11 @@
       },
       {
         "path": "./syntaxes/spec_injection_grammar_java.tmLanguage.json",
-        "scopeName": "specification.injection",
-        "injectTo": [
-          "source.java"
-        ]
+        "scopeName": "source.java.specification",
+        "injectTo" : ["source.java"],
+        "embeddedLanguages": {
+          "specification.injection": "spec_lang"
+        }
       },
       {
         "path": "syntaxes/comment_injection_java.tmLanguage.json",

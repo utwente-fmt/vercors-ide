@@ -8,7 +8,7 @@
   ],
   "repository": {
     "enclosing-ats": {
-      "name": "specification.injection",
+      "name": "java-comment-spec.injection",
       "begin": "@",
       "end": "@",
       "patterns": [
