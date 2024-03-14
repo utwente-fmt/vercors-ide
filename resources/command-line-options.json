@@ -1,0 +1,214 @@
+{
+  "General" : {
+    "help": {
+      "name": "Help",
+      "description": "Prints this usage text",
+      "skip": true
+    },
+    "help-hidden": {
+      "name": "Help Hidden",
+      "description": "Show hidden options (intended for VerCors experts, proceed with caution!)",
+      "skip": true
+    },
+    "version": {
+      "name": "Version",
+      "description": "Prints version and build information",
+      "skip": true
+    },
+    "help-passes": {
+      "name": "Help Passes",
+      "description": "Lists the pass keys available for options that take a pass key.",
+      "skip": true
+    },
+    "quiet": {
+      "name": "Quiet Mode",
+      "description": "Instruct VerCors to only log errors.",
+      "skip": false
+    }
+  },
+
+  "Advanced" : {
+    "verify": {
+      "name": "Verification Mode",
+      "description": "Instruct VerCors to verify the given files (default)",
+      "skip": true
+    },
+    "more": {
+      "name": "More Errors",
+      "description": "Always print the maximum amount of information about errors."
+    },
+    "lang": {
+      "name": "Language",
+      "description": "{silver, pvl, llvm, i, java, c, systemc} Do not detect the language from the file extension, but force a specific language parser for all files",
+      "arguments": "silver, pvl, llvm, i, java, c, systemc"
+    },
+    "backend-file-base": {
+      "name": "Backend File Base",
+      "description": "In addition to verification, output the resulting ASTs for the backend to files, appended with -<number>.<extension>"
+    },
+    "backend-debug": {
+      "name": "Debug Mode",
+      "description": "Instruct the backend to print as much debugging information as possible"
+    },
+    "output-after-pass": {
+      "name": "Output After Pass",
+      "description": "<pass>=<path> Print the AST after a pass key",
+      "arguments": "<pass>=<path>"
+    },
+    "output-before-pass": {
+      "name": "Output Before Pass",
+      "description": "<pass>=<path> Print the AST before a pass key",
+      "arguments": "<pass>=<path>"
+    },
+    "backend-option": {
+      "name": "Custom Flags",
+      "description": "Provide custom flags to Viper",
+      "arguments": "custom flags"
+    },
+    "skip-backend": {
+      "name": "Skip Backend",
+      "description": "Stop VerCors successfully before the backend is used to verify the program"
+    },
+    "skip-translation": {
+      "name": "Skip Translation",
+      "description": "Stop VerCors successfully immediately after the file is parsed and resolved, and do no further processing"
+    },
+    "skip-translation-after ": {
+      "name": "Skip Translation",
+      "description": "<pass> Stop VerCors successfully after executing the transformation pass with the supplied key",
+      "arguments": "<pass>"
+    },
+    "skip-pass": {
+      "name": "Skip Pass",
+      "description": "<pass> Skip the passes that have the supplied keys",
+      "arguments": "<pass>"
+    },
+    "silicon-print-quantifier-stats": {
+      "name": "Print Quantifier Stats",
+      "description": "<amount> Print quantifier instantiation statistics from Z3 via silicon, every <amount> instantiations, every 5 seconds. \nImplies --dev-silicon-num-verifiers 1",
+      "arguments": "<amount>"
+    },
+    "silicon-quiet": {
+      "name": "Silicon Quiet Mode",
+      "description": "Disable various diagnostics of the silicon backend."
+    },
+    "bip-report-file": {
+      "name": "JavaBIP report",
+      "description": "<path> Write JavaBIP verification report to file, or standard out if \"-\" is used",
+      "arguments": "<path>"
+    },
+    "c-define": {
+      "name": "-D Options",
+      "description": "<macro>=<defn>,... Pass -D options to the C preprocessor",
+      "arguments": "<macro>=<defn>,..."
+    },
+    "paths-simplify": {
+      "name": "Simplify paths",
+      "description": "<simplify.pvl>,... Specify a chain of files to use that contain axiomatic simplification rules",
+      "arguments": "<simplify.pvl>,..."
+    },
+    "paths-simplify-after-relations": {
+      "name": "Simplify Path after relations",
+      "description": "<simplify.pvl>,... Specify a chain of files to use the contain axiomatic simplification rules, which will be applied after quantified integer relations are simplified",
+      "arguments": "<simplify.pvl>,..."
+    },
+    "path-adt": {
+      "name": "ADT Path",
+      "description": "<path> Use a custom directory that contains definitions for all internal types encoded as axiomatic datatypes (array, option, any, etc.)",
+      "arguments": "<path>"
+    },
+    "path-cc": {
+      "name": "C compiler path",
+      "description": "<path> Set the C compiler to use for preprocessing",
+      "arguments": "<path>"
+    },
+    "path-c-system": {
+      "name": "System Headers path",
+      "description": "<path> Set the include path for system headers (-isystem)",
+      "arguments": "<path>"
+    },
+    "no-std-class-path": {
+      "name": "No STD class path",
+      "description": "Remove the @jre (the default path to specified classes in the java runtime) and @source (the sources root computed via the package entry of submitted sources) entry"
+    },
+    "class-path": {
+      "name": "Class path",
+      "description": "<path>|@jre|@source Add an entry to the sources class path",
+      "arguments": "<path>|@jre|@source"
+    },
+    "path-z3": {
+      "name": "Z3 path",
+      "description": "<path> Set the location of the z3 binary",
+      "arguments": "<path>"
+    },
+    "path-boogie": {
+      "name": "Bookie path",
+      "description": "<path> Set the location of the boogie binary",
+      "arguments": "<path>"
+    },
+    "path-c-preprocessor": {
+      "name": "C Preprocessor path",
+      "description": "<path> Set the location of the C preprocessor binary",
+      "arguments": "<path>"
+    }
+  },
+  "VeyMont" : {
+    "veymont": {
+      "name": "Veymont Mode",
+      "description": "Enable VeyMont mode: decompose the global program from the input files into several local programs that can be executed in parallel"
+    },
+    "veymont-output": {
+      "name": "Output path",
+      "description": "<path> Output path for VeyMont",
+      "arguments": "<path>"
+    }
+  },
+
+  "Batch-Testing": {
+    "test": {
+      "name": "Test Mode",
+      "description": "Enable batch testing mode: execute all tests in a directory"
+    },
+    "test-dir": {
+      "name": "Testing Directory",
+      "description": "<path> The directory from which to run all tests",
+      "arguments": "<path>"
+    },
+    "test-filter-backend": {
+      "name": "Filter Backend",
+      "description": "<backend>,...",
+      "arguments": "<backend>,..."
+    },
+    "test-filter-include-suite": {
+      "name": "Filter include suites",
+      "description": "<suite>,...",
+      "arguments": "<suite>,..."
+    },
+    "test-filter-exclude-suite": {
+      "name": "Filter exclude suites",
+      "description": "<suite>,...",
+      "arguments": "<suite>,..."
+    },
+    "test-workers": {
+      "name": "Workers #",
+      "description": "<value> Number of threads to start to run tests (default: 1)",
+      "arguments": "<value>"
+    },
+    "test-coverage": {
+      "name": "Coverage report",
+      "description": "Generate a coverage report"
+    },
+    "test-failing-first": {
+      "name": "Failing First",
+      "description": "When run twice with this option, VerCors will run the tests that failed the previous time first (cancelling a run is safe)"
+    },
+    "test-generate-failing-run-configs": {
+      "name": "Generate failing run config",
+      "description": "Generates Intellij IDEA run configurations for tests that fail (and deletes recovered tests, cancelling a run is safe)"
+    },
+    "test-ci-output": {
+      "name": "CI Output",
+      "description": "Tailor the logging output for a CI run"
+    }
+  }
+}

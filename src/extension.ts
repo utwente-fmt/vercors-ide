@@ -59,7 +59,7 @@ async function activate(context: vscode.ExtensionContext) {
     // vscode.commands.registerCommand('extension.refreshEntry', () =>
     //     vercorsPathProvider.refresh()
     // );
-    
+
     context.subscriptions.push(documentLinkProviderDisposable);
 }
 
@@ -85,12 +85,6 @@ async function executeVercorsCommand() {
     // Get the URI (Uniform Resource Identifier) of the current file
     const uri = editor!.document.uri;
     const filePath = uri.fsPath;
-
-    if (path.extname(filePath).toLowerCase() !== '.pvl') {
-        console.log(filePath);
-        vscode.window.showErrorMessage('The active file is not a .pvl file.');
-        return; // Exit early if the file is not a .pvl
-    }
 
     const vercorsPaths = await VerCorsPaths.getPathList();
     if (!vercorsPaths.length) {
@@ -118,6 +112,19 @@ async function executeVercorsCommand() {
     const fileOptions = vercorsOptionsMap.get(filePath);
     let inputFile = '"' + filePath + '"';
     let args = fileOptions ? ([inputFile].concat(fileOptions)) : [inputFile];
+
+    // Check if we have options, don't check file extension if --lang is used
+    if (!fileOptions || (fileOptions && !(fileOptions.includes("--lang")))) {
+        if (path.extname(filePath).toLowerCase() !== '.pvl') {
+            console.log(filePath);
+            vscode.window.showErrorMessage('The active file is not a .pvl file.');
+            return; // Exit early if the file is not a .pvl
+        }
+    }
+
+    // Always execute in progress & verbose mode for extension features to work.
+    args.push("--progress");
+    args.push("--verbose");
 
     console.log(command);
     console.log(args);
