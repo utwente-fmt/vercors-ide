@@ -1,0 +1,29 @@
+{
+  "scopeName": "java-comment-spec.injection",
+  "injectionSelector": "L:source.java",
+  
+  "patterns": [
+      {
+        "name": "specification.injection.block",
+        "begin": "\\/\\*@",
+        "end": "\\*\\/",
+        "patterns": [
+          {
+            "name": "constant.character.escape.untitled",
+            "match": "\\."
+          }
+        ]
+      },
+      {
+        "name": "specification.injection.line",
+        "begin": "\\/\\/@",
+        "end": "\\\n",
+        "patterns": [
+          {
+            "name": "constant.character.escape.untitled",
+            "match": "\\."
+          }
+        ]
+      }
+  ]
+}

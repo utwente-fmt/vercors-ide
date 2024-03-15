@@ -39,6 +39,12 @@
         ]
       },
       {
+        "id": "java",
+        "extensions": [
+          ".java"
+        ]
+      },
+      {
         "id": "vercors-output",
         "aliases": [
           "My Output Channel"
@@ -55,11 +61,22 @@
         "path": "./syntaxes/pvl.tmLanguage.json"
       },
       {
-        "path": "./syntaxes/spec_injection_grammar.tmLanguage.json",
-        "scopeName": "specification",
+        "path": "./syntaxes/spec_injection_grammar_pvl.tmLanguage.json",
+        "scopeName": "source.pvl.specification",
         "injectTo": [
           "source.pvl"
         ]
+      },
+      {
+        "path": "./syntaxes/spec_injection_grammar_java.tmLanguage.json",
+        "scopeName": "source.java.specification",
+        "injectTo" : ["source.java"]
+        
+      },
+      {
+        "path": "syntaxes/comment_injection_java.tmLanguage.json",
+        "scopeName": "java-comment-spec.injection",
+        "injectTo": ["source.java"]
       }
     ],
     "commands": [
