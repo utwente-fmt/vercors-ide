@@ -13,6 +13,8 @@
   "contributes": {
     "snippets": [
       {"language": "pvl",
+       "path": "./snippets.json"},
+      {"language": "spec_injection_grammar",
        "path": "./snippets.json"}
     ],
     "configuration": {
