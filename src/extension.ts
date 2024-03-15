@@ -3,61 +3,64 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { VerCorsPathProvider } from './settingsView';
-import { VerCorsWebViewProvider } from './VerCors-CLI-UI';
+import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './VerCors-CLI-UI';
+import { VerCorsWebViewProvider as VerCorsPathWebViewProvider, VerCorsPaths } from './VerCors-Path-UI';
+import * as fs from "fs";
 
 
 let outputChannel: vscode.OutputChannel;
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
-
+let vercorsProcessPid = -1;
 /**
  * Method called when the extension is activated
  * @param {vscode.ExtensionContext} context
  */
-function activate(context: vscode.ExtensionContext) {
+async function activate(context: vscode.ExtensionContext) {
     // Check if the VerCors path is set
-    const vercorsPath = vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string;
-    if (!vercorsPath) {
-        vscode.window.showWarningMessage('VerCors binary path is not set. Please set it to run the tool.');
+    const vercorsPaths = await VerCorsPaths.getPathList();
+    if (!vercorsPaths.length) {
+        vscode.window.showWarningMessage('No VerCors binary paths are provided. Please provide one to run the tool.');
     }
+
     // Register the 'extension.runVercors' command
-    let disposable = vscode.commands.registerCommand('extension.runVercors', () => {
+    let disposableStartCommand = vscode.commands.registerCommand('extension.runVercors', () => {
         executeVercorsCommand();
     });
 
-    // Add the disposable to the context so it can be disposed of later
-    context.subscriptions.push(disposable);
-
-    let disposableSetPath = vscode.commands.registerCommand('extension.setVercorsPath', () => {
-        setVercorsPath();
+    // Register the 'extension.stopVercors' command
+    let disposableStopCommand = vscode.commands.registerCommand('extension.stopVercors', () => {
+        stopVercorsCommand();
     });
 
-    context.subscriptions.push(disposableSetPath);
+    // Add the disposable to the context so it can be disposed of later
+    context.subscriptions.push(disposableStartCommand);
+    context.subscriptions.push(disposableStopCommand);
 
-    const optionsProvider = new VerCorsWebViewProvider(context, vercorsOptionsMap);
+    const optionsProvider = new VerCorsCLIWebViewProvider(context, vercorsOptionsMap);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('vercorsOptionsView', optionsProvider)
     );
-
-    const vercorsPathProvider = new VerCorsPathProvider();
-    vscode.window.registerTreeDataProvider('vcpView', vercorsPathProvider);
-
-    vscode.commands.registerCommand('extension.refreshEntry', () =>
-        vercorsPathProvider.refresh()
-    );
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-            if (editor) {
-                const filePath = editor.document.uri.fsPath;
-                if (path.extname(filePath) === '.pvl') {
-                    console.log("changed active window");
-                    const options = vercorsOptionsMap.get(filePath) || {};
-                    optionsProvider.updateView(options);
-                }
+        if (editor) {
+            const filePath = editor.document.uri.fsPath;
+            if (path.extname(filePath) === '.pvl') {
+                console.log("changed active window");
+                const options = vercorsOptionsMap.get(filePath) || {};
+                optionsProvider.updateView(options);
             }
-        })
-    );
-    context.subscriptions.push(documentLinkProviderDisposable);
+        }
+    }));
 
+    const vercorsPathProvider = new VerCorsPathWebViewProvider(context);
+    context.subscriptions.push(
+        vscode.window.registerWebviewViewProvider('vercorsPathView', vercorsPathProvider)
+    );
+
+    // vscode.commands.registerCommand('extension.refreshEntry', () =>
+    //     vercorsPathProvider.refresh()
+    // );
+
+    context.subscriptions.push(documentLinkProviderDisposable);
 }
 
 /**
@@ -71,7 +74,7 @@ module.exports = {
     deactivate
 };
 
-function executeVercorsCommand() {
+async function executeVercorsCommand() {
     // Get the currently active text editor
     const editor = vscode.window.activeTextEditor;
 
@@ -87,17 +90,47 @@ function executeVercorsCommand() {
         console.log(filePath);
         vscode.window.showErrorMessage('The active file is not a .pvl or .java file.');
         return; // Exit early if the file is not a .pvl
+
+    const vercorsPaths = await VerCorsPaths.getPathList();
+    if (!vercorsPaths.length) {
+        vscode.window.showErrorMessage("No VerCors paths have been specified yet");
+        return;
+
     }
 
-    const vercorsPath = path.normalize(
-        vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as string + path.sep
-    ) + "vercors";
+    // get selected vercors version
+    const binPath = vercorsPaths.find(p => p.selected);
+    if (!binPath) {
+        vscode.window.showErrorMessage("No VerCors version has been selected");
+        return;
+    }
 
-    let command = '"' + vercorsPath + '"';
+    // remove possible double backslash
+    const vercorsPath = path.normalize(binPath.path + path.sep) + "vercors";
+
+    if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
+        vscode.window.showErrorMessage("Could not find VerCors but expected at the given path: " + vercorsPath);
+        return;
+    }
+
+    let command = '"' + vercorsPath + '"'; // account for spaces
 
     const fileOptions = vercorsOptionsMap.get(filePath);
     let inputFile = '"' + filePath + '"';
     let args = fileOptions ? ([inputFile].concat(fileOptions)) : [inputFile];
+
+    // Check if we have options, don't check file extension if --lang is used
+    if (!fileOptions || (fileOptions && !(fileOptions.includes("--lang")))) {
+        if (path.extname(filePath).toLowerCase() !== '.pvl') {
+            console.log(filePath);
+            vscode.window.showErrorMessage('The active file is not a .pvl file.');
+            return; // Exit early if the file is not a .pvl
+        }
+    }
+
+    // Always execute in progress & verbose mode for extension features to work.
+    args.push("--progress");
+    args.push("--verbose");
 
     console.log(command);
     console.log(args);
@@ -110,27 +143,37 @@ function executeVercorsCommand() {
     outputChannel.clear();
     // Execute the command and send output to the output channel
     const childProcess = require('child_process');
-    const process = childProcess.spawn(command, args, { shell: true });
-
-    process.stdout.on('data', (data: Buffer | string) => {
+    const vercorsProcess = childProcess.spawn(command, args, { shell: true });
+    vercorsProcessPid = vercorsProcess.pid;
+    vercorsProcess.stdout.on('data', (data: Buffer | string) => {
         outputChannel.appendLine(data.toString());
     });
+
+    vercorsProcess.on('exit', function () {
+        vercorsProcessPid = -1;
+    });
+
+      
     // Show the output channel
-    outputChannel.show(vscode.ViewColumn.Three, true); // Change the ViewColumn as needed
+    outputChannel.show(true); // Change the ViewColumn as needed
 }
 
+function stopVercorsCommand(){
 
-function setVercorsPath() {
-    vscode.window.showInputBox({
-        prompt: "Enter the path to the VerCors bin directory",
-        placeHolder: "C:\\path\\to\\vercors\\bin",
-        validateInput: (text) => {
-            // Optional: Add validation logic here if needed
-            return text.trim().length === 0 ? "Path cannot be empty" : null;
+    //TODO: LOOK at vercors again, should be able to exit it cleanly
+
+    if (vercorsProcessPid === -1){ //check if vercors is running
+        vscode.window.showInformationMessage('Vercors is not running');
+        return;
+    }
+    
+    var kill = require('tree-kill');
+    kill(vercorsProcessPid, 'SIGINT', function(err: string) {
+        if(err === null){
+            vscode.window.showInformationMessage('Vercors has been succesfully stopped');
         }
-    }).then((path) => {
-        if (path !== undefined) {
-            vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', path, true);
+        else{
+            vscode.window.showInformationMessage('An error occured while trying to stop Vercors: ' + err);
         }
     });
 }

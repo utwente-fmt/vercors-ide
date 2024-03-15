@@ -30,15 +30,19 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.html = await this.getHtmlForWebview(webviewView.webview);
 
         // Handle messages from the webview
-        webviewView.webview.onDidReceiveMessage(message => {
+        webviewView.webview.onDidReceiveMessage(async message => {
             if (message.command === 'updateOptions') {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
                 if (path.extname(filePath!).toLowerCase() !== '.pvl' && path.extname(filePath!).toLowerCase() !== '.java') {
                     vscode.window.showErrorMessage('The active file is not a .pvl or .java file. Please focus the editor on a PVL or Java file.');
                     return; // Exit early if the file is not a .pvl
                 }
+
                 console.log("we have changed the options for this file" + filePath);
                 this._vercorsOptionsMap.set(filePath!, message.options);
+            } else if (message.command === 'viewLoaded') {
+                const data = await this.fetchCommandLineOptions();
+                this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
             }
         });
     }
@@ -57,6 +61,12 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
         // Return the HTML content for the webview
         return htmlString;
+    }
+
+    private async fetchCommandLineOptions() {
+        const optionsPath = vscode.Uri.joinPath(this._extensionUri, '/resources/command-line-options.json');
+        const optionsContent = await vscode.workspace.fs.readFile(optionsPath);
+        return JSON.parse(Buffer.from(optionsContent).toString('utf8'));
     }
 
     private updateOption(option: string, value: boolean) {

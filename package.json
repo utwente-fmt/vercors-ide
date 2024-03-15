@@ -14,11 +14,12 @@
     "configuration": {
       "properties": {
         "vercorsplugin.vercorsPath": {
-          "type": "string",
-          "description": "Path to the VerCors bin directory"
+          "type": ["array", "null"],
+          "default": [],
+          "description": "Paths to the VerCors bin directory"
         },
         "vercorsplugin.optionsMap": {
-          "type": "Map<String, String>",
+          "type": ["object", "null"],
           "default": {},
           "description": "Options map for my extension."
         }
@@ -82,6 +83,14 @@
         }
       },
       {
+        "command": "extension.stopVercors",
+        "title": "Stop Vercors",
+        "icon": {
+          "light": "resources\\stop.svg",
+          "dark": "resources\\stop.svg"
+        }
+      },
+      {
         "command": "extension.setVercorsPath",
         "title": "Set VerCors Path"
       },
@@ -102,14 +111,14 @@
     "views": {
       "vercors-plugin": [
         {
-          "id": "vcpView",
-          "name": "Plugin View",
-          "contextualTitle": "VerCors"
+          "id": "vercorsPathView",
+          "name": "VerCors Versions",
+          "type": "webview"
         },
         {
-          "type": "webview",
           "id": "vercorsOptionsView",
-          "name": "Options"
+          "name": "Options",
+          "type": "webview"
         }
       ]
     },
@@ -117,7 +126,12 @@
       "view/title": [
         {
           "command": "extension.runVercors",
-          "when": "view == vcpView",
+          "when": "view == vercorsPathView",
+          "group": "navigation"
+        },
+        {
+          "command": "extension.stopVercors",
+          "when": "view == vercorsPathView",
           "group": "navigation"
         }
       ]
@@ -145,6 +159,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@vscode/vsce": "^2.23.0"
+    "@vscode/vsce": "^2.23.0",
+    "tree-kill": "^1.2.2"
   }
 }
