@@ -29,28 +29,23 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private readonly _extensionUri: vscode.Uri;
 
     private _HTMLContent: string | undefined;
+    private webView: vscode.WebviewView | undefined;
 
-    private webView : vscode.WebviewView | null = null;
-
-    constructor(private context: vscode.ExtensionContext) {
+    constructor(context: vscode.ExtensionContext) {
         this._extensionUri = context.extensionUri;
     }
 
-
-
-    public async executeCommand(){
-        console.log(this.webView);
-        console.log(path);
-        if(this.webView){
-            const path = await this.selectNewVercorsPath(this.webView.webview);
-            if (path !== null)  this.sendPathsToWebview(this.webView.webview)
+    public async executeCommand() {
+        const path = await this.selectNewVercorsPath(this.webView?.webview);
+        if (path && this.webView) {
+            await this.sendPathsToWebview(this.webView.webview);
         }
     }
 
     public async resolveWebviewView(
         webviewView: vscode.WebviewView,
-        context: vscode.WebviewViewResolveContext<unknown>,
-        token: vscode.CancellationToken
+        _context: vscode.WebviewViewResolveContext,
+        _token: vscode.CancellationToken
     ) {
         webviewView.webview.options = {
             // Enable scripts in the webview
@@ -58,8 +53,8 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         };
 
         if (!this._HTMLContent) {
-            this._HTMLContent = await this.getHtmlForWebview()
-            
+            this._HTMLContent = await this.getHtmlForWebview();
+
         }
         this.webView = webviewView;
 
@@ -123,7 +118,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         await VerCorsPaths.storePathList(vercorsPaths);
     }
 
-    private async selectNewVercorsPath(webview: vscode.Webview): Promise<VercorsPath | undefined> {
+    private async selectNewVercorsPath(webview: vscode.Webview | undefined): Promise<VercorsPath | undefined> {
         return vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,
@@ -147,11 +142,15 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                     return;
                 }
 
-                webview.postMessage({ command: 'loading' });
+                if (webview) {
+                    webview.postMessage({ command: 'loading' });
+                }
 
                 const version = await this.getVercorsVersion(vercorsPath);
                 if (!version) {
-                    webview.postMessage({ command: 'cancel-loading' });
+                    if (webview) {
+                        webview.postMessage({ command: 'cancel-loading' });
+                    }
                     return;
                 }
 
@@ -189,7 +188,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 const childProcess = require('child_process');
                 let command = '"' + vercorsExecutablePath + '"';
                 const vercorsProcess = childProcess.spawn(command, ["--version"], { shell: true });
-                const pid : number = vercorsProcess.pid;
+                const pid: number = vercorsProcess.pid;
 
                 vercorsProcess.stdout.on('data', (data: Buffer | string) => {
                     const str = data.toString();
@@ -211,13 +210,13 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 reject(_e);
             }
         })
-        .catch(reason => {
-            vscode.window.showErrorMessage(reason.toString());
-            return undefined;
-        });
+            .catch(reason => {
+                vscode.window.showErrorMessage(reason.toString());
+                return undefined;
+            });
     }
 
-    private killPid(pid : number) : void {
+    private killPid(pid: number): void {
         const kill = require('tree-kill');
         kill(pid, 'SIGINT');
     }
