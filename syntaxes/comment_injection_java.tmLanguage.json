@@ -4,24 +4,28 @@
   
   "patterns": [
       {
-        "name": "specification.injection.block",
         "begin": "\\/\\*@",
         "end": "\\*\\/",
         "patterns": [
           {
             "name": "constant.character.escape.untitled",
             "match": "\\."
+          },
+          {
+            "include": "source.java.specification"
           }
         ]
       },
       {
-        "name": "specification.injection.line",
         "begin": "\\/\\/@",
         "end": "\\\n",
         "patterns": [
           {
             "name": "constant.character.escape.untitled",
             "match": "\\."
+          },
+          {
+            "include": "source.java.specification"
           }
         ]
       }

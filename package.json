@@ -63,9 +63,7 @@
       },
       {
         "path": "./syntaxes/spec_injection_grammar_java.tmLanguage.json",
-        "scopeName": "source.java.specification",
-        "injectTo" : ["source.java"]
-        
+        "scopeName": "source.java.specification"
       },
       {
         "path": "syntaxes/comment_injection_java.tmLanguage.json",
