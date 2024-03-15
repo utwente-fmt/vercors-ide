@@ -14,12 +14,18 @@
     "configuration": {
       "properties": {
         "vercorsplugin.vercorsPath": {
-          "type": ["array", "null"],
+          "type": [
+            "array",
+            "null"
+          ],
           "default": [],
           "description": "Paths to the VerCors bin directory"
         },
         "vercorsplugin.optionsMap": {
-          "type": ["object", "null"],
+          "type": [
+            "object",
+            "null"
+          ],
           "default": {},
           "description": "Options map for my extension."
         }
@@ -64,13 +70,16 @@
       {
         "path": "./syntaxes/spec_injection_grammar_java.tmLanguage.json",
         "scopeName": "source.java.specification",
-        "injectTo" : ["source.java"]
-        
+        "injectTo": [
+          "source.java"
+        ]
       },
       {
         "path": "syntaxes/comment_injection_java.tmLanguage.json",
         "scopeName": "java-comment-spec.injection",
-        "injectTo": ["source.java"]
+        "injectTo": [
+          "source.java"
+        ]
       }
     ],
     "commands": [
@@ -80,8 +89,7 @@
         "icon": {
           "light": "resources\\run.svg",
           "dark": "resources\\run.svg"
-        }
-      },
+        }      },
       {
         "command": "extension.stopVercors",
         "title": "Stop Vercors",
@@ -99,6 +107,23 @@
         "title": "Refresh"
       }
     ],
+    "keybindings": [
+      {
+          "command": "extension.runVercors",
+          "key": "ctrl+alt+x",
+          "mac": "shift+cmd+f"
+      },
+      {
+        "command": "extension.stopVercors",
+        "key": "ctrl+alt+v",
+        "mac": "shift+cmd+v"
+      },
+      {
+        "command": "extension.setVercorsPath",
+        "key": "ctrl+alt+j",
+        "mac": "shift+cmd+p"
+      }
+  ],
     "viewsContainers": {
       "activitybar": [
         {

@@ -30,8 +30,21 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     private _HTMLContent: string | undefined;
 
+    private webView : vscode.WebviewView | null = null;
+
     constructor(private context: vscode.ExtensionContext) {
         this._extensionUri = context.extensionUri;
+    }
+
+
+
+    public async executeCommand(){
+        console.log(this.webView);
+        console.log(path);
+        if(this.webView){
+            const path = await this.selectNewVercorsPath(this.webView.webview);
+            if (path !== null)  this.sendPathsToWebview(this.webView.webview)
+        }
     }
 
     public async resolveWebviewView(
@@ -45,8 +58,11 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         };
 
         if (!this._HTMLContent) {
-            this._HTMLContent = await this.getHtmlForWebview();
+            this._HTMLContent = await this.getHtmlForWebview()
+            
         }
+        this.webView = webviewView;
+
         webviewView.webview.html = this._HTMLContent;
 
         webviewView.webview.onDidReceiveMessage(

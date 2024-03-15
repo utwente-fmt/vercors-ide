@@ -56,9 +56,9 @@ async function activate(context: vscode.ExtensionContext) {
         vscode.window.registerWebviewViewProvider('vercorsPathView', vercorsPathProvider)
     );
 
-    // vscode.commands.registerCommand('extension.refreshEntry', () =>
-    //     vercorsPathProvider.refresh()
-    // );
+   let disposableSetPathCommand = vscode.commands.registerCommand('extension.setVercorsPath', () => {
+        vercorsPathProvider.executeCommand();
+   });
 
     context.subscriptions.push(documentLinkProviderDisposable);
 }
