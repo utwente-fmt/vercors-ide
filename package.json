@@ -11,6 +11,10 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "snippets": [
+      {"language": "pvl",
+       "path": "./snippets.json"}
+    ],
     "configuration": {
       "properties": {
         "vercorsplugin.vercorsPath": {
