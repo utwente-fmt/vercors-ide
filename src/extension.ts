@@ -43,7 +43,7 @@ async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor) {
             const filePath = editor.document.uri.fsPath;
-            if (path.extname(filePath) === '.pvl') {
+            if (path.extname(filePath) === '.pvl' || path.extname(filePath) === '.java') {
                 console.log("changed active window");
                 const options = vercorsOptionsMap.get(filePath) || {};
                 optionsProvider.updateView(options);
@@ -90,6 +90,7 @@ async function executeVercorsCommand() {
     if (!vercorsPaths.length) {
         vscode.window.showErrorMessage("No VerCors paths have been specified yet");
         return;
+
     }
 
     // get selected vercors version
@@ -115,9 +116,9 @@ async function executeVercorsCommand() {
 
     // Check if we have options, don't check file extension if --lang is used
     if (!fileOptions || (fileOptions && !(fileOptions.includes("--lang")))) {
-        if (path.extname(filePath).toLowerCase() !== '.pvl') {
+        if (path.extname(filePath).toLowerCase() !== '.pvl' && path.extname(filePath).toLowerCase() !== '.java') {
             console.log(filePath);
-            vscode.window.showErrorMessage('The active file is not a .pvl file.');
+            vscode.window.showErrorMessage('The active file is not a .pvl or .java file.');
             return; // Exit early if the file is not a .pvl
         }
     }

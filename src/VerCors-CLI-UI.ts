@@ -33,6 +33,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(async message => {
             if (message.command === 'updateOptions') {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+
                 console.log("we have changed the options for this file" + filePath);
                 this._vercorsOptionsMap.set(filePath!, message.options);
             } else if (message.command === 'viewLoaded') {
