@@ -1,0 +1,814 @@
+{
+  "scopeName": "source.specification",
+  "injectionSelector": "source.pvl",
+  "patterns": [
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:resource)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:process)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:frac)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:zfrac)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:bool)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:ref)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:rational)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:seq)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:set)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:bag)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:pointer)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:map)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:option)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:either)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:tuple)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:type)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:any)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:nothing)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:string)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:pure)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:thread_local)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:bip_annotation)\\b"
+    },
+    {
+      "name": "keyword.control.spec",
+      "match": "\\b(?:with)\\b"
+    },
+    {
+      "name": "keyword.control.spec",
+      "match": "\\b(?:then)\\b"
+    },
+    {
+      "name": "keyword.control.spec",
+      "match": "\\b(?:given)\\b"
+    },
+    {
+      "name": "keyword.control.spec",
+      "match": "\\b(?:yields)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:axiom)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:model)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:adt)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:prover_type)\\b"
+    },
+    {
+      "name": "type.spec",
+      "match": "\\b(?:prover_function)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:modifies)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:accessible)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:requires)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:ensures)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:context_everywhere)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:context)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:loop_invariant)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:kernel_invariant)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:lock_invariant)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:signals)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:decreases)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:apply)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:fold)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:unfold)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:open)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:close)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:assume)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:inhale)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:exhale)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:label)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:extract)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:frame)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:outline)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:refute)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:witness)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:ghost)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:send)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:to)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:recv)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:from)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:transfer)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:csl_subject)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:spec_ignore)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:replacing_done)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:replacing)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:action)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:atomic)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:commit)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:Reducible)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:AddsTo)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:APerm)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:ArrayPerm)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:Contribution)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:held)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:committed)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:HPerm)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:idle)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:perm)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:Perm)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:PointsTo)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:running)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:Some)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:Left)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:Right)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:Value)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:unfolding)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:Unfolding)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:in)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:memberof)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:current_thread)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:forall)\\b\\*"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:forall)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:exists)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:forperm)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:let)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:sum)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:length)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:old)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:typeof)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:type)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:matrix)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:array)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:pointer)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:pointer_index)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:pointer_block_length)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:pointer_block_offset)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:pointer_length)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:shared_mem_size)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:values)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:vcmp)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:vrep)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:msum)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:mcmp)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:mrep)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:result)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:ltid)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:gtid)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:nd_index)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:nd_length)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:nd_partial_index)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:polarity_dependent)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:smtlib)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\\\\\b(?:boogie)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:none)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:None)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:write)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:read)\\b"
+    },
+    {
+      "name": "keyword.spec",
+      "match": "\\b(?:empty)\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\?"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\!"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\&\\&"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\|\\|"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\|"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\^\\^"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\>\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\<\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\=\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\!\\="
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\+"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\-"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\*"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\/"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\%"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\+\\+"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\-\\-"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\:\\:"
+    },
+    {
+      "name": "keyword.other",
+      "match": "(?<=\\()[^\\s]+(?=\\))"
+    },
+    {
+      "name": "keyword.other",
+      "match": "\\b(?:inline)\\b"
+    },
+    {
+      "name": "keyword.other",
+      "match": "\\b(?:assert)\\b"
+    },
+    {
+      "name": "meta.",
+      "match": "\\b(?:package)\\b"
+    },
+    {
+      "name": "storage.type",
+      "match": "\\b(?:enum)\\b"
+    },
+    {
+      "name": "storage.type",
+      "match": "\\b(?:class)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:seq_program)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:kernel)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:barrier)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:invariant)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:constructor)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:run)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:thread)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:if)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:else)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:while)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:for)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:goto)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:return)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:vec)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:par)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:and)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:parallel)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:sequential)\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(?:block)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:lock)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:unlock)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:wait)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:notify)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:fork)\\b"
+    },
+    {
+      "name": "keyword.control.concurrency",
+      "match": "\\b(?:join)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:this)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:null)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:true)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:false)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:current_thread)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\\\\\b(?:current_thread)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\\\\\b(?:owner)\\b"
+    },
+    {
+      "name": "storage.modifier",
+      "match": "\\b(?:global)\\b"
+    },
+    {
+      "name": "storage.modifier",
+      "match": "\\b(?:local)\\b"
+    },
+    {
+      "name": "storage.modifier",
+      "match": "\\b(?:static)\\b"
+    },
+    {
+      "name": "storage.modifier",
+      "match": "\\b(?:final)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\\\\\b(?:unfolding)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:unfolding)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\\\\\b(?:in)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:in)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:new)\\b"
+    },
+    {
+      "name": "variable.language",
+      "match": "\\b(?:id)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:boolean)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:void)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:int)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:char)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:float32)\\b"
+    },
+    {
+      "name": "keyword.type",
+      "match": "\\b(?:float64)\\b"
+    }
+  ]
+}
