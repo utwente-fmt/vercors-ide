@@ -56,7 +56,7 @@
       },
       {
         "path": "./syntaxes/spec_injection_grammar.tmLanguage.json",
-        "scopeName": "source.pvl.specification",
+        "scopeName": "source.specification",
         "injectTo": [
           "source.pvl"
         ]

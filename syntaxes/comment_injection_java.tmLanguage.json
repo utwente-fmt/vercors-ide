@@ -12,7 +12,7 @@
             "match": "\\."
           },
           {
-            "include": "source.pvl.specification"
+            "include": "source.specification"
           }
         ]
       },
@@ -25,7 +25,7 @@
             "match": "\\."
           },
           {
-            "include": "source.pvl.specification"
+            "include": "source.specification"
           }
         ]
       }
