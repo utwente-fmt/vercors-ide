@@ -16,20 +16,23 @@
         "body": "\\old($1) ",
         "description": "old"
     },
-
     "resource": {
-        "prefix":"res",
+        "prefix": "res",
         "body": "resource $1() = $2;"
     },
-
     "pure": {
         "prefix": "pure",
         "body": "pure $1($2) = $3;"
     },
-
     "unfolding": {
-        "prefix":"\\un",
-        "body":"\\unfolding $1 \\in $2;"
+        "prefix": "\\un",
+        "body": "\\unfolding $1 \\in $2;"
+    },
+    "pointer": {
+        "prefix": "pointer",
+        "body": [
+            "\\pointer($1, $2, $3);",
+            "$0"
+        ]
     }
-    
 }
