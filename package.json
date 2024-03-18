@@ -62,9 +62,12 @@
         ]
       },
       {
-        "path": "syntaxes/comment_injection_java.tmLanguage.json",
+        "path": "syntaxes/comment_injection_java_c.tmLanguage.json",
         "scopeName": "java-comment-spec.injection",
-        "injectTo": ["source.java"]
+        "injectTo": [
+          "source.java",
+          "source.c"
+        ]
       }
     ],
     "commands": [
