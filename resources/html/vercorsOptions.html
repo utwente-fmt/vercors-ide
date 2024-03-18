@@ -213,16 +213,18 @@
     let loaded = false;
 
     function generateOptionsString() {
-        let optionsString = "";
+        let optionsString = [];
         for (const checkbox of document.getElementsByClassName('checkbox-container')) {
             if (checkbox.querySelector('input[type="checkbox"]').checked) {
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
                 // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
-                optionsString += `--${checkbox.querySelector('input[type="checkbox"]').id} ${args}`;
+                optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').id} ${args}`);
             }
         }
-        return optionsString.trim();
+        return optionsString;
     }
+
+
 
     function uncheckAllCheckboxes() {
         const checkboxes = document.querySelectorAll('.custom-checkbox');

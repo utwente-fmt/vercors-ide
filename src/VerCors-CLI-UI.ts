@@ -8,7 +8,7 @@ export class VercorsOptions {
 
     public static getOptions(filePath: string): Array<string> {
         const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        const fileOptions = vercorsOptions.filePath;
+        const fileOptions = vercorsOptions[filePath];
         if (!fileOptions) { // if null
             return [];
         }
@@ -16,16 +16,24 @@ export class VercorsOptions {
     }
 
     public static async updateOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
-        let currentVercorsOptions: Options = {filePath: vercorsOptions}; 
+        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        currentVercorsOptions[filePath] = vercorsOptions; 
         console.log(vercorsOptions);
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
 
-    public static async addOptions(filePath: string, vercorsOptions: []): Promise<void> {
+    public static async addOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
         let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
         let fileOptions = this.getOptions(filePath);
+        console.log(fileOptions)
         fileOptions.push(...vercorsOptions);
-        currentVercorsOptions.filePath = fileOptions;
+        currentVercorsOptions[filePath] = fileOptions;
+        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
+    }
+    public static async removeOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
+        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        let fileOptions = this.getOptions(filePath).filter((el,ind) => vercorsOptions.includes(el) === false);
+        currentVercorsOptions[filePath] = fileOptions;
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
 
