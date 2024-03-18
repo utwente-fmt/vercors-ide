@@ -6,8 +6,8 @@ import * as vscode from 'vscode';
 
 export class VercorsOptions {
 
-    public static getOptions(filePath: String): Array<string> {
-        const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>;
+    public static getOptions(filePath: string): Array<string> {
+        const vercorsOptions = this.RecordToMap(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>);
         const fileOptions = vercorsOptions.get(filePath);
         if (!fileOptions) { // if null
             return [];
@@ -15,19 +15,29 @@ export class VercorsOptions {
         return fileOptions;
     }
 
-    public static async updateOptions(filePath: String, vercorsOptions: string[]): Promise<void> {
-        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>;
+    public static async updateOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
+        let currentVercorsOptions = this.RecordToMap(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>);
         console.log(currentVercorsOptions);
         currentVercorsOptions.set(filePath,vercorsOptions);
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
 
-    public static async addOptions(filePath: String, vercorsOptions: []): Promise<void> {
-        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>
+    public static async addOptions(filePath: string, vercorsOptions: []): Promise<void> {
+        let currentVercorsOptions = this.RecordToMap(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>);
         let fileOptions = this.getOptions(filePath)
         fileOptions.push(...vercorsOptions)
         currentVercorsOptions.set(filePath,fileOptions);
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
+    }
+
+
+    public static RecordToMap(record: Record<string, string[]>) : Map<string, string[]> { 
+        const map = new Map<string, string[]>();
+        Object.entries(record).forEach(([key, value]) => {
+            map.set(key, value);
+        });
+        return map
+
     }
 
 }
