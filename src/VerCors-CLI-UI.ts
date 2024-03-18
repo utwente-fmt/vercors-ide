@@ -1,18 +1,47 @@
 import path from 'path';
 import * as vscode from 'vscode';
 
+
+
+
+export class VercorsOptions {
+
+    public static getOptions(filePath: String): Array<string> {
+        const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>;
+        const fileOptions = vercorsOptions.get(filePath);
+        if (!fileOptions) { // if null
+            return [];
+        }
+        return fileOptions;
+    }
+
+    public static async updateOptions(filePath: String, vercorsOptions: string[]): Promise<void> {
+        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>;
+        console.log(currentVercorsOptions);
+        currentVercorsOptions.set(filePath,vercorsOptions);
+        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
+    }
+
+    public static async addOptions(filePath: String, vercorsOptions: []): Promise<void> {
+        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>
+        let fileOptions = this.getOptions(filePath)
+        fileOptions.push(...vercorsOptions)
+        currentVercorsOptions.set(filePath,fileOptions);
+        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
+    }
+
+}
+
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
-
-    private _vercorsOptionsMap;
 
     private readonly _extensionUri: vscode.Uri;
 
     private _HTMLContent: string | undefined;
 
-    constructor(private context: vscode.ExtensionContext, private optionsMap: Map<String, String>) {
+    constructor(private context: vscode.ExtensionContext) {
         this._extensionUri = context.extensionUri;
-        this._vercorsOptionsMap = optionsMap;
+        
     }
 
     public async resolveWebviewView(
@@ -35,7 +64,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 
                 console.log("we have changed the options for this file" + filePath);
-                this._vercorsOptionsMap.set(filePath!, message.options);
+                VercorsOptions.updateOptions(filePath!, message.options);
             } else if (message.command === 'viewLoaded') {
                 const data = await this.fetchCommandLineOptions();
                 this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
@@ -72,7 +101,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     public updateView(options: any) {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-        const fileOptions = this._vercorsOptionsMap.get(filePath!);
+        const fileOptions = VercorsOptions.getOptions(filePath!);
         if (fileOptions) {
             // set the fields based on the saved options
             this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions });
