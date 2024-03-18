@@ -2,13 +2,13 @@ import path from 'path';
 import * as vscode from 'vscode';
 
 
-
+type Options = Record<string, string[]>
 
 export class VercorsOptions {
 
     public static getOptions(filePath: string): Array<string> {
-        const vercorsOptions = this.RecordToMap(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>);
-        const fileOptions = vercorsOptions.get(filePath);
+        const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        const fileOptions = vercorsOptions.filePath;
         if (!fileOptions) { // if null
             return [];
         }
@@ -16,29 +16,19 @@ export class VercorsOptions {
     }
 
     public static async updateOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
-        let currentVercorsOptions = this.RecordToMap(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>);
-        console.log(currentVercorsOptions);
-        currentVercorsOptions.set(filePath,vercorsOptions);
+        let currentVercorsOptions: Options = {filePath: vercorsOptions}; 
+        console.log(vercorsOptions);
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
 
     public static async addOptions(filePath: string, vercorsOptions: []): Promise<void> {
-        let currentVercorsOptions = this.RecordToMap(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Record<string, Array<string>>);
-        let fileOptions = this.getOptions(filePath)
-        fileOptions.push(...vercorsOptions)
-        currentVercorsOptions.set(filePath,fileOptions);
+        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        let fileOptions = this.getOptions(filePath);
+        fileOptions.push(...vercorsOptions);
+        currentVercorsOptions.filePath = fileOptions;
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
 
-
-    public static RecordToMap(record: Record<string, string[]>) : Map<string, string[]> { 
-        const map = new Map<string, string[]>();
-        Object.entries(record).forEach(([key, value]) => {
-            map.set(key, value);
-        });
-        return map
-
-    }
 
 }
 
@@ -75,6 +65,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
                 console.log("we have changed the options for this file" + filePath);
                 VercorsOptions.updateOptions(filePath!, message.options);
+
             } else if (message.command === 'viewLoaded') {
                 const data = await this.fetchCommandLineOptions();
                 this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
