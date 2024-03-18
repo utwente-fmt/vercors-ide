@@ -116,10 +116,11 @@ async function executeVercorsCommand() {
 
     // Check if we have options, don't check file extension if --lang is used
     if (!fileOptions || (fileOptions && !(fileOptions.includes("--lang")))) {
-        if (path.extname(filePath).toLowerCase() !== '.pvl' && path.extname(filePath).toLowerCase() !== '.java') {
+        const ext = path.extname(filePath).toLowerCase();
+        if (ext !== '.pvl' && ext !== '.java' && ext !== ".c") {
             console.log(filePath);
-            vscode.window.showErrorMessage('The active file is not a .pvl or .java file.');
-            return; // Exit early if the file is not a .pvl
+            vscode.window.showErrorMessage('The active file is not a .pvl, .java or .c file.');
+            return; // Exit early if the file is not a .pvl .java or .c
         }
     }
 
@@ -154,8 +155,6 @@ async function executeVercorsCommand() {
 }
 
 function stopVercorsCommand(){
-
-    //TODO: LOOK at vercors again, should be able to exit it cleanly
 
     if (vercorsProcessPid === -1){ //check if vercors is running
         vscode.window.showInformationMessage('Vercors is not running');
