@@ -41,11 +41,11 @@ async function activate(context: vscode.ExtensionContext) {
         vscode.window.registerWebviewViewProvider('vercorsOptionsView', optionsProvider)
     );
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-        if (editor) {
-            console.log("changed active window");
-            optionsProvider.updateView();
+
+        console.log("changed active window");
+        optionsProvider.updateView();
             
-        }
+        
     }));
 
     const vercorsPathProvider = new VerCorsPathWebViewProvider(context);
