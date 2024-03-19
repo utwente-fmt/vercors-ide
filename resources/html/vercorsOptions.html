@@ -212,14 +212,11 @@
     const vscode = acquireVsCodeApi();
     let loaded = false;
 
-    function generateOptionsString(pinned) {
+    function generateOptionsMessage() {
         let optionsString = [];
-        let checkboxes;
-        if (pinned) {
-            checkboxes = document.getElementsByClassName('checkbox-pin-container')
-        } else {
-            checkboxes = document.getElementsByClassName('checkbox-container')
-        }
+        let optionsPinString = [];
+        let checkboxes = document.getElementsByClassName('checkbox-container');
+        let pinboxes = document.getElementsByClassName('checkbox-pin-container');
         for (const checkbox of checkboxes) {
             if (checkbox.querySelector('input[type="checkbox"]').checked) {
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
@@ -227,38 +224,36 @@
                 optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').name} ${args}`);
             }
         }
-        return optionsString;
+        for (const checkbox of pinboxes) {
+            if (checkbox.querySelector('input[type="checkbox"]').checked) {
+                // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
+                optionsPinString.push(`--${checkbox.querySelector('input[type="checkbox"]').name}`);
+            }
+        }
+
+        vscode.postMessage({
+            command: 'updateOptions',
+            options: optionsString,
+            pinnedOptions: optionsPinString
+        });
     }
 
     function loadOptions(options, pinned) {
         const savedOptions = options.map(option => option.replace(/^--/, '').trim());
-        console.log(savedOptions + " " + pinned);
-        const  checkboxes = document.querySelectorAll('.checkbox-container');
+        const checkboxes = document.querySelectorAll('.checkbox-container');
 
         checkboxes.forEach(checkbox => {
             const box = checkbox.querySelector('input[type="checkbox"]');
             if (savedOptions.includes(box.name)) {
                 if (!pinned) {
+                    box.checked = true;
                     checkbox.classList.add("show");
                 } else {
                     checkbox.classList.add("pinned");
                 }
-                box.checked = true;
                 box.dispatchEvent(new Event('change'));
             }
         })
-    }
-
-    function sendCurrentOptions(){
-        // Generate the options string
-        const options = generateOptionsString(false);
-        const pinnedOptions = generateOptionsString(true);
-        // Post the message to the extension with the generated string
-        vscode.postMessage({
-            command: 'updateOptions',
-            options: options,
-            pinnedOptions: pinnedOptions
-        });
     }
 
 
@@ -359,11 +354,11 @@
                 }
             }
             loaded = true;
-            console.log(1);
 
-            // Attach listener for clicks on the entire checkbox container for convenience
+            // On-change for option checkbox + label
             document.querySelectorAll('.option-container').forEach(container => {
                 container.addEventListener('click', function (event) {
+                    console.log(1);
                     // Find the checkbox inside this container
                     const checkbox = this.querySelector('.custom-checkbox');
                     const label = this.querySelector('label');
@@ -375,61 +370,53 @@
                         checkbox.dispatchEvent(new Event('change'));
                     }
                 });
-
-                // Separate event listener for the checkbox change
-                const checkbox = container.querySelector('.custom-checkbox');
-                if (checkbox) {
-                    checkbox.addEventListener('change', function () {
-                        if (this.checked) {
-                            // Styles to apply when the checkbox is checked
-                            container.style.backgroundColor = 'var(--vscode-checkbox-background)';
-                            container.style.borderLeft = '5px solid #4CAF50';
-                        } else {
-                            // Revert styles when the checkbox is not checked
-                            container.style.backgroundColor = '';
-                            container.style.borderLeft = '';
-                        }
-                    });
-                }
             });
 
-            // Attach change event listeners to checkboxes
+            // Separate event listener for the checkbox change
             document.querySelectorAll('.custom-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
-                    sendCurrentOptions();
+                    const container = checkbox.parentNode.parentNode;
+                    if (this.checked) {
+                        // Styles to apply when the checkbox is checked
+                        container.style.backgroundColor = 'var(--vscode-checkbox-background)';
+                        container.style.borderLeft = '5px solid #4CAF50';
+                    } else {
+                        // Revert styles when the checkbox is not checked
+                        container.style.backgroundColor = '';
+                        container.style.borderLeft = '';
+                    }
 
                     // Hide option if it's not pinned and not checked anymore.
-                    const parent = checkbox.parentNode.parentNode;
-                    if (!parent.classList.contains("pinned") && !checkbox.checked)  {
-                        parent.classList.remove("show");
+                    if (!container.classList.contains("pinned") && !checkbox.checked)  {
+                        container.classList.remove("show");
                     }
+                    // Update headers if necessary (e.g. no option for category is shown -> don't show header for that category).
                     updateCategoryHeaders();
+                    // Post new settings after change
+                    generateOptionsMessage();
                 });
             });
 
-            // Attach change event listeners to input fields
+            // On-input for text-input fields for options with arguments
             document.querySelectorAll('.argument-input').forEach(checkbox => {
                 checkbox.addEventListener('input', function () {
-                    // Generate the options string
-                    const options = generateOptionsString(false);
-                    const pinnedOptions = generateOptionsString(true);
-                    // Post the message to the extension with the generated string
-                    vscode.postMessage({
-                        command: 'updateOptions',
-                        options: options,
-                        pinnedOptions: pinnedOptions
-                    });
+                    // Post new settings after change
+                    generateOptionsMessage();
                 });
             });
 
-            // Attach change event listeners to the checkboxes for pinning
+            // On-change for the pin checkboxes.
             document.querySelectorAll('.checkbox-pin').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
-                    const flagCheckbox = document.getElementById(checkbox.id.replace("-pin",""));
-                    flagCheckbox.checked = !!checkbox.checked;
-                    sendCurrentOptions();
-                    const parent = checkbox.parentNode;
-                    parent.classList.toggle("pinned");
+                    const parent = checkbox.parentNode.parentNode;
+                    // Toggle class "pinned" to parent `checkbox-container`
+                    if (checkbox.checked) {
+                        parent.classList.add("pinned");
+                    } else {
+                        parent.classList.remove("pinned");
+                    }
+                    // Post new settings after change
+                    generateOptionsMessage();
                 });
             });
         }
