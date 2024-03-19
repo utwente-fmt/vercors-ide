@@ -42,9 +42,8 @@ async function activate(context: vscode.ExtensionContext) {
     );
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor) {
-            const filePath = editor.document.uri.fsPath;
             console.log("changed active window");
-            optionsProvider.updateView(filePath);
+            optionsProvider.updateView();
             
         }
     }));

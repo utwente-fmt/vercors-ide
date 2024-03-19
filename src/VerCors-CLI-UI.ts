@@ -77,6 +77,9 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
             } else if (message.command === 'viewLoaded') {
                 const data = await this.fetchCommandLineOptions();
                 this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
+                if(vscode.window.activeTextEditor !== undefined){
+                    this.updateView();
+                }
             }
         });
     }
@@ -108,7 +111,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         console.log(`Option ${option} set to ${value}`);
     }
 
-    public updateView(options: any) {
+    public updateView() {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
         const fileOptions = VercorsOptions.getOptions(filePath!);
         console.log(fileOptions)
