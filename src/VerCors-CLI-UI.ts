@@ -17,8 +17,9 @@ export class VercorsOptions {
 
     public static async updateOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
         let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        currentVercorsOptions[filePath] = vercorsOptions; 
-        console.log(vercorsOptions);
+        
+        currentVercorsOptions[filePath] =  vercorsOptions.map(e => e.trim())
+        console.log(currentVercorsOptions[filePath]);
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
 
