@@ -3,27 +3,24 @@ import * as vscode from 'vscode';
 
 
 type Options = Record<string, string[]>
-
+const checkType = {pinned: "pinned"}
 export class VercorsOptions {
 
     public static getOptions(filePath: string): Array<string> {
         const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        const fileOptions = vercorsOptions[filePath];
-        if (!fileOptions) { // if null
-            return [];
-        }
+        let fileOptions = (vercorsOptions[filePath] === undefined) ? []: vercorsOptions[filePath]  ;
+        fileOptions.concat((vercorsOptions[checkType.pinned] === undefined) ? []: vercorsOptions[checkType.pinned])
         return fileOptions;
     }
 
-    public static async updateOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
+    public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[]): Promise<void> {
         let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
         
         currentVercorsOptions[filePath] =  vercorsOptions.map(e => e.trim())
+        currentVercorsOptions[checkType.pinned] = pinnedOptions.map(e => e.trim())
         console.log(currentVercorsOptions[filePath]);
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
-
-
 }
 
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
@@ -58,8 +55,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
 
                 console.log("we have changed the options for this file" + filePath);
-                VercorsOptions.updateOptions(filePath!, message.options);
-
+                VercorsOptions.updateOptions(filePath!, message.options,message.pinnedOptions);
             } else if (message.command === 'viewLoaded') {
                 const data = await this.fetchCommandLineOptions();
                 this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
@@ -100,13 +96,26 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     public updateView() {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
         const fileOptions = VercorsOptions.getOptions(filePath!);
+        const pinnedOptions = VercorsOptions.getOptions(checkType.pinned)
         console.log(fileOptions)
+        console.log(pinnedOptions)
+        //TODO: make this 1 post message
         if (fileOptions) {
             // set the fields based on the saved options
             this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions });
-        } else {
+        }
+        else {
             // load the default options page, since this file has no options associated with it
             this._view!.webview.postMessage({ command: 'loadOptions', options: [] });
+        }
+
+        if (pinnedOptions) {
+            // set the fields based on the saved options
+            this._view!.webview.postMessage({ command: 'loadPinnedOptions', options: pinnedOptions });
+        }
+        else {
+            // load the default options page, since this file has no options associated with it
+            this._view!.webview.postMessage({ command: 'loadPinnedOptions', options: [] });
         }
     }
 }

@@ -212,13 +212,20 @@
     const vscode = acquireVsCodeApi();
     let loaded = false;
 
-    function generateOptionsString() {
+    function generateOptionsString(pinned) {
         let optionsString = [];
-        for (const checkbox of document.getElementsByClassName('checkbox-container')) {
+        let checkboxes;
+        if(pinned){
+            checkboxes = document.getElementsByClassName('checkbox-pin-container')
+        }
+        else{
+            checkboxes = document.getElementsByClassName('checkbox-container')
+        }
+        for (const checkbox of checkboxes) {
             if (checkbox.querySelector('input[type="checkbox"]').checked) {
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
                 // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
-                optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').id} ${args}`);
+                optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').name} ${args}`);
             }
         }
         return optionsString;
@@ -236,12 +243,17 @@
         });
     }
 
-    function loadOptions(options) {
+    function loadOptions(options, pinned) {
         const savedOptions = options.map(option => option.replace(/^--/, '').trim());
         console.log(savedOptions);
-        const checkboxes = document.querySelectorAll('.custom-checkbox');
+        let checkboxes;
+        if(pinned){
+            checkboxes = document.querySelectorAll('.checkbox-pin-container, .custom-checkbox');
+        }
+        else{
+            checkboxes = document.querySelectorAll('.custom-checkbox');}
         checkboxes.forEach(checkbox => {
-            if (savedOptions.includes(checkbox.id)) {
+            if (savedOptions.includes(checkbox.name)) {
                 if (!checkbox.checked) {
                     console.log("enable " + checkbox.id)
                     checkbox.checked = true;
@@ -255,6 +267,8 @@
             }
         })
     }
+
+
 
     /**
      * Toggle visibility of all category headings, their options and their respective pin checkboxes.
@@ -314,7 +328,15 @@
     window.addEventListener('message', event => {
         const message = event.data;
         if (message.command === 'loadOptions') {
-            loadOptions(message.options);
+            loadOptions(message.options,false);
+        }
+    });
+
+     // Listen for messages from the extension
+     window.addEventListener('message', event => {
+        const message = event.data;
+        if (message.command === 'loadPinnedOptions') {
+            loadOptions(message.options,true);
         }
     });
 
@@ -337,7 +359,7 @@
                             </div>
                             ${arguments}
                             <div class="checkbox-pin-container">
-                                <input type="checkbox" id="${key}-pin" name="${key}-pin" class="checkbox-pin">
+                                <input type="checkbox" id="${key}-pin" name="${key}" class="checkbox-pin">
                                 <label class="input-label" for="${key}-pin">Pin</label>
                             </div>
                         </div>`;
@@ -382,11 +404,13 @@
             document.querySelectorAll('.custom-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
                     // Generate the options string
-                    const options = generateOptionsString();
+                    const options = generateOptionsString(false);
+                    const pinnedOptions = generateOptionsString(true);
                     // Post the message to the extension with the generated string
                     vscode.postMessage({
                         command: 'updateOptions',
-                        options: options
+                        options: options,
+                        pinnedOptions: pinnedOptions
                     });
 
                     // Hide option if it's not pinned and not checked anymore.
@@ -402,18 +426,31 @@
             document.querySelectorAll('.argument-input').forEach(checkbox => {
                 checkbox.addEventListener('input', function () {
                     // Generate the options string
-                    const options = generateOptionsString();
+                    const options = generateOptionsString(false);
+                    const pinnedOptions = generateOptionsString(true);
                     // Post the message to the extension with the generated string
                     vscode.postMessage({
                         command: 'updateOptions',
                         options: options,
+                        pinnedOptions: pinnedOptions
                     });
                 });
             });
 
             // Attach change event listeners to the checkboxes for pinning
-            document.querySelectorAll('.checkbox-pin-container').forEach(checkbox => {
+            document.querySelectorAll('.checkbox-pin').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
+                    if(checkbox.checked){
+                        flagCheckbox = document.getElementById(checkbox.id.replace("-pin",""));
+                        flagCheckbox.checked = true;
+                        flagCheckbox.disabled = true;
+                        console.log(document.getElementById(checkbox.id.replace("-pin","")));
+                    }
+                    else{
+                        flagCheckbox = document.getElementById(checkbox.id.replace("-pin",""));
+                        flagCheckbox.checked = false;
+                        flagCheckbox.disabled = false;
+                    }
                     const parent = checkbox.parentNode;
                     parent.classList.toggle("pinned");
                 });
