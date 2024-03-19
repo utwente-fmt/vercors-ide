@@ -5,6 +5,7 @@ import * as path from 'path';
 
 import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './VerCors-CLI-UI';
 import { VerCorsWebViewProvider as VerCorsPathWebViewProvider, VerCorsPaths } from './VerCors-Path-UI';
+import { OutputState } from './output-parser';
 import * as fs from "fs";
 
 
@@ -141,25 +142,18 @@ async function executeVercorsCommand() {
     const childProcess = require('child_process');
     const vercorsProcess = childProcess.spawn(command, args, { shell: true });
     vercorsProcessPid = vercorsProcess.pid;
+
+    const outputState = new OutputState(outputChannel);
+
     vercorsProcess.stdout.on('data', (data: Buffer | string) => {
-        let StringData = data.toString().trim();
-
-        if (!StringData.includes("[DEBUG]")){
-
-            //parsing the percentages
-            if (StringData.startsWith("[")){
-                outputChannel.appendLine(StringData.slice(1,StringData.indexOf("]")-1));
-            }
-
-            //TODO: parsing the errors
-            
-
-            outputChannel.appendLine(":--" + StringData + "--:");
+        let lines : string[] = data.toString().split(/(\r\n|\n|\r)/gm);
+        for (let line of lines) {
+            outputState.accept(line);
         }
-        
     });
 
     vercorsProcess.on('exit', function () {
+        outputState.finish();
         vercorsProcessPid = -1;
     });
 
