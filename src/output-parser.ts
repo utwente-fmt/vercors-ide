@@ -9,6 +9,7 @@ enum state {
 export class OutputState {
 
     private state: state = state.RUNNING;
+    private currentPercentage: number = 0;
 
     public constructor(private outputChannel: vscode.OutputChannel) {
 
@@ -16,6 +17,7 @@ export class OutputState {
 
     public finish() {
         this.state = state.FINISHED;
+        this.currentPercentage = 100;
     }
 
     public accept(line: string) {
@@ -40,12 +42,18 @@ export class OutputState {
 
     private handlePercentage(line: string) {
         const matchResult =
-            /^\[(?<percentage>\d+,\d+)%] \((?<step>\d+\/\d+)\) (?<step_name>[^›]+).*$/.exec(line);
+            /^\[(?<percentage1>\d+),(?<percentage2>\d+)%] \((?<step>\d+\/\d+)\) (?<step_name>[^›]+).*$/.exec(line);
         if (matchResult) {
-            const percentage = matchResult.groups!['percentage'];
+            const percentage1 = matchResult.groups!['percentage1'];
+            const percentage2 = matchResult.groups!['percentage2'];
+            const newPercentage: number = Number(percentage1 + '.' + percentage2);
+            if (newPercentage <= this.currentPercentage) {
+                return;
+            }
+            this.currentPercentage = newPercentage;
             const step = matchResult.groups!['step'];
             const stepName = matchResult.groups!['step_name'];
-            this.outputChannel.appendLine(percentage + ", " + step + ", " + stepName);
+            this.outputChannel.appendLine(this.currentPercentage + ", " + step + ", " + stepName);
         }
     }
 
