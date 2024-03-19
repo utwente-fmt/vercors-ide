@@ -22,21 +22,6 @@ export class VercorsOptions {
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
 
-    public static async addOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
-        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        let fileOptions = this.getOptions(filePath);
-        console.log(fileOptions)
-        fileOptions.push(...vercorsOptions);
-        currentVercorsOptions[filePath] = fileOptions;
-        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
-    }
-    public static async removeOptions(filePath: string, vercorsOptions: string[]): Promise<void> {
-        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        let fileOptions = this.getOptions(filePath).filter((el,ind) => vercorsOptions.includes(el) === false);
-        currentVercorsOptions[filePath] = fileOptions;
-        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
-    }
-
 
 }
 
