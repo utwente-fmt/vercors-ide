@@ -111,6 +111,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     public updateView(options: any) {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
         const fileOptions = VercorsOptions.getOptions(filePath!);
+        console.log(fileOptions)
         if (fileOptions) {
             // set the fields based on the saved options
             this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions });

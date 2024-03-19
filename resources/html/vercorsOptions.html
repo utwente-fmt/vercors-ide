@@ -237,8 +237,8 @@
     }
 
     function loadOptions(options) {
-        const savedOptions = options.split(' ').map(option => option.replace(/^--/, ''));
-
+        const savedOptions = options.map(option => option.replace(/^--/, '').trim());
+        console.log(savedOptions);
         const checkboxes = document.querySelectorAll('.custom-checkbox');
         checkboxes.forEach(checkbox => {
             if (savedOptions.includes(checkbox.id)) {

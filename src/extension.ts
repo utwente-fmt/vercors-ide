@@ -43,7 +43,7 @@ async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
         if (editor) {
             const filePath = editor.document.uri.fsPath;
-            if (path.extname(filePath) === '.pvl' || path.extname(filePath) === '.java') {
+            if (path.extname(filePath) === '.pvl' || path.extname(filePath) === '.java' || path.extname(filePath) === '.c') {
                 console.log("changed active window");
                 optionsProvider.updateView(filePath);
             }
