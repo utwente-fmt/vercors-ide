@@ -215,10 +215,9 @@
     function generateOptionsString(pinned) {
         let optionsString = [];
         let checkboxes;
-        if(pinned){
+        if (pinned) {
             checkboxes = document.getElementsByClassName('checkbox-pin-container')
-        }
-        else{
+        } else {
             checkboxes = document.getElementsByClassName('checkbox-container')
         }
         for (const checkbox of checkboxes) {
@@ -231,39 +230,21 @@
         return optionsString;
     }
 
-
-
-    function uncheckAllCheckboxes() {
-        const checkboxes = document.querySelectorAll('.custom-checkbox');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                checkbox.checked = false;
-                checkbox.dispatchEvent(new Event('change'));
-            }
-        });
-    }
-
     function loadOptions(options, pinned) {
         const savedOptions = options.map(option => option.replace(/^--/, '').trim());
-        console.log(savedOptions);
-        let checkboxes;
-        if(pinned){
-            checkboxes = document.querySelectorAll('.checkbox-pin-container, .custom-checkbox');
-        }
-        else{
-            checkboxes = document.querySelectorAll('.custom-checkbox');}
+        console.log(savedOptions + " " + pinned);
+        const  checkboxes = document.querySelectorAll('.checkbox-container');
+
         checkboxes.forEach(checkbox => {
-            if (savedOptions.includes(checkbox.name)) {
-                if (!checkbox.checked) {
-                    console.log("enable " + checkbox.id)
-                    checkbox.checked = true;
-                    checkbox.dispatchEvent(new Event('change'));
+            const box = checkbox.querySelector('input[type="checkbox"]');
+            if (savedOptions.includes(box.name)) {
+                if (!pinned) {
+                    checkbox.classList.add("show");
+                } else {
+                    checkbox.classList.add("pinned");
                 }
-            } else {
-                if (checkbox.checked) {
-                    checkbox.checked = false;
-                    checkbox.dispatchEvent(new Event('change'));
-                }
+                box.checked = true;
+                box.dispatchEvent(new Event('change'));
             }
         })
     }
@@ -339,7 +320,7 @@
     window.addEventListener('message', event => {
         const message = event.data;
         if (message.command === 'loadOptions') {
-            loadOptions(message.options,false);
+            loadOptions(message.options, false);
         }
     });
 
@@ -347,7 +328,7 @@
      window.addEventListener('message', event => {
         const message = event.data;
         if (message.command === 'loadPinnedOptions') {
-            loadOptions(message.options,true);
+            loadOptions(message.options, true);
         }
     });
 
@@ -378,6 +359,7 @@
                 }
             }
             loaded = true;
+            console.log(1);
 
             // Attach listener for clicks on the entire checkbox container for convenience
             document.querySelectorAll('.option-container').forEach(container => {
@@ -443,22 +425,11 @@
             // Attach change event listeners to the checkboxes for pinning
             document.querySelectorAll('.checkbox-pin').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
-                    if(checkbox.checked){
-                        flagCheckbox = document.getElementById(checkbox.id.replace("-pin",""));
-                        flagCheckbox.checked = true;
-                        flagCheckbox.disabled = true;
-                        console.log(document.getElementById(checkbox.id.replace("-pin","")));
-                    }
-                    else{
-                        flagCheckbox = document.getElementById(checkbox.id.replace("-pin",""));
-                        flagCheckbox.checked = false;
-                        flagCheckbox.disabled = false;
-                    }
+                    const flagCheckbox = document.getElementById(checkbox.id.replace("-pin",""));
+                    flagCheckbox.checked = !!checkbox.checked;
                     sendCurrentOptions();
                     const parent = checkbox.parentNode;
                     parent.classList.toggle("pinned");
-
-                    
                 });
             });
         }
