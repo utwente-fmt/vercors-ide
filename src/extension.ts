@@ -142,7 +142,21 @@ async function executeVercorsCommand() {
     const vercorsProcess = childProcess.spawn(command, args, { shell: true });
     vercorsProcessPid = vercorsProcess.pid;
     vercorsProcess.stdout.on('data', (data: Buffer | string) => {
-        outputChannel.appendLine(data.toString());
+        let StringData = data.toString().trim();
+
+        if (!StringData.includes("[DEBUG]")){
+
+            //parsing the percentages
+            if (StringData.startsWith("[")){
+                outputChannel.appendLine(StringData.slice(1,StringData.indexOf("]")-1));
+            }
+
+            //TODO: parsing the errors
+            
+
+            outputChannel.appendLine(":--" + StringData + "--:");
+        }
+        
     });
 
     vercorsProcess.on('exit', function () {
