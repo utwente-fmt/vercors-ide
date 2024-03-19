@@ -117,7 +117,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
             this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions });
         } else {
             // load the default options page, since this file has no options associated with it
-            this._view!.webview.postMessage({ command: 'uncheckAllCheckboxes' });
+            this._view!.webview.postMessage({ command: 'loadOptions', options: [] });
         }
     }
 }

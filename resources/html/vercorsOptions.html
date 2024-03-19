@@ -304,14 +304,6 @@
     }
 
     // Listen for messages from the extension
-    window.addEventListener('message', event => {
-        const message = event.data;
-        if (message.command === 'uncheckAllCheckboxes') {
-            uncheckAllCheckboxes();
-        }
-    });
-
-    // Listen for messages from the extension
     window.addEventListener('DOMContentLoaded', () => {
         vscode.postMessage({
             command: 'viewLoaded',
