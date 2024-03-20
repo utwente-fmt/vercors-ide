@@ -107,7 +107,7 @@ async function executeVercorsCommand() {
 
     let command = '"' + vercorsPath + '"'; // account for spaces
 
-    const fileOptions = VercorsOptions.getOptions(filePath);
+    const fileOptions = VercorsOptions.getFlagOptions(filePath);
     let inputFile = '"' + filePath + '"';
     let args = fileOptions ? ([inputFile].concat(fileOptions)) : [inputFile];
 

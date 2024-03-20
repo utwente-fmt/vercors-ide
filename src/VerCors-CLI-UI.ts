@@ -1,23 +1,32 @@
 import path from 'path';
 import * as vscode from 'vscode';
 
-
-type Options = Record<string, string[]>
-const checkType = {pinned: "pinned"}
+type Optionfields = {
+    pinned: string[],
+    flags: string[]
+}
+type Options = Record<string, Optionfields>
 export class VercorsOptions {
 
-    public static getOptions(filePath: string): Array<string> {
+    public static getFlagOptions(filePath: string): Array<string> {
         const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        let fileOptions = (vercorsOptions[filePath] === undefined) ? []: vercorsOptions[filePath]  ;
-        fileOptions.concat((vercorsOptions[checkType.pinned] === undefined) ? []: vercorsOptions[checkType.pinned])
+        let fileOptions = vercorsOptions[filePath]? vercorsOptions[filePath].flags:[];
         return fileOptions;
     }
+
+    public static getAllOptions(filePath: string): Optionfields {
+        const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        let fileOptions = vercorsOptions[filePath]? vercorsOptions[filePath]:{pinned: [], flags: []};
+        return fileOptions;
+    }
+
+
+    
 
     public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[]): Promise<void> {
         let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
         
-        currentVercorsOptions[filePath] =  vercorsOptions.map(e => e.trim())
-        currentVercorsOptions[checkType.pinned] = pinnedOptions.map(e => e.trim())
+        currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
         console.log(currentVercorsOptions[filePath]);
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
     }
@@ -95,10 +104,9 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     public updateView() {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-        const fileOptions = VercorsOptions.getOptions(filePath!)? VercorsOptions.getOptions(filePath!): [];
-        const pinOptions = VercorsOptions.getOptions(checkType.pinned)? VercorsOptions.getOptions(checkType.pinned): [];
-        console.log(fileOptions)
-        console.log(pinOptions)
-        this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions, pinnedOptions: pinOptions});
+        const fileOptions = VercorsOptions.getAllOptions(filePath!);
+        console.log(fileOptions.flags)
+        console.log(fileOptions.pinned)
+        this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions.flags, pinnedOptions: fileOptions.pinned});
     }
 }
