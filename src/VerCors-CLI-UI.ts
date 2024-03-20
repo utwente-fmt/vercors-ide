@@ -95,27 +95,10 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     public updateView() {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-        const fileOptions = VercorsOptions.getOptions(filePath!);
-        const pinnedOptions = VercorsOptions.getOptions(checkType.pinned)
+        const fileOptions = VercorsOptions.getOptions(filePath!)? VercorsOptions.getOptions(filePath!): [];
+        const pinOptions = VercorsOptions.getOptions(checkType.pinned)? VercorsOptions.getOptions(checkType.pinned): [];
         console.log(fileOptions)
-        console.log(pinnedOptions)
-        //TODO: make this 1 post message
-        if (fileOptions) {
-            // set the fields based on the saved options
-            this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions });
-        }
-        else {
-            // load the default options page, since this file has no options associated with it
-            this._view!.webview.postMessage({ command: 'loadOptions', options: [] });
-        }
-
-        if (pinnedOptions) {
-            // set the fields based on the saved options
-            this._view!.webview.postMessage({ command: 'loadPinnedOptions', options: pinnedOptions });
-        }
-        else {
-            // load the default options page, since this file has no options associated with it
-            this._view!.webview.postMessage({ command: 'loadPinnedOptions', options: [] });
-        }
+        console.log(pinOptions)
+        this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions, pinnedOptions: pinOptions});
     }
 }

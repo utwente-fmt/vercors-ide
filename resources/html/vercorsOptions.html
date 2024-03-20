@@ -238,22 +238,39 @@
         });
     }
 
-    function loadOptions(options, pinned) {
+    function loadOptions(options, pinnedOptions) {
         const savedOptions = options.map(option => option.replace(/^--/, '').trim());
-        const checkboxes = document.querySelectorAll('.checkbox-container');
+        const savedPinnedOptions = pinnedOptions.map(option => option.replace(/^--/, '').trim());
+        const flagboxes = document.querySelectorAll('.checkbox-container');
+        const pinboxes = document.querySelectorAll('.checkbox-pin-container');
 
-        checkboxes.forEach(checkbox => {
+        flagboxes.forEach(checkbox => {
             const box = checkbox.querySelector('input[type="checkbox"]');
             if (savedOptions.includes(box.name)) {
-                if (!pinned) {
-                    box.checked = true;
-                    checkbox.classList.add("show");
-                } else {
-                    checkbox.classList.add("pinned");
-                }
-                box.dispatchEvent(new Event('change'));
+                
+                box.checked = true;
+                checkbox.classList.add("show");
             }
+            else{
+                box.checked = false;
+            }
+                
+               
+            
         })
+
+        pinboxes.forEach(checkbox => {
+            const box = checkbox.querySelector('input[type="checkbox"]');
+            if (savedPinnedOptions.includes(box.name)){
+                document.getElementById(box.name).classList.add("pinned");
+                box.checked = true
+            }
+            else{
+                box.checked = false;
+            } 
+        })
+
+        box.dispatchEvent(new Event('change'));
     }
 
 
@@ -315,17 +332,10 @@
     window.addEventListener('message', event => {
         const message = event.data;
         if (message.command === 'loadOptions') {
-            loadOptions(message.options, false);
+            loadOptions(message.options, message.pinnedOptions);
         }
     });
 
-     // Listen for messages from the extension
-     window.addEventListener('message', event => {
-        const message = event.data;
-        if (message.command === 'loadPinnedOptions') {
-            loadOptions(message.options, true);
-        }
-    });
 
     // Generate options & attach listeners to them
     window.addEventListener('message', event => {
