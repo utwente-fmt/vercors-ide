@@ -205,7 +205,7 @@
             </label>
         </div>
     </form>
-<button id="edit-options-button" onclick="toggleAllOptions(this)">See all options</button>
+<button id="edit-options-button" onclick="toggleAllOptions(this)" data-isHideOptions = "true">See all options</button>
 </body>
 <script>
 
@@ -281,28 +281,42 @@
      * Toggle visibility of all category headings, their options and their respective pin checkboxes.
      */
     function toggleAllOptions(button) {
-        if (!loaded) return
+
+        button.dataset.ishideoptions = button.dataset.ishideoptions === "false";
+        setShownOptions();
+  
+    }
+
+    /*
+        Shows all options that are supposed to be showed at this time.
+        It depends on the current view mode 
+    */
+    function setShownOptions() {
+        const button = document.getElementById("edit-options-button");
+        if (!loaded) return;
         const checkboxes = document.querySelectorAll(".checkbox-container");
-        const isHideOptions = button.textContent === "Hide options";
+        const isHideOptions = button.dataset.ishideoptions === "true";
+  
 
         // Show all option checkboxes or hide all unchecked & unpinned
         for (let checkbox of checkboxes) {
             const isChecked = checkbox.querySelector('input[type="checkbox"]').checked;
             const isPinned = checkbox.classList.contains("pinned");
             checkbox.classList.toggle("show", isHideOptions ? isChecked || isPinned : true);
-            checkbox.classList.toggle("showAll");
+            checkbox.classList.toggle("showAll",!isHideOptions);
         }
         // Toggle pin boxes
         const pinCheckboxes = document.querySelectorAll(".checkbox-pin-container");
         for (let pinCheckbox of pinCheckboxes) {
-            pinCheckbox.classList.toggle("showAll");
+            pinCheckbox.classList.toggle("showAll",!isHideOptions);
         }
 
-        // Show all headers & toggle visibility based on selected options if needed
-        document.querySelectorAll(".option-category").forEach((category) => category.classList.toggle("showAll"));
-        this.updateCategoryHeaders();
+             
+        button.textContent = isHideOptions ? "See all options": "Hide options";
 
-        button.textContent = isHideOptions ? "See all options" : "Hide options";
+        // Show all headers & toggle visibility based on selected options if needed
+        document.querySelectorAll(".option-category").forEach((category) => category.classList.toggle("showAll",!isHideOptions));
+        this.updateCategoryHeaders();
     }
 
     /**
@@ -336,6 +350,7 @@
         const message = event.data;
         if (message.command === 'loadOptions') {
             loadOptions(message.options, message.pinnedOptions);
+            setShownOptions();
         }
     });
 
