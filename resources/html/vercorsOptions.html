@@ -212,7 +212,8 @@
     const vscode = acquireVsCodeApi();
     let loaded = false;
 
-    function generateOptionsMessage() {
+
+    function sendOptionsMessage() {
         let optionsString = [];
         let optionsPinString = [];
         let checkboxes = document.getElementsByClassName('checkbox-container');
@@ -249,10 +250,11 @@
             if (savedOptions.includes(box.name)) {
                 
                 box.checked = true;
-                checkbox.classList.add("show");
+                box.dispatchEvent(new Event('change'));
             }
             else{
                 box.checked = false;
+                box.dispatchEvent(new Event('change'));
             }
                 
                
@@ -262,15 +264,16 @@
         pinboxes.forEach(checkbox => {
             const box = checkbox.querySelector('input[type="checkbox"]');
             if (savedPinnedOptions.includes(box.name)){
-                document.getElementById(box.name).classList.add("pinned");
-                box.checked = true
+                box.checked = true;
+                box.dispatchEvent(new Event('change'));
             }
             else{
                 box.checked = false;
+                box.dispatchEvent(new Event('change'));
             } 
         })
 
-        box.dispatchEvent(new Event('change'));
+        
     }
 
 
@@ -403,7 +406,7 @@
                     // Update headers if necessary (e.g. no option for category is shown -> don't show header for that category).
                     updateCategoryHeaders();
                     // Post new settings after change
-                    generateOptionsMessage();
+                    sendOptionsMessage();
                 });
             });
 
@@ -411,7 +414,7 @@
             document.querySelectorAll('.argument-input').forEach(checkbox => {
                 checkbox.addEventListener('input', function () {
                     // Post new settings after change
-                    generateOptionsMessage();
+                    sendOptionsMessage();
                 });
             });
 
@@ -426,7 +429,7 @@
                         parent.classList.remove("pinned");
                     }
                     // Post new settings after change
-                    generateOptionsMessage();
+                    sendOptionsMessage();
                 });
             });
         }
