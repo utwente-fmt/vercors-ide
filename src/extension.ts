@@ -40,12 +40,9 @@ async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('vercorsOptionsView', optionsProvider)
     );
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => {
         console.log("changed active window");
         optionsProvider.updateView();
-            
-        
     }));
 
     const vercorsPathProvider = new VerCorsPathWebViewProvider(context);
@@ -125,8 +122,8 @@ async function executeVercorsCommand() {
     args.push("--progress");
     args.push("--verbose");
 
-    console.log(command);
-    console.log(args);
+    // console.log(command);
+    // console.log(args);
     // Create the output channel if it doesn't exist
     if (!outputChannel) {
         outputChannel = vscode.window.createOutputChannel("vercors-output", "vercors-output");
@@ -172,7 +169,7 @@ function stopVercorsCommand(){
 const documentLinkProviderDisposable = vscode.languages.registerDocumentLinkProvider(
     { language: "vercors-output" }, // Use the language ID
     {
-        provideDocumentLinks: (doc, token) => {
+        provideDocumentLinks: (doc) => {
             const links: vscode.ProviderResult<vscode.DocumentLink[]> = [];
             const regex = /^.*( )(.*):(\d+):(\d+):/gm; // Adjust regex as needed
             let match;
