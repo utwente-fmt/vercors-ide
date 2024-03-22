@@ -215,7 +215,7 @@
         </label>
     </div>
 </form>
-<button id="edit-options-button" onclick="toggleAllOptions(this)">See all options</button>
+<button id="edit-options-button" onclick="toggleAllOptions(this)" data-ishideoptions = "true">See all options</button>
 </body>
 <script>
 
@@ -271,8 +271,6 @@
 
 
     function toggleAllOptions(button) {
-        if (!loaded) return
-
         // Show all option checkboxes or hide all unchecked & unpinned
         document.querySelectorAll(".checkbox-container").forEach((category) => category.classList.toggle("showAll"));
         // Toggle pin boxes
@@ -281,7 +279,9 @@
         document.querySelectorAll(".option-category").forEach((category) => category.classList.toggle("showAll"));
         this.updateCategoryHeaders();
 
-        button.textContent = button.textContent === "Hide options" ? "See all options" : "Hide options";
+        // flip button text
+        button.dataset.ishideoptions = button.dataset.ishideoptions === "false";
+        button.textContent = button.dataset.ishideoptions === "true" ? "See all options": "Hide options";
     }
 
 
