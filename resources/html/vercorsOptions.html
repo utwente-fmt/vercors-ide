@@ -132,6 +132,15 @@
             align-items: center;
             cursor: pointer;
         }
+        .checkbox-container:has(.custom-checkbox:checked) {
+            background-color: var(--vscode-checkbox-background) !important;
+            border-left: 5px solid #4CAF50 !important;
+            display: flex;
+        }
+        .checkbox-container:has(.checkbox-pin:checked) {
+            display: flex;
+        }
+
         .option-container {
             box-sizing: border-box;
             align-items: center;
@@ -172,12 +181,13 @@
             display: none;
             margin-top: 10px;
         }
-        .show {
+        .option-category.show {
             display: flex;
         }
         .showAll {
             display: flex !important;
         }
+
         #edit-options-button {
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
@@ -194,120 +204,115 @@
     <!-- You can add style here or link to an external stylesheet -->
 </head>
 <body>
-    <h1>VerCors Options</h1>
-    <form id="options-form" style="min-width: 355px">
-        <div style="display:table; margin-bottom: 15px;" title="Set the backend to verify with (default: silicon)">
+<h1>VerCors Options</h1>
+<form id="options-form" style="min-width: 355px">
+    <div style="display:table; margin-bottom: 15px;" title="Set the backend to verify with (default: silicon)">
             <span class="backend-label"
                   style="padding-right: 15px; display: table-cell; vertical-align: middle;">Backend: </span>
-            <label class="switch btn-color-mode-switch">
-                <input type="checkbox" name="color_mode" id="color_mode" value="1">
-                <label for="color_mode" data-on="Carbon" data-off="Silicon" class="btn-color-mode-switch-inner"></label>
-            </label>
-        </div>
-    </form>
-<button id="edit-options-button" onclick="toggleAllOptions(this)">See all options</button>
+        <label class="switch btn-color-mode-switch">
+            <input type="checkbox" name="color_mode" id="color_mode" value="1">
+            <label for="color_mode" data-on="Carbon" data-off="Silicon" class="btn-color-mode-switch-inner"></label>
+        </label>
+    </div>
+</form>
+<button id="edit-options-button" onclick="toggleAllOptions(this)" data-ishideoptions = "true">See all options</button>
 </body>
 <script>
 
     const vscode = acquireVsCodeApi();
     let loaded = false;
 
-    function generateOptionsString() {
-        let optionsString = "";
-        for (const checkbox of document.getElementsByClassName('checkbox-container')) {
+    function generateOptionsMessage() {
+        let optionsString = [];
+        let optionsPinString = [];
+
+        let checkboxContainers = document.getElementsByClassName('checkbox-container');
+        for (const checkbox of checkboxContainers) {
             if (checkbox.querySelector('input[type="checkbox"]').checked) {
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
                 // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
-                optionsString += `--${checkbox.querySelector('input[type="checkbox"]').id} ${args}`;
+                optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').name} ${args}`);
             }
         }
-        return optionsString.trim();
-    }
 
-    function uncheckAllCheckboxes() {
-        const checkboxes = document.querySelectorAll('.custom-checkbox');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                checkbox.checked = false;
-                checkbox.dispatchEvent(new Event('change'));
+        let pinContainers = document.getElementsByClassName('checkbox-pin-container');
+        for (const checkbox of pinContainers) {
+            if (checkbox.querySelector('input[type="checkbox"]').checked) {
+                // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
+                optionsPinString.push(`--${checkbox.querySelector('input[type="checkbox"]').name}`);
             }
+        }
+
+        vscode.postMessage({
+            command: 'updateOptions',
+            options: optionsString,
+            pinnedOptions: optionsPinString
         });
     }
 
-    function loadOptions(options) {
-        const savedOptions = options.split(' ').map(option => option.replace(/^--/, ''));
+    function loadOptions(options, pinnedOptions) {
+        const savedOptions = options.map(option => option.replace(/^--/, '').trim());
+        const savedPinnedOptions = pinnedOptions.map(option => option.replace(/^--/, '').trim());
 
-        const checkboxes = document.querySelectorAll('.custom-checkbox');
-        checkboxes.forEach(checkbox => {
-            if (savedOptions.includes(checkbox.id)) {
-                if (!checkbox.checked) {
-                    console.log("enable " + checkbox.id)
-                    checkbox.checked = true;
-                    checkbox.dispatchEvent(new Event('change'));
-                }
-            } else {
-                if (checkbox.checked) {
-                    checkbox.checked = false;
-                    checkbox.dispatchEvent(new Event('change'));
-                }
-            }
-        })
+        // update option checkboxes
+        document.querySelectorAll('.checkbox-container')
+            .forEach((flagContainer) => flagContainer.querySelectorAll('input[type="checkbox"]')
+                .forEach((checkbox) => checkbox.checked = savedOptions.includes(checkbox.name)
+                )
+            );
+        // update pin checkboxes
+        document.querySelectorAll('.checkbox-pin-container')
+            .forEach((pinContainer) => pinContainer.querySelectorAll('input[type="checkbox"]')
+                .forEach((checkbox) => checkbox.checked = savedPinnedOptions.includes(checkbox.name)
+                )
+            );
+        updateCategoryHeaders();
     }
 
-    /**
-     * Toggle visibility of all category headings, their options and their respective pin checkboxes.
-     */
+
     function toggleAllOptions(button) {
-        if (!loaded) return
-        const checkboxes = document.querySelectorAll(".checkbox-container");
-        const isHideOptions = button.textContent === "Hide options";
-
         // Show all option checkboxes or hide all unchecked & unpinned
-        for (let checkbox of checkboxes) {
-            const isChecked = checkbox.querySelector('input[type="checkbox"]').checked;
-            const isPinned = checkbox.classList.contains("pinned");
-            checkbox.classList.toggle("show", isHideOptions ? isChecked || isPinned : true);
-            checkbox.classList.toggle("showAll");
-        }
+        document.querySelectorAll(".checkbox-container").forEach((category) => category.classList.toggle("showAll"));
         // Toggle pin boxes
-        const pinCheckboxes = document.querySelectorAll(".checkbox-pin-container");
-        for (let pinCheckbox of pinCheckboxes) {
-            pinCheckbox.classList.toggle("showAll");
-        }
-
-        // Show all headers & toggle visibility based on selected options if needed
+        document.querySelectorAll(".checkbox-pin-container").forEach((category) => category.classList.toggle("showAll"));
+        // Show all headers
         document.querySelectorAll(".option-category").forEach((category) => category.classList.toggle("showAll"));
         this.updateCategoryHeaders();
 
-        button.textContent = isHideOptions ? "See all options" : "Hide options";
+        // flip button text
+        button.dataset.ishideoptions = button.dataset.ishideoptions === "false";
+        button.textContent = button.dataset.ishideoptions === "true" ? "See all options": "Hide options";
     }
 
-    /**
-     * Toggle category titles if none selected.
-     */
-    function updateCategoryHeaders() {
-        const categories = document.querySelectorAll(".option-category");
-        for (let category of categories) {
-            const options = document.querySelectorAll(`.${category.id}`);
 
-            // Check if any checkbox is checked or has the class "pinned"
-            for (let option of options) {
-                if (option.querySelector('input[type="checkbox"]').checked || option.classList.contains("pinned")) {
-                    category.classList.add("show");
-                    break;
+    function updateCategoryHeaders() {
+        const categoryElements = document.querySelectorAll(".option-category");
+
+        for (let category of categoryElements) {
+            let shouldShowCategory = false;
+            const optionElements = document.querySelectorAll(`.${category.id}`);
+
+            for (let option of optionElements) {
+                const checkboxElements = option.querySelectorAll('input[type="checkbox"]');
+                for (let checkbox of checkboxElements) {
+                    if (checkbox.checked) {
+                        shouldShowCategory = true;
+                        break; // don't bother with the rest of the checkboxes
+                    }
                 }
+                if (shouldShowCategory) {
+                    break; // don't bother with the rest of the options
+                }
+            }
+
+            if (shouldShowCategory) {
+                category.classList.add("show");
+            } else {
                 category.classList.remove("show");
             }
         }
     }
 
-    // Listen for messages from the extension
-    window.addEventListener('message', event => {
-        const message = event.data;
-        if (message.command === 'uncheckAllCheckboxes') {
-            uncheckAllCheckboxes();
-        }
-    });
 
     // Listen for messages from the extension
     window.addEventListener('DOMContentLoaded', () => {
@@ -320,9 +325,10 @@
     window.addEventListener('message', event => {
         const message = event.data;
         if (message.command === 'loadOptions') {
-            loadOptions(message.options);
+            loadOptions(message.options, message.pinnedOptions);
         }
     });
+
 
     // Generate options & attach listeners to them
     window.addEventListener('message', event => {
@@ -343,7 +349,7 @@
                             </div>
                             ${arguments}
                             <div class="checkbox-pin-container">
-                                <input type="checkbox" id="${key}-pin" name="${key}-pin" class="checkbox-pin">
+                                <input type="checkbox" id="${key}-pin" name="${key}" class="checkbox-pin">
                                 <label class="input-label" for="${key}-pin">Pin</label>
                             </div>
                         </div>`;
@@ -352,7 +358,7 @@
             }
             loaded = true;
 
-            // Attach listener for clicks on the entire checkbox container for convenience
+            // On-change for option checkbox + label
             document.querySelectorAll('.option-container').forEach(container => {
                 container.addEventListener('click', function (event) {
                     // Find the checkbox inside this container
@@ -362,66 +368,36 @@
                     // Toggle the checkbox only if the click is on the container, but not on the checkbox or label
                     if (event.target !== checkbox && event.target !== label) {
                         checkbox.checked = !checkbox.checked;
+
                         // Only manually dispatch the event if the natural one won't be fired
                         checkbox.dispatchEvent(new Event('change'));
                     }
                 });
-
-                // Separate event listener for the checkbox change
-                const checkbox = container.querySelector('.custom-checkbox');
-                if (checkbox) {
-                    checkbox.addEventListener('change', function () {
-                        if (this.checked) {
-                            // Styles to apply when the checkbox is checked
-                            container.style.backgroundColor = 'var(--vscode-checkbox-background)';
-                            container.style.borderLeft = '5px solid #4CAF50';
-                        } else {
-                            // Revert styles when the checkbox is not checked
-                            container.style.backgroundColor = '';
-                            container.style.borderLeft = '';
-                        }
-                    });
-                }
             });
 
-            // Attach change event listeners to checkboxes
+            // Separate event listener for the checkbox change
             document.querySelectorAll('.custom-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
-                    // Generate the options string
-                    const options = generateOptionsString();
-                    // Post the message to the extension with the generated string
-                    vscode.postMessage({
-                        command: 'updateOptions',
-                        options: options
-                    });
-
-                    // Hide option if it's not pinned and not checked anymore.
-                    const parent = checkbox.parentNode.parentNode;
-                    if (!parent.classList.contains("pinned") && !checkbox.checked)  {
-                        parent.classList.remove("show");
-                    }
+                    // Update headers if necessary (e.g. no option for category is shown -> don't show header for that category).
                     updateCategoryHeaders();
+                    // Post new settings after change
+                    generateOptionsMessage();
                 });
             });
 
-            // Attach change event listeners to input fields
+            // On-input for text-input fields for options with arguments
             document.querySelectorAll('.argument-input').forEach(checkbox => {
                 checkbox.addEventListener('input', function () {
-                    // Generate the options string
-                    const options = generateOptionsString();
-                    // Post the message to the extension with the generated string
-                    vscode.postMessage({
-                        command: 'updateOptions',
-                        options: options,
-                    });
+                    // Post new settings after change
+                    generateOptionsMessage();
                 });
             });
 
-            // Attach change event listeners to the checkboxes for pinning
-            document.querySelectorAll('.checkbox-pin-container').forEach(checkbox => {
+            // On-change for the pin checkboxes.
+            document.querySelectorAll('.checkbox-pin').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
-                    const parent = checkbox.parentNode;
-                    parent.classList.toggle("pinned");
+                    // Post new settings after change
+                    generateOptionsMessage();
                 });
             });
         }

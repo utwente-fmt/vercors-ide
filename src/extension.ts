@@ -3,13 +3,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './VerCors-CLI-UI';
+import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider, VercorsOptions } from './VerCors-CLI-UI';
 import { VerCorsWebViewProvider as VerCorsPathWebViewProvider, VerCorsPaths } from './VerCors-Path-UI';
 import * as fs from "fs";
 
 
 let outputChannel: vscode.OutputChannel;
-const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
+
 let vercorsProcessPid = -1;
 /**
  * Method called when the extension is activated
@@ -36,19 +36,13 @@ async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposableStartCommand);
     context.subscriptions.push(disposableStopCommand);
 
-    const optionsProvider = new VerCorsCLIWebViewProvider(context, vercorsOptionsMap);
+    const optionsProvider = new VerCorsCLIWebViewProvider(context);
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('vercorsOptionsView', optionsProvider)
     );
-    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-        if (editor) {
-            const filePath = editor.document.uri.fsPath;
-            if (path.extname(filePath) === '.pvl' || path.extname(filePath) === '.java') {
-                console.log("changed active window");
-                const options = vercorsOptionsMap.get(filePath) || {};
-                optionsProvider.updateView(options);
-            }
-        }
+    context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => {
+        console.log("changed active window");
+        optionsProvider.updateView();
     }));
 
     const vercorsPathProvider = new VerCorsPathWebViewProvider(context);
@@ -110,7 +104,7 @@ async function executeVercorsCommand() {
 
     let command = '"' + vercorsPath + '"'; // account for spaces
 
-    const fileOptions = vercorsOptionsMap.get(filePath);
+    const fileOptions = VercorsOptions.getFlagOptions(filePath);
     let inputFile = '"' + filePath + '"';
     let args = fileOptions ? ([inputFile].concat(fileOptions)) : [inputFile];
 
@@ -128,8 +122,8 @@ async function executeVercorsCommand() {
     args.push("--progress");
     args.push("--verbose");
 
-    console.log(command);
-    console.log(args);
+    // console.log(command);
+    // console.log(args);
     // Create the output channel if it doesn't exist
     if (!outputChannel) {
         outputChannel = vscode.window.createOutputChannel("vercors-output", "vercors-output");
@@ -175,7 +169,7 @@ function stopVercorsCommand(){
 const documentLinkProviderDisposable = vscode.languages.registerDocumentLinkProvider(
     { language: "vercors-output" }, // Use the language ID
     {
-        provideDocumentLinks: (doc, token) => {
+        provideDocumentLinks: (doc) => {
             const links: vscode.ProviderResult<vscode.DocumentLink[]> = [];
             const regex = /^.*( )(.*):(\d+):(\d+):/gm; // Adjust regex as needed
             let match;

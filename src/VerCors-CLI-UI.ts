@@ -1,18 +1,44 @@
-import path from 'path';
 import * as vscode from 'vscode';
+
+type OptionFields = {
+    pinned: string[],
+    flags: string[]
+}
+type Options = Record<string, OptionFields>
+export class VercorsOptions {
+
+    public static getFlagOptions(filePath: string): Array<string> {
+        const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        return vercorsOptions[filePath] ? vercorsOptions[filePath].flags : [];
+    }
+
+    public static getAllOptions(filePath: string): OptionFields {
+        const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        return vercorsOptions[filePath] ? vercorsOptions[filePath] : { pinned: [], flags: [] };
+    }
+
+
+    
+
+    public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[]): Promise<void> {
+        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        
+        currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
+        console.log({file: filePath, ...currentVercorsOptions[filePath]});
+        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
+    }
+}
 
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private _view?: vscode.WebviewView;
-
-    private _vercorsOptionsMap;
 
     private readonly _extensionUri: vscode.Uri;
 
     private _HTMLContent: string | undefined;
 
-    constructor(private context: vscode.ExtensionContext, private optionsMap: Map<String, String>) {
+    constructor(private context: vscode.ExtensionContext) {
         this._extensionUri = context.extensionUri;
-        this._vercorsOptionsMap = optionsMap;
+        
     }
 
     public async resolveWebviewView(
@@ -33,12 +59,13 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(async message => {
             if (message.command === 'updateOptions') {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-
-                console.log("we have changed the options for this file" + filePath);
-                this._vercorsOptionsMap.set(filePath!, message.options);
+                VercorsOptions.updateOptions(filePath!, message.options,message.pinnedOptions);
             } else if (message.command === 'viewLoaded') {
                 const data = await this.fetchCommandLineOptions();
                 this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
+                if(vscode.window.activeTextEditor !== undefined){
+                    this.updateView();
+                }
             }
         });
     }
@@ -65,20 +92,11 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         return JSON.parse(Buffer.from(optionsContent).toString('utf8'));
     }
 
-    private updateOption(option: string, value: boolean) {
-        // Update your extension's settings or state based on the option selected
-        console.log(`Option ${option} set to ${value}`);
-    }
-
-    public updateView(options: any) {
+    public updateView() {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-        const fileOptions = this._vercorsOptionsMap.get(filePath!);
-        if (fileOptions) {
-            // set the fields based on the saved options
-            this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions });
-        } else {
-            // load the default options page, since this file has no options associated with it
-            this._view!.webview.postMessage({ command: 'uncheckAllCheckboxes' });
-        }
+        const fileOptions = VercorsOptions.getAllOptions(filePath!);
+        // console.log(fileOptions.flags)
+        // console.log(fileOptions.pinned)
+        this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions.flags, pinnedOptions: fileOptions.pinned});
     }
 }
