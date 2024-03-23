@@ -25,7 +25,7 @@ export class VercorsOptions {
         
         currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
         console.log({file: filePath, ...currentVercorsOptions[filePath]});
-        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
+        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions);
     }
 }
 
