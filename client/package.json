@@ -20,7 +20,8 @@
   "devDependencies": {
     "@types/vscode": "^1.75.1",
     "@vscode/test-electron": "^2.3.9",
-    "glob": "^10.3.10"
+    "glob-promise": "^6.0.5",
+    "glob": "^8.0.3"
   },
   "scripts": {
     "compile": "tsc -p ./"
