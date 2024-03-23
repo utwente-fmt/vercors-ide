@@ -1,21 +1,75 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import * as path from 'path';
+/* --------------------------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * ------------------------------------------------------------------------------------------ */
 
-import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider, VercorsOptions } from './VerCors-CLI-UI';
+import * as path from 'path';
+import { workspace, ExtensionContext } from 'vscode';
+import * as vscode from 'vscode';
+import {
+	LanguageClient,
+	LanguageClientOptions,
+	ServerOptions,
+	TransportKind
+} from 'vscode-languageclient/node';
+
+import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider, VercorsOptions  } from './VerCors-CLI-UI';
 import { VerCorsWebViewProvider as VerCorsPathWebViewProvider, VerCorsPaths } from './VerCors-Path-UI';
 import * as fs from "fs";
 
 
 let outputChannel: vscode.OutputChannel;
-
+const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
 let vercorsProcessPid = -1;
+
+let client: LanguageClient;
+
+
+async function startClient(context){
+    	// The server is implemented in node
+	const serverModule = context.asAbsolutePath(
+		path.join('server', 'out', 'server.js')
+	);
+
+	// If the extension is launched in debug mode then the debug server options are used
+	// Otherwise the run options are used
+	const serverOptions: ServerOptions = {
+		run: { module: serverModule, transport: TransportKind.ipc },
+		debug: {
+			module: serverModule,
+			transport: TransportKind.ipc,
+		}
+	};
+
+	// Options to control the language client
+	const clientOptions: LanguageClientOptions = {
+		// Register the server for plain text documents
+		documentSelector: [{ scheme: 'file', language: 'plaintext' }],
+		synchronize: {
+			// Notify the server about file changes to '.clientrc files contained in the workspace
+			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
+		}
+	};
+
+	// Create the language client and start the client.
+	client = new LanguageClient(
+		'languageServerExample',
+		'Language Server Example',
+		serverOptions,
+		clientOptions
+	);
+
+	// Start the client. This will also launch the server
+	client.start();
+
+}
+
 /**
  * Method called when the extension is activated
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context: vscode.ExtensionContext) {
+    startClient(context)
     // Check if the VerCors path is set
     const vercorsPaths = await VerCorsPaths.getPathList();
     if (!vercorsPaths.length) {

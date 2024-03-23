@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import path from 'path';
+const path = require('path'); 
 
 type VercorsPath = {
     path: string,

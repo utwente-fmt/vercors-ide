@@ -3,4 +3,8 @@ dist
 node_modules
 .vscode-test/
 *.vsix
+*.vsix
+.idea
 vercorsplugin-0.0.1.vsix
+client/tsconfig.tsbuildinfo
+server/tsconfig.tsbuildinfo

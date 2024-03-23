@@ -1,0 +1,21 @@
+{
+  "name": "lsp-sample-server",
+  "description": "Example implementation of a language server in node.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/utwente-fmt/vercors-ide/"
+  },
+  "dependencies": {
+    "vsce": "^2.15.0",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11"
+  },
+  "scripts": {
+    "compile": "tsc -p ./"
+  }
+}

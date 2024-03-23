@@ -1,18 +1,44 @@
 {
   "name": "vercorsplugin",
   "displayName": "VerCorsPlugin",
-  "description": "Plugin for the vercors tool.",
+  "license": "MIT",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/utwente-fmt/vercors-ide/"
+  },
+  "publisher": "vscode-samples",
+  "categories": [],
+  "keywords": [
+    "multi-root ready"
+  ],
   "engines": {
     "vscode": "^1.84.0"
   },
-  "categories": [
-    "Other"
+  "activationEvents": [
+    "onLanguage:plaintext"
   ],
-  "main": "./out/extension.js",
+  "main": "./client/out/extension.js",
   "contributes": {
     "configuration": {
       "properties": {
+        "languageServerExample.maxNumberOfProblems": {
+          "scope": "resource",
+          "type": "number",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server."
+        },
+        "languageServerExample.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
+        },
         "vercorsplugin.vercorsPath": {
           "type": [
             "array",
@@ -142,27 +168,21 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js",
-    "build": "vsce package"
+    "compile": "npm run client && npm run server",
+    "watch": "tsc -b -w",
+    "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "test": "sh ./scripts/e2e.sh",
+    "client": "cd client && git clean -xfd out tsconfig.tsbuildinfo && npm run compile",
+    "server": "cd server && git clean -xfd out tsconfig.tsbuildinfo && npm run compile"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.3",
-    "@types/node": "18.x",
-    "@types/vscode": "^1.84.0",
-    "@typescript-eslint/eslint-plugin": "^6.9.0",
-    "@typescript-eslint/parser": "^6.9.0",
-    "@vscode/test-electron": "^2.3.6",
-    "eslint": "^8.52.0",
-    "glob": "^10.3.10",
-    "mocha": "^10.2.0",
-    "typescript": "^5.2.2"
-  },
-  "dependencies": {
-    "@vscode/vsce": "^2.23.0",
-    "tree-kill": "^1.2.2"
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^18.14.6",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0",
+    "mocha": "^10.3.0",
+    "typescript": "^5.3.3"
   }
 }
