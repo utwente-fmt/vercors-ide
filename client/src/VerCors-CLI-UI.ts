@@ -4,6 +4,8 @@ export type OptionFields = {
     pinned: string[],
     flags: string[]
 }
+
+
 type Options = Record<string, OptionFields>
 export class VercorsOptions {
 
@@ -16,16 +18,16 @@ export class VercorsOptions {
         const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
         return vercorsOptions[filePath] ? vercorsOptions[filePath] : { pinned: [], flags: [] };
     }
-
-
-    
-
     public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[]): Promise<void> {
         let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
         
         currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
         console.log({file: filePath, ...currentVercorsOptions[filePath]});
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions);
+    }
+
+    public static isEqual(o1: OptionFields, o2: OptionFields): boolean{
+      return o1.pinned === o2.pinned && o1.flags === o2.flags
     }
 }
 

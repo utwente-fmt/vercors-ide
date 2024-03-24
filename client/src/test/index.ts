@@ -31,17 +31,7 @@ export function run(): Promise<void> {
 				// Run the mocha test
 				mocha.run(failures => {
 					if (failures > 0) {
-						const failedTests = this.testResults.failures.map(failure => {
-							return {
-								title: failure.title,
-								fullTitle: failure.fullTitle,
-								duration: failure.duration,
-								err: failure.err
-							};
-						});
-				
-						// Reject with information about failed tests
-						reject(new Error(`${failures} tests failed.` + JSON.stringify(failedTests, null, 2)));
+						reject(new Error(`${failures} tests failed.`));
 					} else {
 						resolve();
 					}

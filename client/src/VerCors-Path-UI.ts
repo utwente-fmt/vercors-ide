@@ -24,6 +24,11 @@ export class VerCorsPaths {
         await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', stored);
     }
 
+
+    public static isEqual(p1: VercorsPath, p2: VercorsPath): boolean{
+       return p1.path === p2.path && p1.version === p2.version && p1.selected == p2.selected
+    }
+
 }
 
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
