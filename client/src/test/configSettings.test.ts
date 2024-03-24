@@ -12,25 +12,24 @@ const vscodeWorkspaceStub = sinon.stub();
 
 
 vscodeWorkspaceStub.returns({
-    workspace: {
-        getConfiguration: {
-            get: (section, defaultValue) => fakeConfiguration[section] || defaultValue,
-            update: (section, value) => fakeConfiguration[section] = value 
-        }
-    }
+        get: (section, defaultValue) => fakeConfiguration[section] || defaultValue,
+        update: (section, value) => fakeConfiguration[section] = value 
 });
 
-sinon.stub(vscode, 'workspace').callsFake(vscodeWorkspaceStub);
+sinon.stub(vscode.workspace, 'getConfiguration').callsFake(vscodeWorkspaceStub); // has to be from vscode.workspace instead of vscode, because workspace is no function
+
 
 suite('Optionmap Tests', async () => {
 
 	test('Simple adding and removing', async () => {
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
-        let expectedOptions = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
+        let expectedOptions = {pinned: [ "--more"], flags : ["--quite","--backend-file-base"]} as OptionFields
         assert.equal(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions)
+
         VercorsOptions.updateOptions("Design project/arrays.java",["--quite"], ["--more"]);
-        expectedOptions = {pinned: [ "--more"],flags : ["--quiet"]} as OptionFields
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite"]} as OptionFields
         assert.equal(VercorsOptions.getAllOptions("Design project/arrays.java"), expectedOptions)
+
         VercorsOptions.updateOptions("Design project/arrays.java",[], []);
         expectedOptions = {pinned: [],flags : []} as OptionFields
         assert.equal(VercorsOptions.getAllOptions("Design project/arrays.java"), expectedOptions)
