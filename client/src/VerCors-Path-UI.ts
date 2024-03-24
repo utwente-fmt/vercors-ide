@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 const path = require('path'); 
 
-type VercorsPath = {
+export type VercorsPath = {
     path: string,
     version: string,
     selected: boolean

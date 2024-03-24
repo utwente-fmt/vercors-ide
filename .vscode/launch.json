@@ -5,6 +5,7 @@
 {
 	"version": "0.2.0",
 	"configurations": [
+
 		{
 			"name": "Run Extension",
 			"type": "extensionHost",
@@ -33,6 +34,18 @@
 				"${workspaceRoot}/client/out/test/**/*.js",
 			],
 			"preLaunchTask": "${defaultBuildTask}"
-		}
+		},
+
+		{
+			"name": "Jest Tests",
+			"type": "node",
+			"request": "launch",
+			//"env": { "NODE_ENV": "test" },
+			"program": "${workspaceFolder}/node_modules/.bin/jest",
+			"console": "integratedTerminal",
+			"windows": {
+			  "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+			}
+		  }
 	]
 }

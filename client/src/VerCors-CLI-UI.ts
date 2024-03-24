@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-type OptionFields = {
+export type OptionFields = {
     pinned: string[],
     flags: string[]
 }
