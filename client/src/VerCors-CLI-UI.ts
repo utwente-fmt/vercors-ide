@@ -20,14 +20,48 @@ export class VercorsOptions {
     }
     public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[]): Promise<void> {
         let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        
+        if (!this.isOptions(currentVercorsOptions)){
+            currentVercorsOptions = {} as Options
+        }
         currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
         console.log({file: filePath, ...currentVercorsOptions[filePath]});
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions);
     }
 
     public static isEqual(o1: OptionFields, o2: OptionFields): boolean{
-      return o1.pinned === o2.pinned && o1.flags === o2.flags
+      return this.compareLists(o1.pinned,o2.pinned) && this.compareLists(o1.flags, o2.flags)
+    }
+
+    private static isOptions(option): boolean{
+        try{
+            let optionsJSON = JSON.parse(option);
+            for(var optionJSON in optionsJSON){
+                if(!(Array.isArray(optionsJSON[optionJSON].pinned) && Array.isArray(optionsJSON[optionJSON].flags) && new Set(Object.keys(optionsJSON[optionJSON])) === new Set(["pinned","flags"]))){
+                    return false;
+                }
+            }
+            return true;
+
+        }
+        catch(e){
+            return false;
+        }
+
+    }
+
+    public static compareLists(l1, l2){
+        if(l1.length !== l2.length){
+            return false;
+        }
+        const s1 = new Set(l1);
+        const s2 = new Set(l2);
+
+        if(s1.size !== s2.size){
+            return false;
+        }
+
+        return [...s1].every(element => s2.has(element)) && [...s2].every(element => s2.has(element));
+
     }
 }
 

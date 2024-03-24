@@ -88,7 +88,6 @@ suite('PathSetting tests', async () => {
         expectedPath = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), paths))
 
-
         fakeConfiguration["vercorsplugin.optionsMap"] = "hey"
 		VerCorsPaths.storePathList(paths)
         expectedPath = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
