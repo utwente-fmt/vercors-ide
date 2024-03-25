@@ -9,63 +9,66 @@ export type OptionFields = {
 type Options = Record<string, OptionFields>
 export class VercorsOptions {
 
+    public static eqSet = (xs, ys) =>
+        xs.size === ys.size &&
+        [...xs].every((x) => ys.has(x));
+
     public static getFlagOptions(filePath: string): Array<string> {
-        const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        //todo: should give empty optionfields if it is not rigth
-        return vercorsOptions[filePath] ? vercorsOptions[filePath].flags : [];
+        const fileOptions = this.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) as OptionFields;
+        return fileOptions.flags;
     }
 
     public static getAllOptions(filePath: string): OptionFields {
-        const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        if (!this.isOptions(vercorsOptions)){ //todo: should give empty optionfields if it is not rigth
-            vercorsOptions = {} as Options
-        }
-        return vercorsOptions[filePath] ? vercorsOptions[filePath] : { pinned: [], flags: [] };
+        let fileOptions = VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) as OptionFields;
+        return fileOptions ? fileOptions : { pinned: [], flags: [] };
     }
     public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[]): Promise<void> {
-        let currentVercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
-        if (!this.isOptions(currentVercorsOptions)){
-            currentVercorsOptions = {} as Options
-        }
+        let currentVercorsOptions = (VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})) || {}) as Options;
         currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
         console.log({file: filePath, ...currentVercorsOptions[filePath]});
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions);
     }
 
     public static isEqual(o1: OptionFields, o2: OptionFields): boolean{
-      return this.compareLists(o1.pinned,o2.pinned) && this.compareLists(o1.flags, o2.flags)
+      return VercorsOptions.compareLists(o1.pinned,o2.pinned) && VercorsOptions.compareLists(o1.flags, o2.flags)
     }
 
-    private static isOptions(option): boolean{
-        //todo: should only change shit that is wrong and delete those
+    private static fixOptions(options, selector?){
+
         try{
-            let optionsJSON = JSON.parse(option);
-            for(var optionJSON in optionsJSON){
-                if(!(Array.isArray(optionsJSON[optionJSON].pinned) && Array.isArray(optionsJSON[optionJSON].flags) && new Set(Object.keys(optionsJSON[optionJSON])) === new Set(["pinned","flags"]))){
-                    return false;
+            let optionsJSON = JSON.parse(JSON.stringify(options));
+            if(!selector){
+                for(var optionJSON in optionsJSON){
+                    if(!(Array.isArray(optionsJSON[optionJSON].pinned) && Array.isArray(optionsJSON[optionJSON].flags) && VercorsOptions.eqSet(new Set(Object.keys(optionsJSON[optionJSON])), new Set(["pinned","flags"])))){
+                        delete optionsJSON[optionJSON];
+                    }
+                }}
+            else{
+                if(!(Array.isArray(optionsJSON[selector].pinned) && Array.isArray(optionsJSON[selector].flags) && VercorsOptions.eqSet(new Set(Object.keys(optionsJSON[selector])), new Set(["pinned","flags"])))){
+                    return {pinned: [], flags: []};
                 }
+                return optionsJSON[selector]
             }
-            return true;
+            return optionsJSON;
 
         }
         catch(e){
-            return false;
+            return undefined;
         }
-
     }
 
+
     public static compareLists(l1, l2){
+        if (!l1 || !l2){
+            return false;
+        }
         if(l1.length !== l2.length){
             return false;
         }
         const s1 = new Set(l1);
         const s2 = new Set(l2);
 
-        if(s1.size !== s2.size){
-            return false;
-        }
-
-        return [...s1].every(element => s2.has(element)) && [...s2].every(element => s2.has(element));
+        return VercorsOptions.eqSet(s1,s2)
 
     }
 }
