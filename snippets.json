@@ -1,0 +1,38 @@
+{
+    "forall": {
+        "prefix": "for",
+        "body": [
+            "(\\forall int ${1:i} ; ${2:0} <= ${1:i} && ${1:i} < $3);"
+        ],
+        "description": "Forall quantifier"
+    },
+    "permission": {
+        "prefix": "perm",
+        "body": "Perm(this.$1, $2);",
+        "description": "permission"
+    },
+    "old": {
+        "prefix": "old",
+        "body": "\\old($1) ",
+        "description": "old"
+    },
+    "resource": {
+        "prefix": "res",
+        "body": "resource $1() = $2;"
+    },
+    "pure": {
+        "prefix": "pure",
+        "body": "pure $1($2) = $3;"
+    },
+    "unfolding": {
+        "prefix": "\\un",
+        "body": "\\unfolding $1 \\in $2;"
+    },
+    "pointer": {
+        "prefix": "pointer",
+        "body": [
+            "\\pointer($1, $2, $3);",
+            "$0"
+        ]
+    }
+}
