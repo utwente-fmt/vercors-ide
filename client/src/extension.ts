@@ -20,6 +20,7 @@ import * as fs from "fs";
 
 
 let outputChannel: vscode.OutputChannel;
+let diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
 let vercorsProcessPid = -1;
 
@@ -70,7 +71,7 @@ async function startClient(context){
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context: vscode.ExtensionContext) {
-    startClient(context)
+    startClient(context);
     // Check if the VerCors path is set
     const vercorsPaths = await VerCorsPaths.getPathList();
     if (!vercorsPaths.length) {
@@ -191,7 +192,7 @@ async function executeVercorsCommand() {
     const vercorsProcess = childProcess.spawn(command, args, { shell: true });
     vercorsProcessPid = vercorsProcess.pid;
 
-    const outputState = new OutputState(outputChannel);
+    const outputState = new OutputState(outputChannel,uri,diagnosticCollection);
 
 
     vercorsProcess.stdout.on('data', (data: Buffer | string) => {

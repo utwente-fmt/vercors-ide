@@ -23,18 +23,17 @@ export class OutputState {
     private errorState : number = 0;
     private errors : errorCode[][] = [];
     private newError: errorCode[] = [];
-    private diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
+    
 
-    public constructor(private outputChannel: vscode.OutputChannel) {
+    public constructor(private outputChannel: vscode.OutputChannel,private uri: vscode.Uri, private diagnosticCollection: vscode.DiagnosticCollection) {
         
     }
 
     public finish() {
 
         //setting up the diagnostic collection
-        let uri = vscode.window.activeTextEditor!.document.uri;
         let diagnostics: vscode.Diagnostic[] = [];
-        this.diagnosticCollection.set(uri,[]); //TODO: clearing the collection does not yet work
+        this.diagnosticCollection.set(this.uri,[]); //TODO: clearing the collection does not yet work
 
         //for each error gather the error parts and assemble it to one error
         for (let err of this.errors){
@@ -51,7 +50,7 @@ export class OutputState {
         }
 
         //push the errors and complete the loading
-        this.diagnosticCollection.set(uri,diagnostics);
+        this.diagnosticCollection.set(this.uri,diagnostics);
         this.state = state.FINISHED;
         this.currentPercentage = 100;
     }
@@ -127,9 +126,8 @@ export class OutputState {
                     }
                     break;
 
-                //parsing the code block (perhaps handy to extract the exact location instead of one line:collumn location)
+                //TODO: parsing the code block (perhaps handy to extract the exact location instead of one line:collumn location)
                 case 1:
-                    //TODO
                     break;
 
                 //parsing the error message
