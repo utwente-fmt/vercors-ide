@@ -21,7 +21,7 @@ sinon.stub(vscode.workspace, 'getConfiguration').callsFake(vscodeWorkspaceStub);
 //fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile() and getvercorsversion
 suite('Optionmap Tests', async () => {
 
-	test('Simple adding and removing', async () => {
+	test('Simple adding and removing (End To End)', async () => {
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         let expectedOptions = {pinned: [ "--more"], flags : ["--quite","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions))
@@ -43,26 +43,31 @@ suite('Optionmap Tests', async () => {
 
 
         fakeConfiguration["vercorsplugin.optionsMap"] = "hey"
+        assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []}))
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions))
 
         fakeConfiguration["vercorsplugin.optionsMap"] = null
+        assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []}))
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions))
 
         fakeConfiguration["vercorsplugin.optionsMap"] = {pinned: "string",flags: "string"}
+        assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []}))
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions))
 
         fakeConfiguration["vercorsplugin.optionsMap"] = {a: ["string"]}
+        assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []}))
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions))
 
         fakeConfiguration["vercorsplugin.optionsMap"] = {pinned: "string",flags: "string", a: ["string"]}
+        assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []}))
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.isEqual(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions))
@@ -78,34 +83,35 @@ suite('PathSetting tests', async () => {
             "selected": true
         }] as VercorsPath[]
 
-        fakeConfiguration["vercorsplugin.optionsMap"] = {}
+        fakeConfiguration["vercorsplugin.vercorsPath"] = {}
+        assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), {}))
 		VerCorsPaths.storePathList(paths)
         let expectedPath = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), paths))
 
-        fakeConfiguration["vercorsplugin.optionsMap"] = null
+        fakeConfiguration["vercorsplugin.vercorsPath"] = null
+        assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), {}))
 		VerCorsPaths.storePathList(paths)
-        expectedPath = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), paths))
 
-        fakeConfiguration["vercorsplugin.optionsMap"] = "hey"
+        fakeConfiguration["vercorsplugin.vercorsPath"] = "hey"
+        assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), {}))
 		VerCorsPaths.storePathList(paths)
-        expectedPath = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
         assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), paths))
 
-        fakeConfiguration["vercorsplugin.optionsMap"] = { path: "string", version: "string" }
-		VerCorsPaths.storePathList(paths)
-        expectedPath = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
+        fakeConfiguration["vercorsplugin.vercorsPath"] = { path: "string", version: "string" }
+		assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), {}))
+        VerCorsPaths.storePathList(paths)
         assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), paths))
 
-        fakeConfiguration["vercorsplugin.optionsMap"] = { a: "string", version: "string", selected: "string" }
-		VerCorsPaths.storePathList(paths)
-        expectedPath = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
+        fakeConfiguration["vercorsplugin.vercorsPath"] = { a: "string", version: "string", selected: "string" }
+		assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), {}))
+        VerCorsPaths.storePathList(paths)
         assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), paths))
 
-        fakeConfiguration["vercorsplugin.optionsMap"] = { path: "string", version: "string", selected: "string", a: "string" }
-		VerCorsPaths.storePathList(paths)
-        expectedPath = {pinned: [ "--more"],flags : ["--quiet","--backend-file-base"]} as OptionFields
+        fakeConfiguration["vercorsplugin.vercorsPath"] = { path: "string", version: "string", selected: "string", a: "string" }
+		assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), {}))
+        VerCorsPaths.storePathList(paths)
         assert(VercorsOptions.compareLists(await VerCorsPaths.getPathList(), paths))
 	});
     
