@@ -40,11 +40,15 @@ export class OutputState {
             let errorMessage = "";
             let file = err[0].file;
             for (let errpart of err){
-                errorMessage += " at line " + errpart.line + ", " + errpart.message.replace(/\s?\.\.\.\s?/,"").toLowerCase();
+                if (errorMessage !== ""){
+                    errorMessage += " at line " + errpart.line + ", " + errpart.message.replace(/\s?\.\.\.\s?/,"").toLowerCase();
+                } else {
+                    errorMessage += " " + errpart.message.replace(/\s?\.\.\.\s?/,"");
+                }
             }
             
             //create a diagnostic (error) from the gathered information and put it in the collection
-            let diagnostic = new vscode.Diagnostic(new vscode.Range(err[0].line-1,err[0].col-1,err[0].line-1,err[0].col),errorMessage,vscode.DiagnosticSeverity.Error);
+            let diagnostic = new vscode.Diagnostic(new vscode.Range(err[0].line-1,err[0].col-1,err[0].line-1,err[0].col-1),errorMessage,vscode.DiagnosticSeverity.Error);
             diagnostics.push(diagnostic);
             this.outputChannel.appendLine(file + ":" + errorMessage);
         }
