@@ -20,6 +20,14 @@
   ],
   "main": "./client/out/extension.js",
   "contributes": {
+      "snippets": [
+        {"language": "pvl",
+         "path": "./snippets.json"},
+         {"language": "java",
+         "path": "./snippets.json"},
+        {"language": "c",
+         "path": "./snippets.json"}
+      ],
     "configuration": {
       "properties": {
         "languageServerExample.maxNumberOfProblems": {
