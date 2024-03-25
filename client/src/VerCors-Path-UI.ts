@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-const path = require('path'); 
+
+import path = require('path');
 
 type VercorsPath = {
     path: string,
@@ -26,8 +27,9 @@ export class VerCorsPaths {
 }
 
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
-    private readonly _extensionUri: vscode.Uri;
+    private static _webview: vscode.Webview | undefined;
 
+    private readonly _extensionUri: vscode.Uri;
     private _HTMLContent: string | undefined;
 
     constructor(private context: vscode.ExtensionContext) {
@@ -39,6 +41,8 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         context: vscode.WebviewViewResolveContext<unknown>,
         token: vscode.CancellationToken
     ) {
+        VerCorsWebViewProvider._webview = webviewView.webview;
+
         webviewView.webview.options = {
             // Enable scripts in the webview
             enableScripts: true
@@ -83,7 +87,19 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     }
 
-    private async sendPathsToWebview(webview: vscode.Webview) {
+    public static async sendProgressToWebview(percentage: number, step: string, stepName: string): Promise<Boolean | undefined> {
+        if (!VerCorsWebViewProvider._webview) {
+            return;
+        }
+        return VerCorsWebViewProvider._webview.postMessage({
+            command: 'progress',
+            percentage: percentage,
+            step: step,
+            stepName: stepName
+        });
+    }
+
+    private async sendPathsToWebview(webview: vscode.Webview): Promise<void> {
         VerCorsPaths.getPathList()
             .then(paths => {
                 webview.postMessage({
@@ -173,14 +189,14 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 const childProcess = require('child_process');
                 let command = '"' + vercorsExecutablePath + '"';
                 const vercorsProcess = childProcess.spawn(command, ["--version"], { shell: true });
-                const pid : number = vercorsProcess.pid;
+                const pid: number = vercorsProcess.pid;
 
                 vercorsProcess.stdout.on('data', (data: Buffer | string) => {
                     const str = data.toString();
                     this.killPid(pid);
                     if (str.startsWith("Vercors")) {
                         // remove newlines
-                        resolve(str.replace(/(\r\n|\n|\r)/gm, ""));
+                        resolve(str.trim());
                     } else {
                         reject('Could not get VerCors version: ' + str);
                     }
@@ -195,13 +211,13 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 reject(_e);
             }
         })
-        .catch(reason => {
-            vscode.window.showErrorMessage(reason.toString());
-            return undefined;
-        });
+            .catch(reason => {
+                vscode.window.showErrorMessage(reason.toString());
+                return undefined;
+            });
     }
 
-    private killPid(pid : number) : void {
+    private killPid(pid: number): void {
         const kill = require('tree-kill');
         kill(pid, 'SIGINT');
     }

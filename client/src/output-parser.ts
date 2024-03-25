@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 
+import { VerCorsWebViewProvider } from "./VerCors-Path-UI";
+
 enum state {
     RUNNING,
     ERROR,
@@ -25,12 +27,15 @@ export class OutputState {
     private newError: errorCode[] = [];
     
     /**
+     * @param vercorsPathsProvider the path provider class connected to the webview.
      * @param outputChannel the outputchannel where the the output of vercors is printed
      * @param uri the URI of the file that is being checked by vercors
      * @param diagnosticCollection collection of errors about the vercors verification
      */
-    public constructor(private outputChannel: vscode.OutputChannel,private uri: vscode.Uri, private diagnosticCollection: vscode.DiagnosticCollection) {
-        
+    public constructor(
+        private outputChannel: vscode.OutputChannel,
+        private uri: vscode.Uri,
+        private diagnosticCollection: vscode.DiagnosticCollection) {
     }
 
     /**
@@ -38,6 +43,7 @@ export class OutputState {
      * this constructs all found errors and pushes them to the problems tab
      */
     public finish() {
+        VerCorsWebViewProvider.sendProgressToWebview(100, '', 'Finished');
 
         //setting up the diagnostic collection
         let diagnostics: vscode.Diagnostic[] = [];
@@ -118,7 +124,8 @@ export class OutputState {
             this.currentPercentage = newPercentage;
             const step = matchResult.groups!['step'];
             const stepName = matchResult.groups!['step_name'];
-            this.outputChannel.appendLine(this.currentPercentage + ", " + step + ", " + stepName);
+            this.outputChannel.appendLine(line);
+            VerCorsWebViewProvider.sendProgressToWebview(this.currentPercentage, step, stepName);
         }
     }
 
