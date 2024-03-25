@@ -13,6 +13,7 @@ export class VerCorsPaths {
     public static async getPathList(): Promise<VercorsPath[]> {
         const vercorsPaths = await vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as VercorsPath[];
         console.log("paths: " + vercorsPaths)
+        //todo: remove every wrong path
         if (!vercorsPaths) { // if null
             return [];
         }
@@ -21,6 +22,7 @@ export class VerCorsPaths {
 
     public static async storePathList(vercorsPaths: VercorsPath[]): Promise<void> {
         const stored = vercorsPaths.length ? vercorsPaths : null;
+        //todo: remove every wrong path
         await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', stored);
     }
 

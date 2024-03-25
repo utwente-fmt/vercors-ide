@@ -11,11 +11,15 @@ export class VercorsOptions {
 
     public static getFlagOptions(filePath: string): Array<string> {
         const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        //todo: should give empty optionfields if it is not rigth
         return vercorsOptions[filePath] ? vercorsOptions[filePath].flags : [];
     }
 
     public static getAllOptions(filePath: string): OptionFields {
         const vercorsOptions = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}) as Options;
+        if (!this.isOptions(vercorsOptions)){ //todo: should give empty optionfields if it is not rigth
+            vercorsOptions = {} as Options
+        }
         return vercorsOptions[filePath] ? vercorsOptions[filePath] : { pinned: [], flags: [] };
     }
     public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[]): Promise<void> {
@@ -33,6 +37,7 @@ export class VercorsOptions {
     }
 
     private static isOptions(option): boolean{
+        //todo: should only change shit that is wrong and delete those
         try{
             let optionsJSON = JSON.parse(option);
             for(var optionJSON in optionsJSON){
