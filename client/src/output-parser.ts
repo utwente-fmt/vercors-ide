@@ -24,16 +24,24 @@ export class OutputState {
     private errors : errorCode[][] = [];
     private newError: errorCode[] = [];
     
-
+    /**
+     * @param outputChannel the outputchannel where the the output of vercors is printed
+     * @param uri the URI of the file that is being checked by vercors
+     * @param diagnosticCollection collection of errors about the vercors verification
+     */
     public constructor(private outputChannel: vscode.OutputChannel,private uri: vscode.Uri, private diagnosticCollection: vscode.DiagnosticCollection) {
         
     }
 
+    /**
+     * should be called when vercors is finished to finalize the verification
+     * this constructs all found errors and pushes them to the problems tab
+     */
     public finish() {
 
         //setting up the diagnostic collection
         let diagnostics: vscode.Diagnostic[] = [];
-        this.diagnosticCollection.set(this.uri,[]); //TODO: clearing the collection does not yet work
+        this.diagnosticCollection.set(this.uri,[]);
 
         //for each error gather the error parts and assemble it to one error
         for (let err of this.errors){
