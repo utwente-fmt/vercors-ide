@@ -21,13 +21,14 @@ export class VerCorsPaths {
 
     public static async storePathList(vercorsPaths: VercorsPath[]): Promise<void> {
         const stored = vercorsPaths.length ? vercorsPaths : null;
-        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', stored, false);
+        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', stored, true);
     }
 
 }
 
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     private static _webview: vscode.Webview | undefined;
+    private static _progress: vscode.Progress<{message: string, increment: number}> | undefined;
 
     private readonly _extensionUri: vscode.Uri;
     private _HTMLContent: string | undefined;
@@ -91,12 +92,24 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         if (!VerCorsWebViewProvider._webview) {
             return;
         }
+
+        if (VerCorsWebViewProvider._progress) {
+            VerCorsWebViewProvider._progress.report({
+                message: 'VerCors: ' + step + ' ' + stepName,
+                increment: Math.round(percentage)
+            });
+        }
+
         return VerCorsWebViewProvider._webview.postMessage({
             command: 'progress',
             percentage: percentage,
             step: step,
             stepName: stepName
         });
+    }
+
+    public static setProgress(progress: vscode.Progress<{message: string, increment: number}>) {
+        VerCorsWebViewProvider._progress = progress;
     }
 
     private async sendPathsToWebview(webview: vscode.Webview): Promise<void> {

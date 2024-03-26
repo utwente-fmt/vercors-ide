@@ -72,6 +72,10 @@ export class OutputState {
         this.currentPercentage = 100;
     }
 
+    public getPercentage() : number{
+        return this.currentPercentage;
+    }
+
     public accept(line: string) {
         switch (Boolean(line.trim())) {
 
@@ -112,7 +116,7 @@ export class OutputState {
 
     private handlePercentage(line: string) {
         const matchResult =
-            /^\[(?<percentage1>\d+),(?<percentage2>\d+)%\] \((?<step>\d+\/\d+)\) (?<step_name>[^\u203a\ufff0-\uffff]+).*$/u.exec(line);
+            /^\[(?<percentage1>\d+),(?<percentage2>\d+)%\] \((?<step>\d+\/\d+)\) (?<step_name>[\w\s]+).*$/.exec(line);
         if (matchResult) {
             const percentage1 = matchResult.groups!['percentage1'];
             const percentage2 = matchResult.groups!['percentage2'];
