@@ -193,7 +193,7 @@ async function executeVercorsCommand() {
     vercorsProcessPid = vercorsProcess.pid;
 
     const outputState = new OutputState(outputChannel,uri,diagnosticCollection);
-
+    VerCorsPathWebViewProvider.sendProgressToWebview(0, '', 'Starting VerCors...');
 
     vercorsProcess.stdout.on('data', (data: Buffer | string) => {
         let lines : string[] = data.toString().split(/(\r\n|\n|\r)/gm);

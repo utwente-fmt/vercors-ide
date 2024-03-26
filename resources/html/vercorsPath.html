@@ -171,6 +171,14 @@
 <body>
 <div id="progress-bar-container">
     <div id="progress-bar"></div>
+    <div id="loading2" style="display:none;">
+        <div class="lds-ellipsis">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
     <span id="progress-step"></span>
 </div>
 <p>
@@ -197,6 +205,7 @@
         const progressStep = document.getElementById("progress-step");
         const pathList = document.getElementById("path-list");
         const loading = document.getElementById("loading");
+        const loading2 = document.getElementById("loading2");
 
         const button = document.getElementById("button");
         button.addEventListener('click', () => {
@@ -224,25 +233,37 @@
         });
 
         function progress(data) {
-            progressBarContainer.style.height = '30px';
-            progressBarContainer.style.opacity = '1';
+            if (data.percentage === 0) {
+                progressBarContainer.style.height = '30px';
+                progressBarContainer.style.opacity = '1';
+                progressBar.style.display = 'none';
+                progressBar.style.width = '0'
+                loading2.style.display = 'block';
+                progressStep.innerText = `${
+                    data.step === '' ? '' : data.step + ' '
+                }${data.stepName}`;
+                return;
+            }
+
+            progressBar.style.display = 'block';
+            loading2.style.display = 'none';
             let value = `${Math.round(data.percentage)}%`;
             progressBar.style.width = value;
-            progressBar.innerText = value;
-            progressStep.innerText = `${
-                data.step === '' ? '' : data.step + ' '
-            }${data.stepName}`;
-            if (data.percentage === 100) {
-                finishProgress();
-            }
-        }
 
-        function finishProgress() {
-            progressBarContainer.style.height = '0';
-            progressBarContainer.style.opacity = '0';
-            progressBar.innerText = '';
-            progressStep.innerText = '';
-            setTimeout(function() { progressBar.style.width = '0'; }, 300);
+            if (data.percentage === 100) {
+                // finish
+                progressBarContainer.style.height = '0';
+                progressBarContainer.style.opacity = '0';
+                progressBar.innerText = '';
+                progressStep.innerText = '';
+                setTimeout(function() { progressBar.style.width = '0'; }, 300);
+
+            } else {
+                progressBar.innerText = value;
+                progressStep.innerText = `${
+                    data.step === '' ? '' : data.step + ' '
+                }${data.stepName}`;
+            }
         }
 
         function addPaths(paths) {

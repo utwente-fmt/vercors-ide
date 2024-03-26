@@ -27,7 +27,6 @@ export class OutputState {
     private newError: errorCode[] = [];
     
     /**
-     * @param vercorsPathsProvider the path provider class connected to the webview.
      * @param outputChannel the outputchannel where the the output of vercors is printed
      * @param uri the URI of the file that is being checked by vercors
      * @param diagnosticCollection collection of errors about the vercors verification
