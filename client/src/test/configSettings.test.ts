@@ -35,6 +35,10 @@ suite('Optionmap Tests', async () => {
         VercorsOptions.updateOptions("Design project/arrays.java",[], []);
         expectedOptions = {pinned: [],flags : []} as OptionFields
         Assert.equals(VercorsOptions.getAllOptions("Design project/arrays.java"), expectedOptions,VercorsOptions.isEqual)
+
+        Assert.equals(VercorsOptions.getFlagOptions("Design project/arr.java"), [],VercorsOptions.compareLists)
+
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arr.java"), { pinned: [], flags: [] },VercorsOptions.isEqual)
 	});
 
     test('Erronous and default value handling', async () => {

@@ -14,7 +14,7 @@ export class VercorsOptions {
         [...xs].every((x) => ys.has(x));
 
     public static getFlagOptions(filePath: string): Array<string> {
-        const fileOptions = this.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) as OptionFields;
+        const fileOptions = this.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) || { pinned: [], flags: [] } as OptionFields;
         return fileOptions.flags;
     }
 
