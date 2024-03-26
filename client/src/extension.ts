@@ -202,7 +202,17 @@ async function executeVercorsCommand() {
     }, async (progress) => {
         VerCorsPathWebViewProvider.setProgress(progress);
 
-        // TODO update progress
+        // TODO get percentage async without blocking everything, but not exiting this inner function
+
+        // setInterval(function() {
+        //     const percentage = Math.round(outputState.getPercentage());
+        //     if (percentage === 100 || vercorsProcessPid === -1) {
+        //         clearInterval(this);
+        //     } else {
+        //         progress.report({increment: percentage});
+        //     }
+        // }, 100);
+
     });
 
     vercorsProcess.stdout.on('data', (data: Buffer | string) => {
