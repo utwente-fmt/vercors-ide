@@ -195,6 +195,26 @@ async function executeVercorsCommand() {
     const outputState = new OutputState(outputChannel,uri,diagnosticCollection);
     VerCorsPathWebViewProvider.sendProgressToWebview(0, '', 'Starting VerCors...');
 
+    vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        cancellable: false,
+        title: 'VerCors'
+    }, async (progress) => {
+        VerCorsPathWebViewProvider.setProgress(progress);
+
+        // TODO get percentage async without blocking everything, but not exiting this inner function
+
+        // setInterval(function() {
+        //     const percentage = Math.round(outputState.getPercentage());
+        //     if (percentage === 100 || vercorsProcessPid === -1) {
+        //         clearInterval(this);
+        //     } else {
+        //         progress.report({increment: percentage});
+        //     }
+        // }, 100);
+
+    });
+
     vercorsProcess.stdout.on('data', (data: Buffer | string) => {
         let lines : string[] = data.toString().split(/(\r\n|\n|\r)/gm);
         for (let line of lines) {
@@ -204,6 +224,7 @@ async function executeVercorsCommand() {
 
     vercorsProcess.on('exit', function () {
         outputState.finish();
+        VerCorsPathWebViewProvider.setProgress(undefined);
         vercorsProcessPid = -1;
     });
 

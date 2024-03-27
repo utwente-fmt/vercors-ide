@@ -72,6 +72,10 @@ export class OutputState {
         this.currentPercentage = 100;
     }
 
+    public getPercentage() : number{
+        return this.currentPercentage;
+    }
+
     public accept(line: string) {
         switch (Boolean(line.trim())) {
 
@@ -83,11 +87,11 @@ export class OutputState {
                 this.handleInfo(line);
                 break;
 
-            case /^\[\d+,\d+%]/.test(line):
+            case /^\[\d+[.,]\d+%]/.test(line):
                 this.handlePercentage(line);
                 break;
 
-            case line === '======================================':
+            case /(?: > )?={38}/.test(line):
                 // this '=' line means the beginning or the end of an error
                 this.errorState = 0;
                 if (this.state === state.ERROR){
@@ -98,7 +102,7 @@ export class OutputState {
                 this.outputChannel.appendLine(line);
                 break;
 
-            case line === '--------------------------------------':
+            case /(?: > )?-{38}/.test(line):
                 //this '-' line means a new errorState begins, hence the incrementation of the errorState
                 this.errorState = (this.errorState + 1) % 3;
                 this.outputChannel.appendLine(line);
@@ -112,7 +116,7 @@ export class OutputState {
 
     private handlePercentage(line: string) {
         const matchResult =
-            /^\[(?<percentage1>\d+),(?<percentage2>\d+)%] \((?<step>\d+\/\d+)\) (?<step_name>[^›]+).*$/.exec(line);
+            /^\[(?<percentage1>\d+)[.,](?<percentage2>\d+)%] \((?<step>\d+\/\d+)\) (?<step_name>[\w\s]+).*$/g.exec(line);
         if (matchResult) {
             const percentage1 = matchResult.groups!['percentage1'];
             const percentage2 = matchResult.groups!['percentage2'];
