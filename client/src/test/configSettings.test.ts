@@ -3,6 +3,7 @@ import * as sinon from 'sinon'
 import {VercorsOptions,OptionFields} from "../VerCors-CLI-UI"
 import {VerCorsPaths,VercorsPath} from '../VerCors-Path-UI';
 import {Assert} from './Assert';
+import {comparing} from '../comparing';
 const fakeConfiguration = {
 };
 
@@ -25,58 +26,57 @@ suite('Optionmap Tests', async () => {
         
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         let expectedOptions = {pinned: [ "--more"], flags : ["--quite","--backend-file-base"]} as OptionFields
-        let o = VercorsOptions.getAllOptions("Design project/arrayTest.java")
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
         VercorsOptions.updateOptions("Design project/arrays.java",["--quite"], ["--more"]);
         expectedOptions = {pinned: [ "--more"],flags : ["--quite"]} as OptionFields
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrays.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrays.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
         VercorsOptions.updateOptions("Design project/arrays.java",[], []);
         expectedOptions = {pinned: [],flags : []} as OptionFields
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrays.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrays.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
-        Assert.equals(VercorsOptions.getFlagOptions("Design project/arr.java"), [],VercorsOptions.compareLists)
+        Assert.equals(VercorsOptions.getFlagOptions("Design project/arr.java"), [],comparing.compareLists)
 
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arr.java"), { pinned: [], flags: [] },VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arr.java"), { pinned: [], flags: [] },VercorsOptions.isEqualOptionFields)
 	});
 
     test('Erronous and default value handling', async () => {
         fakeConfiguration["vercorsplugin.optionsMap"] = {}
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         let expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
 
         fakeConfiguration["vercorsplugin.optionsMap"] = "hey"
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
         fakeConfiguration["vercorsplugin.optionsMap"] = null
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
         fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {pinned: "string",flags: "string"}}
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)
 		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
         fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {a: ["string"]}}
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)
         VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])		
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
         fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {pinned: "string",flags: "string", a: ["string"]}}
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqual)	
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)	
         VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
         expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
-        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqual)
+        Assert.equals(VercorsOptions.getAllOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
 
 	});
@@ -92,37 +92,37 @@ suite('PathSetting tests', async () => {
         }] as VercorsPath[]
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = []
-        Assert.equals(await VerCorsPaths.getPathList(), [], VerCorsPaths.comparePathLists )
+        Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
 		VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, VerCorsPaths.comparePathLists )        
+        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = null
-        Assert.equals(await VerCorsPaths.getPathList(), [], VerCorsPaths.comparePathLists )
+        Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
 		VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, VerCorsPaths.comparePathLists )        
+        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = "hey"
-        Assert.equals(await VerCorsPaths.getPathList(), [], VerCorsPaths.comparePathLists )
+        Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
 		VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, VerCorsPaths.comparePathLists )        
+        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = [{ path: "string", version: "string" }]
-        Assert.equals(await VerCorsPaths.getPathList(), [], VerCorsPaths.comparePathLists )        
+        Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
         VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, VerCorsPaths.comparePathLists )        
+        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = [{ a: "string", version: "string", selected: "string" }]
-		Assert.equals(await VerCorsPaths.getPathList(), [], VerCorsPaths.comparePathLists )        
+		Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
         VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, VerCorsPaths.comparePathLists )        
+        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = [{ path: "string", version: "string", selected: "string", a: "string" }]
-		Assert.equals(await VerCorsPaths.getPathList(), [], VerCorsPaths.comparePathLists )        
+		Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
         VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, VerCorsPaths.comparePathLists )  
+        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )  
         
         fakeConfiguration["vercorsplugin.vercorsPath"] = [{ path: "string", version: "string" }].concat(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, VerCorsPaths.comparePathLists )        
+        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )        
 	});  
 });
 

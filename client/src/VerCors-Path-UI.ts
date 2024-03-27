@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import {comparing} from './comparing';
 const path = require('path'); 
 
 export type VercorsPath = {
@@ -23,21 +24,24 @@ export class VerCorsPaths {
     }
 
 
-    public static isEqual(p1: VercorsPath, p2: VercorsPath): boolean{
+    public static isEqualPath(p1: VercorsPath, p2: VercorsPath): boolean{
        return p1.path === p2.path && p1.version === p2.version && p1.selected == p2.selected
     }
 
     
     private static fixPaths(paths?): VercorsPath[]{
         const pathList = []
+        let pathJSON;
+
         if(paths){
             for(let i = 0; i < paths.length; i++){
                 try{
-                    let pathJSON = JSON.parse(JSON.stringify(paths[i]));
-                    if(typeof pathJSON.selected === "boolean" && this.eqSet(new Set(Object.keys(pathJSON)),new Set(["path","version","selected"]))){
+                    pathJSON = JSON.parse(JSON.stringify(paths[i]));
+                } catch{}
+                    if(typeof pathJSON.selected === "boolean" && comparing.eqSet(new Set(Object.keys(pathJSON)),new Set(["path","version","selected"]),this.isEqualPath)){
                         pathList.push(pathJSON)
                     }
-                } catch{}
+                
             }
         }
            
@@ -45,27 +49,7 @@ export class VerCorsPaths {
 
     }
 
-    public static eqSet = (xs, ys) =>
-        xs.size === ys.size &&
-        [...xs].every((x) => ys.has(x));
 
-    public static eqPathSet = (xs, ys) =>
-        xs.size === ys.size &&
-        [...xs].every((x) => [...ys].some((y) => this.isEqual(y,x)));
-
-    public static comparePathLists(l1, l2){
-        if (!l1 || !l2){
-            return false;
-        }
-        if(l1.length !== l2.length){
-            return false;
-        }
-        const s1 = new Set(l1);
-        const s2 = new Set(l2);
-
-        return VerCorsPaths.eqPathSet(s1,s2)
-
-    }
 
 }
 

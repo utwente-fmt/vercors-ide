@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import {comparing} from './comparing';
 
 export type OptionFields = {
     pinned: string[],
@@ -9,9 +10,7 @@ export type OptionFields = {
 type Options = Record<string, OptionFields>
 export class VercorsOptions {
 
-    public static eqSet = (xs, ys) =>
-        xs.size === ys.size &&
-        [...xs].every((x) => ys.has(x));
+
 
     public static getFlagOptions(filePath: string): Array<string> {
         const fileOptions = this.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) || { pinned: [], flags: [] } as OptionFields;
@@ -29,48 +28,43 @@ export class VercorsOptions {
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions,true);
     }
 
-    public static isEqual(o1: OptionFields, o2: OptionFields): boolean{
-      return VercorsOptions.compareLists(o1.pinned,o2.pinned) && VercorsOptions.compareLists(o1.flags, o2.flags)
+
+
+    public static isEqualOptionFields(o1: OptionFields, o2: OptionFields): boolean{
+      return comparing.compareLists(o1.pinned,o2.pinned) && comparing.compareLists(o1.flags, o2.flags)
     }
 
     private static fixOptions(options, selector?){
-
+        let optionsJSON;
         try{
-            let optionsJSON = JSON.parse(JSON.stringify(options));
+            optionsJSON = JSON.parse(JSON.stringify(options));
+        }
+        catch(e){
+            return undefined;
+        }
             if(!selector){
                 for(var optionJSON in optionsJSON){
-                    if(!(Array.isArray(optionsJSON[optionJSON].pinned) && Array.isArray(optionsJSON[optionJSON].flags) && VercorsOptions.eqSet(new Set(Object.keys(optionsJSON[optionJSON])), new Set(["pinned","flags"])))){
-                        delete optionsJSON[optionJSON];
+                    if(!(Array.isArray(optionsJSON[optionJSON].pinned) && Array.isArray(optionsJSON[optionJSON].flags) && comparing.eqSet(new Set(Object.keys(optionsJSON[optionJSON])), new Set(["pinned","flags"])))){
+                        try{(!delete optionsJSON[optionJSON])}
+                        catch{
+                            return undefined   
+                        }
+                        
                     }
                 }}
             else{
-                if(!(Array.isArray(optionsJSON[selector].pinned) && Array.isArray(optionsJSON[selector].flags) && VercorsOptions.eqSet(new Set(Object.keys(optionsJSON[selector])), new Set(["pinned","flags"])))){
+                if(new Set(Object.keys(optionsJSON)).has(selector) && !(Array.isArray(optionsJSON[selector].pinned) && Array.isArray(optionsJSON[selector].flags) && comparing.eqSet(new Set(Object.keys(optionsJSON[selector])), new Set(["pinned","flags"])))){
                     return {pinned: [], flags: []};
                 }
                 return optionsJSON[selector]
             }
             return optionsJSON;
 
-        }
-        catch(e){
-            return undefined;
-        }
+        
     }
 
 
-    public static compareLists(l1, l2){
-        if (!l1 || !l2){
-            return false;
-        }
-        if(l1.length !== l2.length){
-            return false;
-        }
-        const s1 = new Set(l1);
-        const s2 = new Set(l2);
-
-        return VercorsOptions.eqSet(s1,s2)
-
-    }
+    
 }
 
 export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
