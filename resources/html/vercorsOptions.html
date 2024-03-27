@@ -225,8 +225,10 @@
     function generateOptionsMessage() {
         let optionsString = [];
         let optionsPinString = [];
+        let optionBackendString = "";
 
         let checkboxContainers = document.getElementsByClassName('checkbox-container');
+
         for (const checkbox of checkboxContainers) {
             if (checkbox.querySelector('input[type="checkbox"]').checked) {
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
@@ -243,10 +245,22 @@
             }
         }
 
+        let backendOptionBox = document.getElementById("color_mode")
+        let backendOptionLabel = document.querySelector('.btn-color-mode-switch-inner')
+        if(backendOptionBox.checked){
+            optionBackendString = "--backend " + backendOptionLabel.dataset.on.toLowerCase();
+        }
+        else{
+            optionBackendString = "--backend " + backendOptionLabel.dataset.off.toLowerCase();
+        }
+        console.log(optionBackendString)
+
+
         vscode.postMessage({
             command: 'updateOptions',
             options: optionsString,
-            pinnedOptions: optionsPinString
+            pinnedOptions: optionsPinString,
+            backendOption: optionBackendString
         });
     }
 

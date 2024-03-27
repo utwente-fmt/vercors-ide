@@ -6,24 +6,31 @@ export type OptionFields = {
     flags: string[]
 }
 
+let silicon = "--backend silicon"
+let carbon = "--backend carbon"
+type backendType = {backend:  string}
+type Options = backendType & Record<string,OptionFields>
 
-type Options = Record<string, OptionFields>
 export class VercorsOptions {
-
-
 
     public static getFlagOptions(filePath: string): Array<string> {
         const fileOptions = this.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) || { pinned: [], flags: [] } as OptionFields;
         return fileOptions.flags;
     }
 
-    public static getAllOptions(filePath: string): OptionFields {
+    public static getAllFileOptions(filePath: string): OptionFields {
         let fileOptions = VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) as OptionFields;
         return fileOptions ? fileOptions : { pinned: [], flags: [] };
     }
-    public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[]): Promise<void> {
+
+    public static getBackendOption(): string{
+        let backendOption = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})["backend"] as string
+        return backendOption? backendOption: silicon
+    }
+    public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[], backendOption: string): Promise<void> {
         let currentVercorsOptions = (VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})) || {}) as Options;
         currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
+        currentVercorsOptions["backend"] = backendOption as string;
         console.log({file: filePath, ...currentVercorsOptions[filePath]});
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions,true);
     }
@@ -97,7 +104,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.onDidReceiveMessage(async message => {
             if (message.command === 'updateOptions') {
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-                VercorsOptions.updateOptions(filePath!, message.options,message.pinnedOptions);
+                VercorsOptions.updateOptions(filePath!, message.options,message.pinnedOptions,message.backendOption);
             } else if (message.command === 'viewLoaded') {
                 const data = await this.fetchCommandLineOptions();
                 this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
@@ -132,9 +139,9 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     public updateView() {
         const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-        const fileOptions = VercorsOptions.getAllOptions(filePath!);
+        const fileOptions = VercorsOptions.getAllFileOptions(filePath!);
         // console.log(fileOptions.flags)
         // console.log(fileOptions.pinned)
-        this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions.flags, pinnedOptions: fileOptions.pinned});
+        this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions.flags, pinnedOptions: fileOptions.pinned, backendOptions: fileOptions.backend});
     }
 }
