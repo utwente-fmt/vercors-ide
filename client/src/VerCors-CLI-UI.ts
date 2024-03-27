@@ -26,7 +26,7 @@ export class VercorsOptions {
         let currentVercorsOptions = (VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})) || {}) as Options;
         currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
         console.log({file: filePath, ...currentVercorsOptions[filePath]});
-        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions);
+        await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions,true);
     }
 
     public static isEqual(o1: OptionFields, o2: OptionFields): boolean{

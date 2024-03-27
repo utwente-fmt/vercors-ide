@@ -19,7 +19,7 @@ export class VerCorsPaths {
     public static async storePathList(vercorsPaths: VercorsPath[]): Promise<void> {
         const stored = vercorsPaths.length ? vercorsPaths : [];
         //todo: remove every wrong path
-        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', this.fixPaths(stored));
+        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', this.fixPaths(stored),true);
     }
 
 
