@@ -6,8 +6,7 @@ export type OptionFields = {
     flags: string[]
 }
 
-let silicon = "--backend silicon"
-let carbon = "--backend carbon"
+enum backend { silicon = "--backend silicon", carbon = "--backend carbon"}
 type backendType = {backend:  string}
 type Options = backendType & Record<string,OptionFields>
 
@@ -23,20 +22,22 @@ export class VercorsOptions {
         return fileOptions ? fileOptions : { pinned: [], flags: [] };
     }
 
-    public static getBackendOption(): string{
-        let backendOption = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})["backend"] as string
-        return backendOption? backendOption: silicon
+    public static getBackendOption(): backend{
+        let backendOption = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})["backend"] as backend
+        return backend[backendOption]? backend[backendOption]: backend.silicon
     }
     public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[], backendOption: string): Promise<void> {
         let currentVercorsOptions = (VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})) || {}) as Options;
         currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
-        currentVercorsOptions["backend"] = backendOption as string;
+        currentVercorsOptions["backend"] = backendOption;
         console.log({file: filePath, ...currentVercorsOptions[filePath]});
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions,true);
     }
 
 
-
+    public static isSilicon(){
+        return backend.silicon === this.getBackendOption()
+    }
     public static isEqualOptionFields(o1: OptionFields, o2: OptionFields): boolean{
       return comparing.compareLists(o1.pinned,o2.pinned) && comparing.compareLists(o1.flags, o2.flags)
     }
@@ -142,6 +143,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         const fileOptions = VercorsOptions.getAllFileOptions(filePath!);
         // console.log(fileOptions.flags)
         // console.log(fileOptions.pinned)
-        this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions.flags, pinnedOptions: fileOptions.pinned, backendOptions: fileOptions.backend});
+        this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions.flags, pinnedOptions: fileOptions.pinned, backendOption: VercorsOptions.isSilicon()});
     }
+
 }

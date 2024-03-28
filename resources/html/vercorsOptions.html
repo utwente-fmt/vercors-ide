@@ -248,10 +248,10 @@
         let backendOptionBox = document.getElementById("color_mode")
         let backendOptionLabel = document.querySelector('.btn-color-mode-switch-inner')
         if(backendOptionBox.checked){
-            optionBackendString = "--backend " + backendOptionLabel.dataset.on.toLowerCase();
+            optionBackendString = backendOptionLabel.dataset.on.toLowerCase();
         }
         else{
-            optionBackendString = "--backend " + backendOptionLabel.dataset.off.toLowerCase();
+            optionBackendString = backendOptionLabel.dataset.off.toLowerCase();
         }
         console.log(optionBackendString)
 
@@ -264,7 +264,8 @@
         });
     }
 
-    function loadOptions(options, pinnedOptions) {
+    function loadOptions(options, pinnedOptions, backendOption) {
+        //todo: it gives an error for the savedOptions
         const savedOptions = options.map(option => option.replace(/^--/, '').trim());
         const savedPinnedOptions = pinnedOptions.map(option => option.replace(/^--/, '').trim());
 
@@ -280,6 +281,9 @@
                 .forEach((checkbox) => checkbox.checked = savedPinnedOptions.includes(checkbox.name)
                 )
             );
+        
+        document.getElementById("color_mode").checked = !backendOption
+        console.log(backendOption)
         updateCategoryHeaders();
     }
 
@@ -339,7 +343,7 @@
     window.addEventListener('message', event => {
         const message = event.data;
         if (message.command === 'loadOptions') {
-            loadOptions(message.options, message.pinnedOptions);
+            loadOptions(message.options, message.pinnedOptions,message.backendOption);
         }
     });
 
