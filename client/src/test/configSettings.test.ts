@@ -36,7 +36,7 @@ suite('Optionmap Tests', async () => {
         expectedOptions = {pinned: [],flags : []} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrays.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
-        Assert.equals(VercorsOptions.getFlagOptions("Design project/arr.java"), [],comparing.compareLists)
+        Assert.equals(VercorsOptions.getSelectedOptions("Design project/arr.java"), [],comparing.compareLists)
 
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arr.java"), { pinned: [], flags: [] },VercorsOptions.isEqualOptionFields)
 	});

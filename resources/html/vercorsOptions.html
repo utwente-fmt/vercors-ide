@@ -418,6 +418,11 @@
                     generateOptionsMessage();
                 });
             });
+            // On-change for the backend button
+            document.getElementById('color_mode').addEventListener('change', function () {
+                    // Post new settings after change
+                    generateOptionsMessage();
+                });
         }
     });
 </script>

@@ -12,9 +12,11 @@ type Options = backendType & Record<string,OptionFields>
 
 export class VercorsOptions {
 
-    public static getFlagOptions(filePath: string): Array<string> {
+    public static getSelectedOptions(filePath: string): Array<string> {
         const fileOptions = this.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) || { pinned: [], flags: [] } as OptionFields;
-        return fileOptions.flags;
+        const selected= fileOptions.flags;
+        selected.push(this.getBackendOption());
+        return selected;
     }
 
     public static getAllFileOptions(filePath: string): OptionFields {
