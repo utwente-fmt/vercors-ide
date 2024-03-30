@@ -1,37 +1,42 @@
 import * as vscode from 'vscode';
 import {comparing} from './comparing';
 
-export type OptionFields = {
-    pinned: string[],
-    flags: string[]
-}
+export type OptionFields = flagType & pinnedType & backendType
 
 enum backend { silicon = "--backend silicon", carbon = "--backend carbon"}
 type backendType = {backend:  string}
-type Options = backendType & Record<string,OptionFields>
+type pinnedType = {pinned: string[]}
+type flagType = {flags: string[]}
+type Options = pinnedType & backendType & Record<string,flagType>
 
 export class VercorsOptions {
 
     public static getSelectedOptions(filePath: string): Array<string> {
-        const fileOptions = this.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) || { pinned: [], flags: [] } as OptionFields;
-        const selected= fileOptions.flags;
+        const selected= this.getFlagedOptions(filePath);
         selected.push(this.getBackendOption());
         return selected;
     }
 
     public static getAllFileOptions(filePath: string): OptionFields {
-        let fileOptions = VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) as OptionFields;
-        return fileOptions ? fileOptions : { pinned: [], flags: [] };
+        return VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{}),filePath) as OptionFields;
     }
 
+    public static getFlagedOptions(filePath: string): string[]{
+        return VercorsOptions.fixFlagOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap'),filePath) as string[];
+    }
+    public static getPinnedOptions() : string[]{
+        return this.fixPinnedOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap')) as string[]
+       
+    }
     public static getBackendOption(): backend{
-        let backendOption = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})["backend"] as backend
-        return backend[backendOption]? backend[backendOption]: backend.silicon
+        return this.fixBackendOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap')) as backend
+        
     }
     public static async updateOptions(filePath: string, vercorsOptions: string[], pinnedOptions: string[], backendOption: string): Promise<void> {
         let currentVercorsOptions = (VercorsOptions.fixOptions(vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap',{})) || {}) as Options;
-        currentVercorsOptions[filePath] = {pinned:pinnedOptions.map(e => e.trim()) ,flags:vercorsOptions.map(e => e.trim())}
+        currentVercorsOptions[filePath] = {flags:vercorsOptions.map(e => e.trim())}
         currentVercorsOptions["backend"] = backendOption;
+        currentVercorsOptions["pinned"] = pinnedOptions;
         console.log({file: filePath, ...currentVercorsOptions[filePath]});
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions,true);
     }
@@ -44,34 +49,66 @@ export class VercorsOptions {
       return comparing.compareLists(o1.pinned,o2.pinned) && comparing.compareLists(o1.flags, o2.flags)
     }
 
-    private static fixOptions(options, selector?){
+
+    private static fixPinnedOptions(options): string[]{
+        let pinnedOptions = options["pinned"]
+        
+        const isStringList = Array.isArray(pinnedOptions) && pinnedOptions.every(item => typeof item === "string");
+        return isStringList? pinnedOptions : []
+
+    }
+
+    private static fixFlagOptions(options: Options, filePath?: string){
         let optionsJSON;
         try{
             optionsJSON = JSON.parse(JSON.stringify(options));
         }
         catch(e){
-            return undefined;
+            return {};
         }
-            if(!selector){
-                for(var optionJSON in optionsJSON){
-                    if(!(Array.isArray(optionsJSON[optionJSON].pinned) && Array.isArray(optionsJSON[optionJSON].flags) && comparing.eqSet(new Set(Object.keys(optionsJSON[optionJSON])), new Set(["pinned","flags"])))){
-                        try{(!delete optionsJSON[optionJSON])}
-                        catch{
-                            return undefined   
-                        }
-                        
+        
+        if(filePath){
+           
+            let fileOptionsJSON = optionsJSON[filePath]
+            const hasRightValue = fileOptionsJSON && Array.isArray(fileOptionsJSON.flags) && comparing.eqSet(new Set(Object.keys(fileOptionsJSON)), new Set(["flags"]))
+            return hasRightValue? fileOptionsJSON.flags: []
+        }
+        else{
+            console.log(optionsJSON)
+            for(var optionJSON in optionsJSON){
+                if(!(Array.isArray(optionsJSON[optionJSON].flags) && comparing.eqSet(new Set(Object.keys(optionsJSON[optionJSON])), new Set(["flags"])))){
+                    try{(!delete optionsJSON[optionJSON])}
+                    catch{
+                        return {} 
                     }
-                }}
-            else{
-                if(new Set(Object.keys(optionsJSON)).has(selector) && !(Array.isArray(optionsJSON[selector].pinned) && Array.isArray(optionsJSON[selector].flags) && comparing.eqSet(new Set(Object.keys(optionsJSON[selector])), new Set(["pinned","flags"])))){
-                    return {pinned: [], flags: []};
                 }
-                return optionsJSON[selector]
             }
-            return optionsJSON;
+            return optionsJSON
+        }
 
+    }
+
+    private static fixBackendOptions(options): backend{
+        
+        return backend[options["backend"]]? backend[options["backend"]]: backend.silicon
+
+    }
+
+    private static fixOptions(options,filePath?): Options | OptionFields{
+            let flagOptions;
+            if(filePath){
+                flagOptions = {flags: this.fixFlagOptions(options,filePath)}
+            }
+            else{
+                flagOptions = this.fixFlagOptions(options)
+            }
+            console.log({ ...flagOptions, pinned: this.fixPinnedOptions(options), backend: this.fixBackendOptions(options)})
+            return { ...flagOptions, pinned: this.fixPinnedOptions(options), backend: this.fixBackendOptions(options)}; 
         
     }
+
+    
+
 
 
     
@@ -145,6 +182,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         const fileOptions = VercorsOptions.getAllFileOptions(filePath!);
         // console.log(fileOptions.flags)
         // console.log(fileOptions.pinned)
+        console.log(fileOptions.flags)
         this._view!.webview.postMessage({ command: 'loadOptions', options: fileOptions.flags, pinnedOptions: fileOptions.pinned, backendOption: VercorsOptions.isSilicon()});
     }
 
