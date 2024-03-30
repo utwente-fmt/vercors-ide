@@ -53,7 +53,7 @@ export class VercorsOptions {
     private static fixPinnedOptions(options): string[]{
         let pinnedOptions = options["pinned"]
         
-        const isStringList = Array.isArray(pinnedOptions) && pinnedOptions.every(item => typeof item === "string");
+        const isStringList = pinnedOptions && Array.isArray(pinnedOptions) && pinnedOptions.every(item => typeof item === "string");
         return isStringList? pinnedOptions : []
 
     }
@@ -76,7 +76,7 @@ export class VercorsOptions {
         else{
             console.log(optionsJSON)
             for(var optionJSON in optionsJSON){
-                if(!(Array.isArray(optionsJSON[optionJSON].flags) && comparing.eqSet(new Set(Object.keys(optionsJSON[optionJSON])), new Set(["flags"])))){
+                if(!(optionsJSON[optionJSON] && Array.isArray(optionsJSON[optionJSON].flags) && comparing.eqSet(new Set(Object.keys(optionsJSON[optionJSON])), new Set(["flags"])))){
                     try{(!delete optionsJSON[optionJSON])}
                     catch{
                         return {} 

@@ -24,59 +24,87 @@ suite('Optionmap Tests', async () => {
 	test('Simple adding and removing (End To End)', async () => {
         
         
-		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
-        let expectedOptions = {pinned: [ "--more"], flags : ["--quite","--backend-file-base"]} as OptionFields
+		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "silicon")
+        let expectedOptions = {pinned: [ "--more"], flags : ["--quite","--backend-file-base"], backend: "--backend silicon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
-        VercorsOptions.updateOptions("Design project/arrays.java",["--quite"], ["--more"]);
-        expectedOptions = {pinned: [ "--more"],flags : ["--quite"]} as OptionFields
+        VercorsOptions.updateOptions("Design project/arrays.java",["--quite"], ["--more"], "carbon");
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite"], backend: "--backend carbon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrays.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
-        VercorsOptions.updateOptions("Design project/arrays.java",[], []);
-        expectedOptions = {pinned: [],flags : []} as OptionFields
+        VercorsOptions.updateOptions("Design project/arrays.java",["--quite"], [], "silicon");
+        expectedOptions = {pinned: [],flags : ["--quite"], backend: "--backend silicon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrays.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
-        Assert.equals(VercorsOptions.getSelectedOptions("Design project/arr.java"), [],comparing.compareLists)
+        Assert.equals(VercorsOptions.getSelectedOptions("Design project/arr.java"), ["--backend silicon"],comparing.compareLists)
 
-        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arr.java"), { pinned: [], flags: [] },VercorsOptions.isEqualOptionFields)
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arr.java"), { pinned: [], flags: [], backend: "--backend silicon" },VercorsOptions.isEqualOptionFields)
 	});
 
     test('Erronous and default value handling', async () => {
         fakeConfiguration["vercorsplugin.optionsMap"] = {}
-		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
-        let expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
+		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        let expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"], backend: "--backend carbon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
 
         fakeConfiguration["vercorsplugin.optionsMap"] = "hey"
-        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)
-		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
-        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: [], backend: "--backend silicon"},VercorsOptions.isEqualOptionFields)
+		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"], backend: "--backend carbon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
         fakeConfiguration["vercorsplugin.optionsMap"] = null
-        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)
-		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
-        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: [], backend: "--backend silicon"},VercorsOptions.isEqualOptionFields)
+		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"], backend: "--backend carbon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
-        fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {pinned: "string",flags: "string"}}
-        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)
-		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
-        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
+        fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {flags: ["string"]}, pinned: "string"}
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: ["string"], backend: "--backend silicon"},VercorsOptions.isEqualOptionFields)
+		VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"], backend: "--backend carbon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
         fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {a: ["string"]}}
-        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)
-        VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])		
-        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: [], backend: "--backend silicon"},VercorsOptions.isEqualOptionFields)
+        VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"], backend: "--backend carbon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
 
-        fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {pinned: "string",flags: "string", a: ["string"]}}
-        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: []},VercorsOptions.isEqualOptionFields)	
-        VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"])
-        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"]} as OptionFields
+        fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {flags: null, a: ["string"]}, pinned: null}
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: [], flags: [], backend: "--backend silicon"},VercorsOptions.isEqualOptionFields)
+        VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"], backend: "--backend carbon"} as OptionFields
         Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
+
+        fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {flags: ["string"]}, pinned: ["string"], backend: null}
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: ["string"], flags: ["string"], backend: "--backend silicon"},VercorsOptions.isEqualOptionFields)
+        VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"], backend: "--backend carbon"} as OptionFields
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
+        
+        fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {flags: ["string"]}, pinned: ["string"], backend: "boei"}
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), {pinned: ["string"], flags: ["string"], backend: "--backend silicon"},VercorsOptions.isEqualOptionFields)
+        VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        expectedOptions = {pinned: [ "--more"],flags : ["--quite","--backend-file-base"], backend: "--backend carbon"} as OptionFields
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arrayTest.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
+
+
+        /**
+         * Other files with good settings shouldn't be deleted if some other settings are wrong
+        */
+
+        fakeConfiguration["vercorsplugin.optionsMap"] = {"Design project/arrayTest.java": {flags: ["string"]}, "Design project/arr.java": {flags: ["string"]}, pinned: null, backend: null}
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arr.java"), {pinned: [], flags: ["string"], backend: "--backend silicon"},VercorsOptions.isEqualOptionFields)
+        VercorsOptions.updateOptions("Design project/arrayTest.java",["--quite", "--backend-file-base"], ["--more"], "carbon")
+        expectedOptions = {pinned: ["--more"],flags : ["string"], backend: "--backend carbon"} as OptionFields
+        Assert.equals(VercorsOptions.getAllFileOptions("Design project/arr.java"), expectedOptions,VercorsOptions.isEqualOptionFields)
+
+
+
+
+        
 
 
 	});
