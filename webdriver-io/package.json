@@ -12,5 +12,8 @@
   },
   "scripts": {
     "wdio": "wdio run ./wdio.conf.ts"
+  },
+  "dependencies": {
+    "vscode": "^1.1.37"
   }
 }
