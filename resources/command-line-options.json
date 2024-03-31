@@ -42,6 +42,12 @@
       "description": "{silver, pvl, llvm, i, java, c, systemc} Do not detect the language from the file extension, but force a specific language parser for all files",
       "arguments": "silver, pvl, llvm, i, java, c, systemc"
     },
+    "backend": {
+      "name": "Backend",
+      "description": "Set the backend to verify with (default: silicon)",
+      "arguments": "silicon, carbon",
+      "skip": true
+    },
     "backend-file-base": {
       "name": "Backend File Base",
       "description": "In addition to verification, output the resulting ASTs for the backend to files, appended with -<number>.<extension>"
