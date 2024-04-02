@@ -14,7 +14,7 @@ export function run(): Promise<void> {
 	});
 	mocha.timeout(100000);
 
-	const testsRoot = __dirname;
+	const testsRoot = __dirname + "/path and option tests";
 
 	return new Promise((resolve, reject) => {
 		// @ts-ignore

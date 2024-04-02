@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import {comparing} from './comparing';
+
 const path = require('path'); 
 
 export type VercorsPath = {
@@ -76,7 +77,6 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
             this._HTMLContent = await this.getHtmlForWebview();
         }
         webviewView.webview.html = this._HTMLContent;
-
         webviewView.webview.onDidReceiveMessage(
             message => {
                 switch (message.command) {

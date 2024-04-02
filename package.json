@@ -20,14 +20,20 @@
   ],
   "main": "./client/out/extension.js",
   "contributes": {
-      "snippets": [
-        {"language": "pvl",
-         "path": "./snippets.json"},
-         {"language": "java",
-         "path": "./snippets.json"},
-        {"language": "c",
-         "path": "./snippets.json"}
-      ],
+    "snippets": [
+      {
+        "language": "pvl",
+        "path": "./snippets.json"
+      },
+      {
+        "language": "java",
+        "path": "./snippets.json"
+      },
+      {
+        "language": "c",
+        "path": "./snippets.json"
+      }
+    ],
     "configuration": {
       "properties": {
         "languageServerExample.maxNumberOfProblems": {
@@ -197,6 +203,8 @@
   },
   "dependencies": {
     "expect.js": "^0.3.1",
-    "sinon": "^17.0.1"
+    "mock-fs": "^5.2.0",
+    "sinon": "^17.0.1",
+    "wdio": "^6.0.1"
   }
 }

@@ -70,7 +70,7 @@ async function startClient(context){
  * Method called when the extension is activated
  * @param {vscode.ExtensionContext} context
  */
-async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     startClient(context);
     // Check if the VerCors path is set
     const vercorsPaths = await VerCorsPaths.getPathList();
@@ -116,7 +116,7 @@ async function activate(context: vscode.ExtensionContext) {
 /**
  * Method called when the extension is deactivated
  */
-function deactivate() {
+export function deactivate() {
 }
 
 module.exports = {
