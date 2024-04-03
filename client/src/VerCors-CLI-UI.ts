@@ -51,10 +51,9 @@ export class VercorsOptions {
 
 
     private static fixPinnedOptions(options): string[]{
-        let pinnedOptions = options["pinned"]
         
-        const isStringList = pinnedOptions && Array.isArray(pinnedOptions) && pinnedOptions.every(item => typeof item === "string");
-        return isStringList? pinnedOptions : []
+        const isStringList = options && options["pinned"] && Array.isArray(options["pinned"]) && options["pinned"].every(item => typeof item === "string");
+        return isStringList? options["pinned"] : []
 
     }
 
@@ -66,14 +65,24 @@ export class VercorsOptions {
         catch(e){
             return {};
         }
+
+        
         
         if(filePath){
+
+            if(!optionsJSON){
+                return []
+            }
            
             let fileOptionsJSON = optionsJSON[filePath]
             const hasRightValue = fileOptionsJSON && Array.isArray(fileOptionsJSON.flags) && comparing.eqSet(new Set(Object.keys(fileOptionsJSON)), new Set(["flags"]))
             return hasRightValue? fileOptionsJSON.flags: []
         }
         else{
+
+            if(!optionsJSON){
+                return {}
+            }
             console.log(optionsJSON)
             for(var optionJSON in optionsJSON){
                 if(!(optionsJSON[optionJSON] && Array.isArray(optionsJSON[optionJSON].flags) && comparing.eqSet(new Set(Object.keys(optionsJSON[optionJSON])), new Set(["flags"])))){
@@ -90,7 +99,7 @@ export class VercorsOptions {
 
     private static fixBackendOptions(options): backend{
         
-        return backend[options["backend"]]? backend[options["backend"]]: backend.silicon
+        return options && backend[options["backend"]]? backend[options["backend"]]: backend.silicon
 
     }
 
