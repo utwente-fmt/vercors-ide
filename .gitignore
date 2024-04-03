@@ -8,3 +8,4 @@ node_modules
 vercorsplugin-0.0.1.vsix
 client/tsconfig.tsbuildinfo
 server/tsconfig.tsbuildinfo
+.wdio-vscode-service
