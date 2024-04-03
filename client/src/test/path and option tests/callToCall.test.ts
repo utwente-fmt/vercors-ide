@@ -18,7 +18,7 @@ class MockExtensionContext implements vscode.ExtensionContext{
     workspaceState: vscode.Memento;
     globalState: vscode.Memento & { setKeysForSync(keys: readonly string[]): void; };
     secrets: vscode.SecretStorage;
-    extensionUri: vscode.Uri;
+    extensionUri: vscode.Uri = vscode.Uri.file(projectStartPath); ;
     extensionPath: string;
     environmentVariableCollection: vscode.GlobalEnvironmentVariableCollection;
     asAbsolutePath(relativePath: string){
@@ -39,8 +39,21 @@ class MockExtensionContext implements vscode.ExtensionContext{
  * It is mostly set so it doesn't really matter what is in here.
  */
 class mockWebviewView implements vscode.WebviewView{
+    onDidReceiveMessageListener: (e: any) => any;
     viewType: string;
-    webview: vscode.Webview;
+    webview: vscode.Webview = {
+        // Mock properties and methods of the Webview interface
+        onDidReceiveMessage: new vscode.EventEmitter<any>().event,
+        options: undefined,
+        html: '',
+        asWebviewUri: function (localResource: vscode.Uri): vscode.Uri {
+            throw new Error('Function not implemented.');
+        },
+        cspSource: '',
+        postMessage: function (message: any): Thenable<boolean> {
+            throw new Error('Function not implemented.');
+        }
+    };
     title?: string;
     description?: string;
     badge?: vscode.ViewBadge;
@@ -56,11 +69,12 @@ class testMocking{
 
     
     context = new MockExtensionContext();
+    
 
     public workspaceSettingsMocking(fakeConfiguration: { [x: string]: any; }){
         const vscodeWorkspaceStub = sinon.stub();
         vscodeWorkspaceStub.returns({
-                get: (section, defaultValue) => fakeConfiguration[section] || defaultValue,
+                get: (section, defaultValue) => fakeConfiguration[section] || defaultValue || {},
                 update: (section, value) => fakeConfiguration[section] = value 
         });
         sinon.stub(vscode.workspace, 'getConfiguration').callsFake(vscodeWorkspaceStub); // has to be from vscode.workspace instead of vscode, because workspace is no function
@@ -68,9 +82,30 @@ class testMocking{
     }
 
     public showFileDialogMocking(){
-        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(vscode.Uri.parse('fakeVercors/bin')));
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri('fakeVercors/bin')));
     }
 
+    public createMockUri(path: string): [vscode.Uri] {
+
+    
+        const mockFolderUri: vscode.Uri = {
+            scheme: 'file',
+            authority: '',
+            path: path,
+            query: '',
+            fragment: '',
+            fsPath: path, // Calculate the filesystem path based on the path
+            with: (change: { scheme?: string; authority?: string; path?: string; query?: string; fragment?: string; }) => {
+                // Optionally, implement the `with` method if needed
+                return mockFolderUri;
+            },
+            toJSON: function () {
+                throw new Error('Function not implemented.');
+            }
+        };
+    
+        return [mockFolderUri];
+    }
     //mock the vscode api file call by redirecting it to the fs call, because fs goes now to our own fake filesystem
     public WorkspaceFsMocking(){
         const vscodeWorkspaceFsStub = sinon.stub();
@@ -82,14 +117,14 @@ class testMocking{
 
 
     public fsMocking(){
-        const frontendPath = projectStartPath + '/resources/html'
+        const frontendPath = projectStartPath + '/resources/html/'
         mock_fs({
             'fakeVercors/bin': {
                 'vercors': fs.readFileSync(projectStartPath +  '/client/src/test/fakeVercors/vercors', 'utf-8') // vercors is not compiled so not put in the out folder
             },
-            frontend:{
-                'vercorsPath.html': fs.readFileSync(frontendPath + "/vercorsPath.html"),
-                'vercorsOptions.html': fs.readFileSync(frontendPath + "/vercorsOptions.html")
+            frontendPath:{
+                'vercorsPath.html': fs.readFileSync(frontendPath + "vercorsPath.html"),
+                'vercorsOptions.html': fs.readFileSync(frontendPath + "vercorsOptions.html")
             }
         });
 
@@ -115,27 +150,35 @@ suite('Path handling', async () => {
     let testMock: testMocking;
     let webviewViewMock: mockWebviewView;
     let returnDictionary = {};
+    let resolveWebviewViewSpy;
+    let onDidReceiveMessageFunction;
 
 
     beforeEach(async () => {
+
+
         testMock = new testMocking();
         webviewViewMock = new mockWebviewView();
+        resolveWebviewViewSpy = sinon.spy(webviewViewMock.webview,'onDidReceiveMessage')
         testMock.workspaceSettingsMocking(fakeConfiguration);
         testMock.showFileDialogMocking();
         testMock.fsMocking();
         testMock.WorkspaceFsMocking();
         WebviewViewProvider = new VerCorsWebViewProvider(new MockExtensionContext())
-        WebviewViewProvider.resolveWebviewView(webviewViewMock, undefined,undefined)
-        //testMock.postMessageMocking(webviewViewMock.webview,returnDictionary)
+        await WebviewViewProvider.resolveWebviewView(webviewViewMock, undefined,undefined)
+        onDidReceiveMessageFunction = resolveWebviewViewSpy.args[0][0]
+        testMock.postMessageMocking(webviewViewMock.webview,returnDictionary)
     })
     afterEach(() => {
         mock_fs.restore();
         sinon.restore();
         vercorsExtension.deactivate()
+        resolveWebviewViewSpy.restore()
     })
 
 	test('', async () => {
-        console.log(testMock.context)
+       await onDidReceiveMessageFunction({command: "add-path"})
+       console.log(returnDictionary)
 
         //send a message
     });

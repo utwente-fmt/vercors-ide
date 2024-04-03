@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import {comparing} from './comparing';
+import { workerData } from 'worker_threads';
 
 const path = require('path'); 
 
@@ -136,6 +137,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     }
 
     private async selectNewVercorsPath(webview: vscode.Webview): Promise<VercorsPath | undefined> {
+        VerCorsPaths.getPathList()
         return vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,
