@@ -137,7 +137,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
     }
 
     private async selectNewVercorsPath(webview: vscode.Webview): Promise<VercorsPath | undefined> {
-        VerCorsPaths.getPathList()
+        console.log("hey")
         return vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,
