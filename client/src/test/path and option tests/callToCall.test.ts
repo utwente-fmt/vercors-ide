@@ -166,7 +166,7 @@ suite('Path handling', async () => {
         testMock.WorkspaceFsMocking();
         WebviewViewProvider = new VerCorsWebViewProvider(new MockExtensionContext())
         await WebviewViewProvider.resolveWebviewView(webviewViewMock, undefined,undefined)
-        onDidReceiveMessageFunction = async (message: string) => resolveWebviewViewSpy.args[0][0](message)
+        onDidReceiveMessageFunction = async (message: string) =>{await new Promise(resolve => resolveWebviewViewSpy.args[0][0](message));} 
         testMock.postMessageMocking(webviewViewMock.webview,returnDictionary)
     })
     afterEach(() => {
@@ -177,9 +177,10 @@ suite('Path handling', async () => {
     })
 
 	test('', async () => {
-     await onDidReceiveMessageFunction({command: "add-path"})
-     console.log(returnDictionary)
-       
+        
+     await onDidReceiveMessageFunction({command: "add-path"}).then( ()=> console.log(returnDictionary)
+     )
+     
        
 
 
