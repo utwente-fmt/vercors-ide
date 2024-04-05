@@ -46,7 +46,7 @@ export class OutputState {
     }
 
     public start() {
-        this.progressReceiver.accept(0, '', 'Starting VerCors...');
+        this.progressReceiver.update(0, '', 'Starting VerCors...');
         this.currentPercentage = 0;
     }
 
@@ -55,7 +55,7 @@ export class OutputState {
      * this constructs all found errors and pushes them to the problems tab
      */
     public finish() {
-        this.progressReceiver.accept(100, '', 'Finished');
+        this.progressReceiver.update(100, '', 'Finished');
 
         //setting up the diagnostic collection
         let diagnostics: vscode.Diagnostic[] = [];
@@ -137,7 +137,7 @@ export class OutputState {
             const step = matchResult.groups!['step'];
             const stepName = matchResult.groups!['step_name'];
             this.outputChannel.appendLine(line);
-            this.progressReceiver.accept(this.currentPercentage, step, stepName);
+            this.progressReceiver.update(this.currentPercentage, step, stepName);
         }
     }
 

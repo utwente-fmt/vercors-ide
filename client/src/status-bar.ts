@@ -12,7 +12,7 @@ export class StatusBar implements ProgressReceiver {
         return StatusBar.instance;
     }
 
-    async accept(percentage: number, step: string, stepName: string) {
+    async update(percentage: number, step: string, stepName: string) {
         if (percentage === 100) {
             this.statusBarItem.hide();
             return;

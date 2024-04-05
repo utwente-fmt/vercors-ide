@@ -1,6 +1,6 @@
 export interface ProgressReceiver {
 
-    accept(percentage: number, step: string, stepName: string) : Promise<void>;
+    update(percentage: number, step: string, stepName: string) : Promise<void>;
 
 }
 
@@ -13,9 +13,9 @@ class MultiReceiver implements ProgressReceiver {
     constructor(private receivers : ProgressReceiver[]) {
     }
 
-    async accept(percentage: number, step: string, stepName: string): Promise<void> {
+    async update(percentage: number, step: string, stepName: string): Promise<void> {
         await Promise.all<void>(
-            this.receivers.map(receiver => receiver.accept(percentage, step, stepName))
+            this.receivers.map(receiver => receiver.update(percentage, step, stepName))
         );
     }
 

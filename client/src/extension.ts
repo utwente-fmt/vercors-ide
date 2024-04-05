@@ -20,11 +20,11 @@ import * as fs from "fs";
 import { StatusBar } from "./status-bar";
 
 
+const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence
+let diagnosticCollection: vscode.DiagnosticCollection;
 let outputChannel: vscode.OutputChannel;
-let diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
-const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
+let vercorsStatusBarItem: vscode.StatusBarItem;
 let vercorsProcessPid = -1;
-let vercorsStatusBarItem: vscode.StatusBarItem | undefined;
 
 let client: LanguageClient;
 
@@ -110,6 +110,8 @@ async function activate(context: vscode.ExtensionContext) {
 
     vercorsStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
     new StatusBar(vercorsStatusBarItem);
+
+    diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
 
     // vscode.commands.registerCommand('extension.refreshEntry', () =>
     //     vercorsPathProvider.refresh()
@@ -209,7 +211,6 @@ async function executeVercorsCommand() {
 
     vercorsProcess.on('exit', function () {
         outputState.finish();
-        VerCorsPathWebViewProvider.setProgress(undefined);
         vercorsProcessPid = -1;
     });
 
