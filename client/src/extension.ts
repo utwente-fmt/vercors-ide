@@ -4,17 +4,12 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
 import * as vscode from 'vscode';
-import {
-	LanguageClient,
-	LanguageClientOptions,
-	ServerOptions,
-	TransportKind
-} from 'vscode-languageclient/node';
+import { ExtensionContext, StatusBarAlignment, workspace } from 'vscode';
+import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
 
-import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider, VercorsOptions  } from './VerCors-CLI-UI';
-import { VerCorsWebViewProvider as VerCorsPathWebViewProvider, VerCorsPaths } from './VerCors-Path-UI';
+import { VercorsOptions, VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './VerCors-CLI-UI';
+import { VerCorsPaths, VerCorsWebViewProvider as VerCorsPathWebViewProvider } from './VerCors-Path-UI';
 import { OutputState } from './output-parser';
 import * as fs from "fs";
 import { StatusBar } from "./status-bar";
@@ -23,7 +18,7 @@ import { StatusBar } from "./status-bar";
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence
 let diagnosticCollection: vscode.DiagnosticCollection;
 let outputChannel: vscode.OutputChannel;
-let vercorsStatusBarItem: vscode.StatusBarItem;
+let vercorsStatusBarProgress: vscode.StatusBarItem;
 let vercorsProcessPid = -1;
 
 let client: LanguageClient;
@@ -108,8 +103,12 @@ async function activate(context: vscode.ExtensionContext) {
         vscode.window.registerWebviewViewProvider('vercorsPathView', vercorsPathProvider)
     );
 
-    vercorsStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    new StatusBar(vercorsStatusBarItem);
+    const vercorsStatusBarStartButton = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 100);
+    vercorsStatusBarStartButton.command = 'extension.runVercors';
+    const vercorsStatusBarStopButton = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 99);
+    vercorsStatusBarStopButton.command = 'extension.stopVercors';
+    vercorsStatusBarProgress = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
+    new StatusBar(vercorsStatusBarProgress, vercorsStatusBarStartButton, vercorsStatusBarStopButton);
 
     diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
 
