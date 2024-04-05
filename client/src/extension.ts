@@ -17,12 +17,14 @@ import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider, VercorsOptions  } 
 import { VerCorsWebViewProvider as VerCorsPathWebViewProvider, VerCorsPaths } from './VerCors-Path-UI';
 import { OutputState } from './output-parser';
 import * as fs from "fs";
+import { StatusBar } from "./status-bar";
 
 
 let outputChannel: vscode.OutputChannel;
 let diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence 
 let vercorsProcessPid = -1;
+let vercorsStatusBarItem: vscode.StatusBarItem | undefined;
 
 let client: LanguageClient;
 
@@ -105,6 +107,9 @@ async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.window.registerWebviewViewProvider('vercorsPathView', vercorsPathProvider)
     );
+
+    vercorsStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+    new StatusBar(vercorsStatusBarItem);
 
     // vscode.commands.registerCommand('extension.refreshEntry', () =>
     //     vercorsPathProvider.refresh()
@@ -193,27 +198,7 @@ async function executeVercorsCommand() {
     vercorsProcessPid = vercorsProcess.pid;
 
     const outputState = new OutputState(outputChannel,uri,diagnosticCollection);
-    VerCorsPathWebViewProvider.sendProgressToWebview(0, '', 'Starting VerCors...');
-
-    vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
-        cancellable: false,
-        title: 'VerCors'
-    }, async (progress) => {
-        VerCorsPathWebViewProvider.setProgress(progress);
-
-        // TODO get percentage async without blocking everything, but not exiting this inner function
-
-        // setInterval(function() {
-        //     const percentage = Math.round(outputState.getPercentage());
-        //     if (percentage === 100 || vercorsProcessPid === -1) {
-        //         clearInterval(this);
-        //     } else {
-        //         progress.report({increment: percentage});
-        //     }
-        // }, 100);
-
-    });
+    outputState.start();
 
     vercorsProcess.stdout.on('data', (data: Buffer | string) => {
         let lines : string[] = data.toString().split(/(\r\n|\n|\r)/gm);

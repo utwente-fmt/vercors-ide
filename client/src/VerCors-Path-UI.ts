@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 
 import path = require('path');
+import { ProgressReceiver } from "./progress-receiver";
 
 type VercorsPath = {
     path: string,
@@ -26,15 +27,21 @@ export class VerCorsPaths {
 
 }
 
-export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
+export class VerCorsWebViewProvider implements vscode.WebviewViewProvider, ProgressReceiver {
     private static _webview: vscode.Webview | undefined;
     private static _progress: vscode.Progress<{message: string, increment: number}> | undefined;
+    private static instance: VerCorsWebViewProvider;
 
     private readonly _extensionUri: vscode.Uri;
     private _HTMLContent: string | undefined;
 
     constructor(private context: vscode.ExtensionContext) {
         this._extensionUri = context.extensionUri;
+        VerCorsWebViewProvider.instance = this;
+    }
+
+    static getInstance(): VerCorsWebViewProvider {
+        return VerCorsWebViewProvider.instance;
     }
 
     public async resolveWebviewView(
@@ -88,7 +95,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     }
 
-    public static async sendProgressToWebview(percentage: number, step: string, stepName: string): Promise<Boolean | undefined> {
+    public async accept(percentage: number, step: string, stepName: string): Promise<void> {
         if (!VerCorsWebViewProvider._webview) {
             return;
         }
@@ -100,7 +107,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
             });
         }
 
-        return VerCorsWebViewProvider._webview.postMessage({
+        VerCorsWebViewProvider._webview.postMessage({
             command: 'progress',
             percentage: percentage,
             step: step,

@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 
 import { VerCorsWebViewProvider } from "./VerCors-Path-UI";
+import { StatusBar } from "./status-bar";
+import { combine, ProgressReceiver } from "./progress-receiver";
 
 enum state {
     RUNNING,
@@ -19,6 +21,7 @@ export class OutputState {
 
     private state: state = state.RUNNING;
     private currentPercentage: number = 0;
+    private progressReceiver: ProgressReceiver;
 
     //each errors consist of error parts, each parts shows a part of the error in a specific place in the code
     //each error part has 3 stages, stage 1 is the file the error is in, 2 is the code snippet of the location and 3 is the error message
@@ -35,6 +38,16 @@ export class OutputState {
         private outputChannel: vscode.OutputChannel,
         private uri: vscode.Uri,
         private diagnosticCollection: vscode.DiagnosticCollection) {
+
+        this.progressReceiver = combine(
+            VerCorsWebViewProvider.getInstance(),
+            StatusBar.getInstance()
+        );
+    }
+
+    public start() {
+        this.progressReceiver.accept(0, '', 'Starting VerCors...');
+        this.currentPercentage = 0;
     }
 
     /**
@@ -42,7 +55,7 @@ export class OutputState {
      * this constructs all found errors and pushes them to the problems tab
      */
     public finish() {
-        VerCorsWebViewProvider.sendProgressToWebview(100, '', 'Finished');
+        this.progressReceiver.accept(100, '', 'Finished');
 
         //setting up the diagnostic collection
         let diagnostics: vscode.Diagnostic[] = [];
@@ -70,10 +83,6 @@ export class OutputState {
         this.diagnosticCollection.set(this.uri,diagnostics);
         this.state = state.FINISHED;
         this.currentPercentage = 100;
-    }
-
-    public getPercentage() : number{
-        return this.currentPercentage;
     }
 
     public accept(line: string) {
@@ -128,7 +137,7 @@ export class OutputState {
             const step = matchResult.groups!['step'];
             const stepName = matchResult.groups!['step_name'];
             this.outputChannel.appendLine(line);
-            VerCorsWebViewProvider.sendProgressToWebview(this.currentPercentage, step, stepName);
+            this.progressReceiver.accept(this.currentPercentage, step, stepName);
         }
     }
 
