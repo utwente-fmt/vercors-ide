@@ -166,7 +166,7 @@ async function executeVercorsCommand() {
 
     let command = '"' + vercorsPath + '"'; // account for spaces
 
-    const fileOptions = VercorsOptions.getFlagOptions(filePath);
+    const fileOptions = VercorsOptions.getSelectedOptions(filePath);
     let inputFile = '"' + filePath + '"';
     let args = fileOptions ? ([inputFile].concat(fileOptions)) : [inputFile];
 
@@ -194,6 +194,7 @@ async function executeVercorsCommand() {
     // Clear previous content in the output channel
     outputChannel.clear();
     // Execute the command and send output to the output channel
+    console.log(command,args)
     const childProcess = require('child_process');
     const vercorsProcess = childProcess.spawn(command, args, { shell: true });
     vercorsProcessPid = vercorsProcess.pid;

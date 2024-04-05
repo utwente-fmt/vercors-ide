@@ -3,8 +3,9 @@ import * as fs from 'fs';
 
 import path = require('path');
 import { ProgressReceiver } from "./progress-receiver";
+import {comparing} from './comparing';
 
-type VercorsPath = {
+export type VercorsPath = {
     path: string,
     version: string,
     selected: boolean
@@ -13,17 +14,44 @@ type VercorsPath = {
 export class VerCorsPaths {
 
     public static async getPathList(): Promise<VercorsPath[]> {
-        const vercorsPaths = await vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath') as VercorsPath[];
-        if (!vercorsPaths) { // if null
-            return [];
-        }
+        const vercorsPaths = this.fixPaths(await vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath')) as VercorsPath[];
+        console.log("paths: " + vercorsPaths)
         return vercorsPaths;
     }
 
     public static async storePathList(vercorsPaths: VercorsPath[]): Promise<void> {
-        const stored = vercorsPaths.length ? vercorsPaths : null;
-        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', stored, true);
+        const stored = vercorsPaths.length ? vercorsPaths : [];
+        //todo: remove every wrong path
+        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', this.fixPaths(stored),true);
     }
+
+
+    public static isEqualPath(p1: VercorsPath, p2: VercorsPath): boolean{
+       return p1.path === p2.path && p1.version === p2.version && p1.selected == p2.selected
+    }
+
+
+    private static fixPaths(paths?): VercorsPath[]{
+        const pathList = []
+        let pathJSON;
+
+        if(paths){
+            for(let i = 0; i < paths.length; i++){
+                try{
+                    pathJSON = JSON.parse(JSON.stringify(paths[i]));
+                } catch{}
+                    if(typeof pathJSON.selected === "boolean" && comparing.eqSet(new Set(Object.keys(pathJSON)),new Set(["path","version","selected"]),this.isEqualPath)){
+                        pathList.push(pathJSON)
+                    }
+
+            }
+        }
+
+            return pathList;
+
+    }
+
+
 
 }
 
@@ -219,10 +247,10 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider, Progr
                 reject(_e);
             }
         })
-            .catch(reason => {
-                vscode.window.showErrorMessage(reason.toString());
-                return undefined;
-            });
+        .catch(reason => {
+            vscode.window.showErrorMessage(reason.toString());
+            return undefined;
+        });
     }
 
     private killPid(pid: number): void {

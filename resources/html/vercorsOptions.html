@@ -224,8 +224,10 @@
     function generateOptionsMessage() {
         let optionsString = [];
         let optionsPinString = [];
+        let optionBackendString = "";
 
         let checkboxContainers = document.getElementsByClassName('checkbox-container');
+
         for (const checkbox of checkboxContainers) {
             if (checkbox.querySelector('input[type="checkbox"]').checked) {
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
@@ -242,14 +244,27 @@
             }
         }
 
+        let backendOptionBox = document.getElementById("color_mode")
+        let backendOptionLabel = document.querySelector('.btn-color-mode-switch-inner')
+        if(backendOptionBox.checked){
+            optionBackendString = backendOptionLabel.dataset.on.toLowerCase();
+        }
+        else{
+            optionBackendString = backendOptionLabel.dataset.off.toLowerCase();
+        }
+        console.log(optionBackendString)
+
+
         vscode.postMessage({
             command: 'updateOptions',
             options: optionsString,
-            pinnedOptions: optionsPinString
+            pinnedOptions: optionsPinString,
+            backendOption: optionBackendString
         });
     }
 
-    function loadOptions(options, pinnedOptions) {
+    function loadOptions(options, pinnedOptions, backendOption) {
+        //todo: it gives an error for the savedOptions
         const savedOptions = options.map(option => option.replace(/^--/, '').trim());
         const savedPinnedOptions = pinnedOptions.map(option => option.replace(/^--/, '').trim());
 
@@ -265,6 +280,9 @@
                 .forEach((checkbox) => checkbox.checked = savedPinnedOptions.includes(checkbox.name)
                 )
             );
+        
+        document.getElementById("color_mode").checked = !backendOption
+        console.log(backendOption)
         updateCategoryHeaders();
     }
 
@@ -324,7 +342,7 @@
     window.addEventListener('message', event => {
         const message = event.data;
         if (message.command === 'loadOptions') {
-            loadOptions(message.options, message.pinnedOptions);
+            loadOptions(message.options, message.pinnedOptions,message.backendOption);
         }
     });
 
@@ -399,6 +417,11 @@
                     generateOptionsMessage();
                 });
             });
+            // On-change for the backend button
+            document.getElementById('color_mode').addEventListener('change', function () {
+                    // Post new settings after change
+                    generateOptionsMessage();
+                });
         }
     });
 </script>
