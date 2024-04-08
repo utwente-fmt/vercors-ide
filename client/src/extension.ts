@@ -2,16 +2,16 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
+import * as path from 'path';
+import * as vscode from 'vscode';
+import { ExtensionContext, StatusBarAlignment, workspace } from 'vscode';
+import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
 
-import * as path from "path";
-import { workspace, ExtensionContext } from "vscode";
-import * as vscode from "vscode";
-import {
-  LanguageClient,
-  LanguageClientOptions,
-  ServerOptions,
-  TransportKind,
-} from "vscode-languageclient/node";
+import { VercorsOptions, VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './VerCors-CLI-UI';
+import { VerCorsPaths, VerCorsWebViewProvider as VerCorsPathWebViewProvider } from './VerCors-Path-UI';
+import { OutputState } from './output-parser';
+import * as fs from "fs";
+import { StatusBar } from "./status-bar";
 
 import {
   VerCorsWebViewProvider as VerCorsCLIWebViewProvider,
@@ -24,12 +24,12 @@ import {
 import { OutputState } from "./output-parser";
 import * as fs from "fs";
 
-let outputChannel: vscode.OutputChannel;
-let diagnosticCollection =
-  vscode.languages.createDiagnosticCollection("VerCors");
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence
-let vercorsProcessPid = -1;
+let diagnosticCollection: vscode.DiagnosticCollection;
+let outputChannel: vscode.OutputChannel;
 
+let vercorsStatusBarProgress: vscode.StatusBarItem;
+let vercorsProcessPid = -1;
 let client: LanguageClient;
 
 async function startClient(context) {
@@ -86,14 +86,19 @@ async function activate(context: vscode.ExtensionContext) {
       "No VerCors binary paths are provided. Please provide one to run the tool."
     );
   }
+  
+    const vercorsStatusBarStartButton = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 100);
+    vercorsStatusBarStartButton.command = 'extension.runVercors';
+    const vercorsStatusBarStopButton = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 99);
+    vercorsStatusBarStopButton.command = 'extension.stopVercors';
+    vercorsStatusBarProgress = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
+    new StatusBar(vercorsStatusBarProgress, vercorsStatusBarStartButton, vercorsStatusBarStopButton);
 
-  // Register the 'extension.runVercors' command
-  let disposableStartCommand = vscode.commands.registerCommand(
-    "extension.runVercors",
-    () => {
-      executeVercorsCommand();
-    }
-  );
+    diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
+
+    // vscode.commands.registerCommand('extension.refreshEntry', () =>
+    //     vercorsPathProvider.refresh()
+    // );
 
   // Register the 'extension.stopVercors' command
   let disposableStopCommand = vscode.commands.registerCommand(
@@ -230,13 +235,32 @@ async function executeVercorsCommand() {
     }
   });
 
-  vercorsProcess.on("exit", function () {
-    outputState.finish();
-    vercorsProcessPid = -1;
-  });
+    // Clear previous content in the output channel
+    outputChannel.clear();
+    // Execute the command and send output to the output channel
+    console.log(command,args)
+    const childProcess = require('child_process');
+    const vercorsProcess = childProcess.spawn(command, args, { shell: true });
+    vercorsProcessPid = vercorsProcess.pid;
 
-  // Show the output channel
-  outputChannel.show(true); // Change the ViewColumn as needed
+    const outputState = new OutputState(outputChannel,uri,diagnosticCollection);
+    outputState.start();
+
+    vercorsProcess.stdout.on('data', (data: Buffer | string) => {
+        let lines : string[] = data.toString().split(/(\r\n|\n|\r)/gm);
+        for (let line of lines) {
+            outputState.accept(line);
+        }
+    });
+
+    vercorsProcess.on('exit', function () {
+        outputState.finish();
+        vercorsProcessPid = -1;
+    });
+
+      
+    // Show the output channel
+    outputChannel.show(true); // Change the ViewColumn as needed
 }
 
 function stopVercorsCommand() {

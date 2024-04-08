@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import {comparing} from './comparing';
-const path = require('path'); 
+
+import path = require('path');
+import { ProgressReceiver } from "./progress-receiver";
+import { comparing } from './comparing';
 
 export type VercorsPath = {
     path: string,
@@ -13,60 +15,64 @@ export class VerCorsPaths {
 
     public static async getPathList(): Promise<VercorsPath[]> {
         const vercorsPaths = this.fixPaths(await vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath')) as VercorsPath[];
-        console.log("paths: " + vercorsPaths)
+        console.log("paths: " + vercorsPaths);
         return vercorsPaths;
     }
 
     public static async storePathList(vercorsPaths: VercorsPath[]): Promise<void> {
         const stored = vercorsPaths.length ? vercorsPaths : [];
         //todo: remove every wrong path
-        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', this.fixPaths(stored),true);
+        await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', this.fixPaths(stored), true);
     }
 
-
-    public static isEqualPath(p1: VercorsPath, p2: VercorsPath): boolean{
-       return p1.path === p2.path && p1.version === p2.version && p1.selected == p2.selected
+    public static isEqualPath(p1: VercorsPath, p2: VercorsPath): boolean {
+        return p1.path === p2.path && p1.version === p2.version && p1.selected === p2.selected;
     }
 
-    
-    private static fixPaths(paths?): VercorsPath[]{
-        const pathList = []
-        let pathJSON;
+    private static fixPaths(paths?: any): VercorsPath[] {
+        const pathList = [];
+        let pathJSON: any;
 
-        if(paths){
-            for(let i = 0; i < paths.length; i++){
-                try{
+        if (paths) {
+            for (let i = 0; i < paths.length; i++) {
+                try {
                     pathJSON = JSON.parse(JSON.stringify(paths[i]));
-                } catch{}
-                    if(typeof pathJSON.selected === "boolean" && comparing.eqSet(new Set(Object.keys(pathJSON)),new Set(["path","version","selected"]),this.isEqualPath)){
-                        pathList.push(pathJSON)
-                    }
-                
+                } catch {
+                }
+                if (typeof pathJSON.selected === "boolean" && comparing.eqSet(new Set(Object.keys(pathJSON)), new Set(["path", "version", "selected"]), this.isEqualPath)) {
+                    pathList.push(pathJSON);
+                }
             }
         }
-           
-            return pathList;
 
+        return pathList;
     }
-
-
 
 }
 
-export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
-    private readonly _extensionUri: vscode.Uri;
+export class VerCorsWebViewProvider implements vscode.WebviewViewProvider, ProgressReceiver {
+    private static _webview: vscode.Webview | undefined;
+    private static instance: VerCorsWebViewProvider;
 
+    private readonly _extensionUri: vscode.Uri;
     private _HTMLContent: string | undefined;
 
-    constructor(private context: vscode.ExtensionContext) {
+    constructor(context: vscode.ExtensionContext) {
         this._extensionUri = context.extensionUri;
+        VerCorsWebViewProvider.instance = this;
+    }
+
+    static getInstance(): VerCorsWebViewProvider {
+        return VerCorsWebViewProvider.instance;
     }
 
     public async resolveWebviewView(
         webviewView: vscode.WebviewView,
-        context: vscode.WebviewViewResolveContext<unknown>,
-        token: vscode.CancellationToken
+        _context: vscode.WebviewViewResolveContext,
+        _token: vscode.CancellationToken
     ) {
+        VerCorsWebViewProvider._webview = webviewView.webview;
+
         webviewView.webview.options = {
             // Enable scripts in the webview
             enableScripts: true
@@ -111,7 +117,20 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
 
     }
 
-    private async sendPathsToWebview(webview: vscode.Webview) {
+    public async update(percentage: number, step: string, stepName: string): Promise<void> {
+        if (!VerCorsWebViewProvider._webview) {
+            return;
+        }
+
+        VerCorsWebViewProvider._webview.postMessage({
+            command: 'progress',
+            percentage: percentage,
+            step: step,
+            stepName: stepName
+        });
+    }
+
+    private async sendPathsToWebview(webview: vscode.Webview): Promise<void> {
         VerCorsPaths.getPathList()
             .then(paths => {
                 webview.postMessage({
@@ -201,14 +220,14 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 const childProcess = require('child_process');
                 let command = '"' + vercorsExecutablePath + '"';
                 const vercorsProcess = childProcess.spawn(command, ["--version"], { shell: true });
-                const pid : number = vercorsProcess.pid;
+                const pid: number = vercorsProcess.pid;
 
                 vercorsProcess.stdout.on('data', (data: Buffer | string) => {
                     const str = data.toString();
                     this.killPid(pid);
                     if (str.startsWith("Vercors")) {
                         // remove newlines
-                        resolve(str.replace(/(\r\n|\n|\r)/gm, ""));
+                        resolve(str.trim());
                     } else {
                         reject('Could not get VerCors version: ' + str);
                     }
@@ -223,13 +242,13 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
                 reject(_e);
             }
         })
-        .catch(reason => {
-            vscode.window.showErrorMessage(reason.toString());
-            return undefined;
-        });
+            .catch(reason => {
+                vscode.window.showErrorMessage(reason.toString());
+                return undefined;
+            });
     }
 
-    private killPid(pid : number) : void {
+    private killPid(pid: number): void {
         const kill = require('tree-kill');
         kill(pid, 'SIGINT');
     }
