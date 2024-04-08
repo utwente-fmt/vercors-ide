@@ -23,6 +23,11 @@ import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
 
+
+import PVLsyntax from '../../syntaxes/languageServerPVLMatches.json';
+
+let completionArray = [];
+
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
@@ -33,6 +38,24 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
+
+
+
+function generateCompletionArrayPVL(){
+	let index = 0;
+	  
+		for (const item of PVLsyntax) {
+		  let output = {
+			label: item.match,
+			kind: CompletionItemKind.Text,
+			data: index,
+		  };
+		  completionArray.push(output);
+		  index += 1;
+		}
+}
+
+generateCompletionArrayPVL()
 
 connection.onInitialize((params: InitializeParams) => {
 	const capabilities = params.capabilities;
@@ -215,18 +238,8 @@ connection.onCompletion(
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.
-		return [
-			{
-				label: 'Yeyeye',
-				kind: CompletionItemKind.Text,
-				data: 1
-			},
-			{
-				label: 'JavaScript',
-				kind: CompletionItemKind.Text,
-				data: 2
-			}
-		];
+		
+		return completionArray;
 	}
 );
 
@@ -234,12 +247,10 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		if (item.data === 1) {
-			item.detail = 'TypeScript details';
-			item.documentation = 'TypeScript docum test';
-		} else if (item.data === 2) {
-			item.detail = 'JavaScript details';
-			item.documentation = 'JavaScript documentation';
+
+		if (item.data >= 0 && item.data <= completionArray.length) {	
+			item.detail = "PVL";
+			item.documentation = "PVL autocompletion";
 		}
 		return item;
 	}
