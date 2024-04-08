@@ -46,7 +46,7 @@ export default class OutputParser {
     }
 
     public start() {
-        this.progressReceiver.updateProgress(0, '', 'Starting VerCors...');
+        this.progressReceiver.updateProgress(0, '', 'Starting VerCors...', '');
         this.currentPercentage = 0;
     }
 
@@ -55,7 +55,7 @@ export default class OutputParser {
      * this constructs all found errors and pushes them to the problems tab
      */
     public finish() {
-        this.progressReceiver.updateProgress(100, '', 'Finished');
+        this.progressReceiver.updateProgress(100, '', 'Finished', '');
 
         //setting up the diagnostic collection
         let diagnostics: vscode.Diagnostic[] = [];
@@ -95,8 +95,9 @@ export default class OutputParser {
         this.currentPercentage = 100;
     }
 
-    public accept(line: string) {
-        switch (Boolean(line.trim())) {
+    public accept(lineRaw: string) {
+        let line: string = lineRaw.trim();
+        switch (Boolean(line)) {
 
             case line.startsWith("[DEBUG]"):
                 this.handleDebug(line);
@@ -135,7 +136,8 @@ export default class OutputParser {
 
     private handlePercentage(line: string) {
         const matchResult =
-            /^\[(?<percentage1>\d+)[.,](?<percentage2>\d+)%] \((?<step>\d+\/\d+)\) (?<step_name>[\w\s]+).*$/g.exec(line);
+            /^\[(?<percentage1>\d+)[.,](?<percentage2>\d+)%] \((?<step>\d+\/\d+)\) (?<step_name>[\w\s]+)(?<details>.*)$/g
+                .exec(line);
         if (matchResult) {
             const percentage1 = matchResult.groups!['percentage1'];
             const percentage2 = matchResult.groups!['percentage2'];
@@ -145,9 +147,10 @@ export default class OutputParser {
             }
             this.currentPercentage = newPercentage;
             const step = matchResult.groups!['step'];
-            const stepName = matchResult.groups!['step_name'];
+            const stepName = matchResult.groups!['step_name'].trim();
+            const details = matchResult.groups!['details'].trim();
             this.outputChannel.appendLine(line);
-            this.progressReceiver.updateProgress(this.currentPercentage, step, stepName);
+            this.progressReceiver.updateProgress(this.currentPercentage, step, stepName, details);
         }
     }
 

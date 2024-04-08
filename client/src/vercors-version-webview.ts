@@ -104,7 +104,7 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
             });
     }
 
-    public async updateProgress(percentage: number, step: string, stepName: string): Promise<void> {
+    public async updateProgress(percentage: number, step: string, stepName: string, _details: string): Promise<void> {
         if (!this.hasWebview()) {
             return;
         }

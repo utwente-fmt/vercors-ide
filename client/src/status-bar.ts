@@ -28,7 +28,7 @@ export default class StatusBar implements ProgressReceiver {
         this.stopButton.color = new vscode.ThemeColor('debugIcon.stopForeground');
     }
 
-    async updateProgress(percentage: number, step: string, stepName: string) {
+    async updateProgress(percentage: number, _step: string, stepName: string, _details: string) {
         if (percentage === 100) {
             this.statusBarItem.hide();
             this.stopButton.hide();

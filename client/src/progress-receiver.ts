@@ -1,6 +1,6 @@
 export default interface ProgressReceiver {
 
-    updateProgress(percentage: number, step: string, stepName: string): Promise<void>;
+    updateProgress(percentage: number, step: string, stepName: string, details: string): Promise<void>;
 
 }
 
@@ -13,9 +13,9 @@ class MultiReceiver implements ProgressReceiver {
     constructor(private receivers: ProgressReceiver[]) {
     }
 
-    async updateProgress(percentage: number, step: string, stepName: string): Promise<void> {
+    async updateProgress(percentage: number, step: string, stepName: string, details: string): Promise<void> {
         await Promise.all<void>(
-            this.receivers.map(receiver => receiver.updateProgress(percentage, step, stepName))
+            this.receivers.map(receiver => receiver.updateProgress(percentage, step, stepName, details))
         );
     }
 
