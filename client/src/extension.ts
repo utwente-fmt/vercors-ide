@@ -13,17 +13,6 @@ import { OutputState } from './output-parser';
 import * as fs from "fs";
 import { StatusBar } from "./status-bar";
 
-import {
-  VerCorsWebViewProvider as VerCorsCLIWebViewProvider,
-  VercorsOptions,
-} from "./VerCors-CLI-UI";
-import {
-  VerCorsWebViewProvider as VerCorsPathWebViewProvider,
-  VerCorsPaths,
-} from "./VerCors-Path-UI";
-import { OutputState } from "./output-parser";
-import * as fs from "fs";
-
 const vercorsOptionsMap = new Map(); // TODO: save this in the workspace configuration under vercorsplugin.optionsMap for persistence
 let diagnosticCollection: vscode.DiagnosticCollection;
 let outputChannel: vscode.OutputChannel;
@@ -94,6 +83,13 @@ async function activate(context: vscode.ExtensionContext) {
     vercorsStatusBarProgress = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
     new StatusBar(vercorsStatusBarProgress, vercorsStatusBarStartButton, vercorsStatusBarStopButton);
 
+    // Register the 'extension.runVercors' command
+    let disposableStartCommand = vscode.commands.registerCommand(
+      "extension.runVercors",
+      () => {
+        executeVercorsCommand();
+      }
+    );
     diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
 
     // vscode.commands.registerCommand('extension.refreshEntry', () =>
@@ -217,23 +213,6 @@ async function executeVercorsCommand() {
       "vercors-output"
     );
   }
-
-  // Clear previous content in the output channel
-  outputChannel.clear();
-  // Execute the command and send output to the output channel
-  console.log(command, args);
-  const childProcess = require("child_process");
-  const vercorsProcess = childProcess.spawn(command, args, { shell: true });
-  vercorsProcessPid = vercorsProcess.pid;
-
-  const outputState = new OutputState(outputChannel, uri, diagnosticCollection);
-
-  vercorsProcess.stdout.on("data", (data: Buffer | string) => {
-    let lines: string[] = data.toString().split(/(\r\n|\n|\r)/gm);
-    for (let line of lines) {
-      outputState.accept(line);
-    }
-  });
 
     // Clear previous content in the output channel
     outputChannel.clear();
