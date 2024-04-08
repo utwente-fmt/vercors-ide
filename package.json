@@ -110,6 +110,18 @@
         ]
       }
     ],
+    "keybindings":[
+      {
+        "command": "extension.runVercors",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l"
+      },
+      {
+        "command": "extension.stopVercors",
+        "key": "ctrl+shift+q",
+        "mac": "cmd+shift+q"
+      }
+    ],
     "commands": [
       {
         "command": "extension.runVercors",
