@@ -1,6 +1,6 @@
 export interface ProgressReceiver {
 
-    update(percentage: number, step: string, stepName: string) : Promise<void>;
+    update(percentage: number, step: string, stepName: string): Promise<void>;
 
 }
 
@@ -10,7 +10,7 @@ export function combine(...receivers: ProgressReceiver[]): ProgressReceiver {
 
 class MultiReceiver implements ProgressReceiver {
 
-    constructor(private receivers : ProgressReceiver[]) {
+    constructor(private receivers: ProgressReceiver[]) {
     }
 
     async update(percentage: number, step: string, stepName: string): Promise<void> {

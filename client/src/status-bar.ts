@@ -44,7 +44,7 @@ export class StatusBar implements ProgressReceiver {
         this.stopButton.show();
     }
 
-    private getPercentageChars(ratio: number, size: number) : string {
+    private getPercentageChars(ratio: number, size: number): string {
         let completed: number = Math.round(ratio * size);
         let notCompleted: number = size - completed;
 

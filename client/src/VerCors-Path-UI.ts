@@ -5,7 +5,7 @@ import path = require('path');
 import { ProgressReceiver } from "./progress-receiver";
 import { comparing } from './comparing';
 
-export type VercorsPath = {
+export type VerCorsPath = {
     path: string,
     version: string,
     selected: boolean
@@ -13,23 +13,21 @@ export type VercorsPath = {
 
 export class VerCorsPaths {
 
-    public static async getPathList(): Promise<VercorsPath[]> {
-        const vercorsPaths = this.fixPaths(await vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath')) as VercorsPath[];
-        console.log("paths: " + vercorsPaths);
-        return vercorsPaths;
+    public static async getPathList(): Promise<VerCorsPath[]> {
+        return this.fixPaths(await vscode.workspace.getConfiguration().get('vercorsplugin.vercorsPath')) as VerCorsPath[];
     }
 
-    public static async storePathList(vercorsPaths: VercorsPath[]): Promise<void> {
+    public static async storePathList(vercorsPaths: VerCorsPath[]): Promise<void> {
         const stored = vercorsPaths.length ? vercorsPaths : [];
         //todo: remove every wrong path
         await vscode.workspace.getConfiguration().update('vercorsplugin.vercorsPath', this.fixPaths(stored), true);
     }
 
-    public static isEqualPath(p1: VercorsPath, p2: VercorsPath): boolean {
+    public static isEqualPath(p1: VerCorsPath, p2: VerCorsPath): boolean {
         return p1.path === p2.path && p1.version === p2.version && p1.selected === p2.selected;
     }
 
-    private static fixPaths(paths?: any): VercorsPath[] {
+    private static fixPaths(paths?: any): VerCorsPath[] {
         const pathList = [];
         let pathJSON: any;
 
@@ -105,7 +103,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider, Progr
                             });
                         break;
                     case 'remove':
-                        this.deleteVercorsPath(message.path)
+                        this.deleteVerCorsPath(message.path)
                             .then(() => {
                                 this.sendPathsToWebview(webviewView.webview);
                             });
@@ -140,7 +138,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider, Progr
             });
     }
 
-    private async deleteVercorsPath(path: string): Promise<void> {
+    private async deleteVerCorsPath(path: string): Promise<void> {
         let vercorsPaths = await VerCorsPaths.getPathList();
         vercorsPaths = vercorsPaths.filter(vercorsPath => vercorsPath.path !== path);
         await VerCorsPaths.storePathList(vercorsPaths);
@@ -154,7 +152,7 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider, Progr
         await VerCorsPaths.storePathList(vercorsPaths);
     }
 
-    private async selectNewVercorsPath(webview: vscode.Webview): Promise<VercorsPath | undefined> {
+    private async selectNewVercorsPath(webview: vscode.Webview): Promise<VerCorsPath | undefined> {
         return vscode.window.showOpenDialog({
             canSelectFiles: false,
             canSelectFolders: true,

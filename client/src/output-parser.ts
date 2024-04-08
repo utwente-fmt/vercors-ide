@@ -17,7 +17,7 @@ interface errorCode{
     col: number;
 }
 
-export class OutputState {
+export class OutputParser {
 
     private state: state = state.RUNNING;
     private currentPercentage: number = 0;
