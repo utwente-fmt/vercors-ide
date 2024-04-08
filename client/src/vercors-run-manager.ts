@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from "fs";
-import { VerCorsPaths } from "./VerCors-Path-UI";
 import { VerCorsOptions } from "./VerCors-CLI-UI";
-import { OutputParser } from './output-parser';
+import OutputParser from './output-parser';
+import VerCorsPathsProvider, { VerCorsPath } from "./vercors-paths-provider";
 
-export class VerCorsRunManager {
+export default class VerCorsRunManager {
 
-    private outputChannel: vscode.OutputChannel | null = null;
+    private outputChannel: vscode.OutputChannel | undefined;
     private processPid: number = -1;
 
     constructor(private diagnosticCollection: vscode.DiagnosticCollection) {
@@ -24,13 +24,13 @@ export class VerCorsRunManager {
         const uri = editor!.document.uri;
         const filePath = uri.fsPath;
 
-        const paths = await VerCorsPaths.getPathList();
+        const paths = await VerCorsPathsProvider.getInstance().getPathList();
         if (!paths.length) {
             return vscode.window.showErrorMessage("No VerCors paths have been specified yet");
         }
 
         // get selected VerCors version
-        const binPath = paths.find((p) => p.selected);
+        const binPath: VerCorsPath = paths.find((p) => p.selected);
         if (!binPath) {
             return vscode.window.showErrorMessage("No VerCors version has been selected");
         }
@@ -104,18 +104,18 @@ export class VerCorsRunManager {
     public async stopVerCors(): Promise<any> {
         if (this.processPid === -1) {
             //check if vercors is running
-            return vscode.window.showInformationMessage("Vercors is not running");
+            return vscode.window.showWarningMessage("VerCors is not running");
         }
 
         const kill = require("tree-kill");
         kill(this.processPid, "SIGINT", async function (err: string) {
             if (err === null) {
                 await vscode.window.showInformationMessage(
-                    "Vercors has been succesfully stopped"
+                    "VerCors has been successfully stopped"
                 );
             } else {
-                await vscode.window.showInformationMessage(
-                    "An error occured while trying to stop Vercors: " + err
+                await vscode.window.showErrorMessage(
+                    "An error occurred while trying to stop VerCors: " + err
                 );
             }
         });

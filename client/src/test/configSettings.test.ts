@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as sinon from 'sinon'
 import {VerCorsOptions,OptionFields} from "../VerCors-CLI-UI"
-import {VerCorsPaths,VerCorsPath} from '../VerCors-Path-UI';
+import VerCorsPathsProvider, { VerCorsPath, isEqualPath } from '../vercors-paths-provider';
 import {Assert} from './Assert';
 import {comparing} from '../comparing';
 const fakeConfiguration = {
@@ -152,37 +152,37 @@ suite('PathSetting tests', async () => {
         }] as VerCorsPath[]
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = []
-        Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
-		VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), [], (x, y) => comparing.compareLists(x,y,isEqualPath) )
+		VerCorsPathsProvider.getInstance().storePathList(paths)
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), paths, (x, y) => comparing.compareLists(x,y,isEqualPath) )
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = null
-        Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
-		VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), [], (x, y) => comparing.compareLists(x,y,isEqualPath) )
+		VerCorsPathsProvider.getInstance().storePathList(paths)
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), paths, (x, y) => comparing.compareLists(x,y,isEqualPath) )
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = "hey"
-        Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
-		VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), [], (x, y) => comparing.compareLists(x,y,isEqualPath) )
+		VerCorsPathsProvider.getInstance().storePathList(paths)
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), paths, (x, y) => comparing.compareLists(x,y,isEqualPath) )
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = [{ path: "string", version: "string" }]
-        Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
-        VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), [], (x, y) => comparing.compareLists(x,y,isEqualPath) )
+        VerCorsPathsProvider.getInstance().storePathList(paths)
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), paths, (x, y) => comparing.compareLists(x,y,isEqualPath) )
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = [{ a: "string", version: "string", selected: "string" }]
-		Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
-        VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
+		Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), [], (x, y) => comparing.compareLists(x,y,isEqualPath) )
+        VerCorsPathsProvider.getInstance().storePathList(paths)
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), paths, (x, y) => comparing.compareLists(x,y,isEqualPath) )
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = [{ path: "string", version: "string", selected: "string", a: "string" }]
-		Assert.equals(await VerCorsPaths.getPathList(), [], (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
-        VerCorsPaths.storePathList(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
+		Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), [], (x, y) => comparing.compareLists(x,y,isEqualPath) )
+        VerCorsPathsProvider.getInstance().storePathList(paths)
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), paths, (x, y) => comparing.compareLists(x,y,isEqualPath) )
 
         fakeConfiguration["vercorsplugin.vercorsPath"] = [{ path: "string", version: "string" }].concat(paths)
-        Assert.equals(await VerCorsPaths.getPathList(), paths, (x,y) => comparing.compareLists(x,y,VerCorsPaths.isEqualPath) )
+        Assert.equals(await VerCorsPathsProvider.getInstance().getPathList(), paths, (x, y) => comparing.compareLists(x,y,isEqualPath) )
 	});
 });
 
