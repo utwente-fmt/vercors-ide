@@ -11,42 +11,42 @@ import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './VerCors-C
 import VerCorsVersionWebviewProvider from './vercors-version-webview';
 import StatusBar from "./status-bar";
 import VerCorsRunManager from "./vercors-run-manager";
-import VerCorsPathsProvider from "./vercors-paths-provider";
+import VerCorsPathsProvider, { VerCorsPath } from "./vercors-paths-provider";
 
 /**
  * Method called when the extension is activated
  * @param {vscode.ExtensionContext} context
  */
-async function activate(context: vscode.ExtensionContext) {
+async function activate(context: vscode.ExtensionContext): Promise<void> {
     startClient(context);
     // Check if the VerCors path is set
-    const vercorsPaths = await VerCorsPathsProvider.getInstance().getPathList();
+    const vercorsPaths: VerCorsPath[] = await VerCorsPathsProvider.getInstance().getPathList();
     if (!vercorsPaths.length) {
         vscode.window.showWarningMessage(
             "No VerCors binary paths are provided. Please provide one to run the tool."
         );
     }
 
-    const vercorsStatusBarStartButton = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 100);
+    const vercorsStatusBarStartButton: vscode.StatusBarItem = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 100);
     vercorsStatusBarStartButton.command = 'extension.runVercors';
-    const vercorsStatusBarStopButton = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 99);
+    const vercorsStatusBarStopButton: vscode.StatusBarItem = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 99);
     vercorsStatusBarStopButton.command = 'extension.stopVercors';
-    const vercorsStatusBarProgress = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
+    const vercorsStatusBarProgress: vscode.StatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 98);
     new StatusBar(vercorsStatusBarProgress, vercorsStatusBarStartButton, vercorsStatusBarStopButton);
 
-    const diagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
+    const diagnosticCollection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection('VerCors');
     let manager: VerCorsRunManager = new VerCorsRunManager(diagnosticCollection);
 
     // Register the 'extension.runVercors' command
-    const disposableStartCommand = vscode.commands.registerCommand(
+    const disposableStartCommand: vscode.Disposable = vscode.commands.registerCommand(
         "extension.runVercors", () => manager.runVerCors()
     );
     // Register the 'extension.stopVercors' command
-    const disposableStopCommand = vscode.commands.registerCommand(
+    const disposableStopCommand: vscode.Disposable = vscode.commands.registerCommand(
         "extension.stopVercors", () => manager.stopVerCors()
     );
 
-    // Add the disposable to the context so it can be disposed of later
+    // Add the disposable to the context, so it can be disposed of later
     context.subscriptions.push(disposableStartCommand);
     context.subscriptions.push(disposableStopCommand);
 
@@ -71,8 +71,8 @@ async function activate(context: vscode.ExtensionContext) {
             verCorsVersionWebviewProvider
         )
     );
-    // Register the 'extension.stopVercors' command
-    const disposableVersionCommand = vscode.commands.registerCommand(
+    // Register the 'extension.selectVercorsVersion' command
+    const disposableVersionCommand: vscode.Disposable = vscode.commands.registerCommand(
         "extension.selectVercorsVersion", () => verCorsVersionWebviewProvider.addPath()
     );
     context.subscriptions.push(disposableVersionCommand);
