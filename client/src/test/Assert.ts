@@ -3,7 +3,7 @@ import * as assert from "assert";
  * An extention on the standard node assert 
 */
 
-export class Assert{
+export class Assert {
 
     /**
      * Checks if the actual value is the same as the expected value using an equal method
@@ -16,7 +16,7 @@ export class Assert{
         if(!eql_method){
             eql_method = (x,y) => x===y
         }
-    
+
         if (!eql_method(actual, expected)) {
             throw new assert.AssertionError({
                 message: message || `Expected ${actual} to equal ${expected}`,
