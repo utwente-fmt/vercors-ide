@@ -9,8 +9,11 @@ import * as fs from 'fs'
 import * as vercorsExtension from "../../extension"
 import { activate } from '../language server tests/helper';
 import { posix } from 'path';
+import { spawn } from 'child_process';
+
 
 const projectStartPath = __dirname + "/../../../.."
+const testStartPath = __dirname + "/../../../src/test"
 
 //This context is created to fake the extension context that is used for starting the extension
 class MockExtensionContext implements vscode.ExtensionContext{
@@ -81,8 +84,12 @@ class testMocking{
 
     }
 
+    /**
+    * When trying to open the file dialog, give a Uri that goes to a vercors bin that is in the vercors project.
+    * This way you never access file outside of the test folder.
+    */
     public showFileDialogMocking(){
-        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri('fakeVercors/bin')));
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '/fakeVercors/vercors')));
     }
 
     public createMockUri(path: string): [vscode.Uri] {
@@ -118,13 +125,14 @@ class testMocking{
 
     public fsMocking(){
         const frontendPath = projectStartPath + '/resources/html/'
+        const vercorsPath = testStartPath + '/fakeVercors/vercors';
         mock_fs({
-            'fakeVercors/bin': {
-                'vercors': fs.readFileSync(projectStartPath +  '/client/src/test/fakeVercors/vercors', 'utf-8') // vercors is not compiled so not put in the out folder
+            [vercorsPath]: {
+                'vercors': 'vercors'
             },
-            frontendPath:{
-                'vercorsPath.html': fs.readFileSync(frontendPath + "vercorsPath.html"),
-                'vercorsOptions.html': fs.readFileSync(frontendPath + "vercorsOptions.html")
+            [frontendPath]:{
+                'vercorsPath.html': 'vercorsPath.html',
+                'vercorsOptions.html': 'vercorsOption.html'
             }
         });
 
@@ -138,6 +146,7 @@ class testMocking{
         sinon.stub(webview, 'postMessage').callsFake((message) => returnDictionary = message)
         
     }
+
 
     
 }
@@ -166,7 +175,7 @@ suite('Path handling', async () => {
         testMock.WorkspaceFsMocking();
         WebviewViewProvider = new VerCorsWebViewProvider(new MockExtensionContext())
         await WebviewViewProvider.resolveWebviewView(webviewViewMock, undefined,undefined)
-        onDidReceiveMessageFunction = async (message: string) =>{await new Promise(resolve => resolveWebviewViewSpy.args[0][0](message));} 
+        onDidReceiveMessageFunction = async (message: string) =>{await new Promise(resolve => {resolveWebviewViewSpy.args[0][0](message);});} 
         testMock.postMessageMocking(webviewViewMock.webview,returnDictionary)
     })
     afterEach(() => {
@@ -177,9 +186,10 @@ suite('Path handling', async () => {
     })
 
 	test('', async () => {
-        
-     await onDidReceiveMessageFunction({command: "add-path"}).then( ()=> console.log(returnDictionary)
-     )
+
+     await onDidReceiveMessageFunction({command: "add-path"})
+     console.log(returnDictionary)
+     
      
        
 
