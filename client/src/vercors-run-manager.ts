@@ -48,7 +48,15 @@ export default class VerCorsRunManager {
 
         const fileOptions = VerCorsOptions.getSelectedOptions(filePath);
         let inputFile = '"' + filePath + '"';
-        let args = fileOptions ? [inputFile].concat(fileOptions) : [inputFile];
+
+        // extract custom options if there are any
+        const customFlagsRegex = /--custom-flags \[([^\]]*)\]/;
+        for (let i = 0; i < fileOptions.length; i++) {
+            const matches = fileOptions[i].match(customFlagsRegex);
+            if (matches) {
+                fileOptions[i] = matches[1]; // content between square brackets
+            }
+        }
 
         // Check if we have options, don't check file extension if --lang is used
         if (!fileOptions || (fileOptions && fileOptions.filter(option => option.includes("--lang")).length === 0)) {
@@ -61,6 +69,7 @@ export default class VerCorsRunManager {
             }
         }
 
+        let args = fileOptions ? [inputFile].concat(fileOptions) : [inputFile];
         // Always execute in progress & verbose mode for extension features to work.
         args.push("--progress");
         args.push("--verbose");

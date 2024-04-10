@@ -233,7 +233,7 @@
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
                 if (checkboxPin.id === "custom-flags") {
                     // Only add the arguments for the custom flags option
-                    optionsString.push(`${args}`);
+                    optionsString.push(`--custom-flags [${args}]`);
                 } else {
                     // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
                     optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').name} ${args}`);
@@ -271,13 +271,13 @@
     function loadOptions(options, pinnedOptions, backendOption) {
         //todo: it gives an error for the savedOptions
         // ignore the argument value if there is one
-        const regOptions = options.map(option => option.split(" ")[0]);
+        const regOptions = options.map(option => option.split(' ')[0]);
         // construct a map between option and argument for the ones that do have them
         const argOptions = {}
         options.forEach(option => {
-            const op = option.split(" ");
+            const op = option.split(' ');
             if (op.length > 1) {
-                argOptions[op[0]] = op[1];
+                argOptions[op[0]] = op.slice(1).join(' ');
             }
         });
 
@@ -291,7 +291,9 @@
                     checkbox.checked = savedOptions.includes(checkbox.name);
                     // add argument value if there is one
                     const argumentInput = flagContainer.querySelector('input[type="text"]');
-                    if (argumentInput) argumentInput.value = argOptions["--" + checkbox.name] || "";
+                    const argumentValue = argOptions["--" + checkbox.name];
+                    if (argumentInput) argumentInput.value =
+                        argumentValue ? argumentValue.replace(/[\[\]]/g, '') : "";
                 })
             );
         // update pin checkboxes
