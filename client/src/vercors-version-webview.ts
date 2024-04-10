@@ -47,7 +47,7 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
         return !(!this.webviewView || !this.webview || !this.webviewView.webview) && this.webviewView.visible;
     }
 
-    private async receiveMessage(message: any) {
+    public async receiveMessage(message: any) {
         switch (message.command) {
             case 'ready':
                 return this.ready();

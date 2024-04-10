@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as sinon from 'sinon'
 import {VercorsOptions,OptionFields} from "../../VerCors-CLI-UI"
-import {VerCorsPaths,VercorsPath} from '../../VerCors-Path-UI';
+import {VerCorsPaths,VercorsPath} from '../../vercors-paths-provider';
 import {Assert} from '../Assert';
 import {comparing} from '../../comparing';
 const fakeConfiguration = {

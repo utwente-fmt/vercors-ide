@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
 import * as sinon from 'sinon'
-import {VercorsOptions,OptionFields} from "../../VerCors-CLI-UI"
-import {VerCorsPaths,VercorsPath, VerCorsWebViewProvider} from '../../VerCors-Path-UI';
+import {OptionFields} from "../../VerCors-CLI-UI"
+import { VerCorsOptions } from '../../VerCors-CLI-UI';
+import {VerCorsPath} from '../../vercors-paths-provider'
+import VerCorsPathsProvider from '../../vercors-paths-provider';
+import VerCorsWebViewProvider from '../../vercors-version-webview';
 import {Assert} from '../Assert';
 import {beforeEach,afterEach} from 'mocha';
 import * as mock_fs from 'mock-fs'
@@ -10,7 +13,8 @@ import * as vercorsExtension from "../../extension"
 import { activate } from '../language server tests/helper';
 import { posix } from 'path';
 import { spawn } from 'child_process';
-
+import {waitFor} from 'wait-for-event';
+import {EventEmitter} from 'events';
 
 const projectStartPath = __dirname + "/../../../.."
 const testStartPath = __dirname + "/../../../src/test"
@@ -42,9 +46,11 @@ class MockExtensionContext implements vscode.ExtensionContext{
  * It is mostly set so it doesn't really matter what is in here.
  */
 class mockWebviewView implements vscode.WebviewView{
+
     onDidReceiveMessageListener: (e: any) => any;
     viewType: string;
     webview: vscode.Webview = {
+
         // Mock properties and methods of the Webview interface
         onDidReceiveMessage: new vscode.EventEmitter<any>().event,
         options: undefined,
@@ -61,19 +67,26 @@ class mockWebviewView implements vscode.WebviewView{
     description?: string;
     badge?: vscode.ViewBadge;
     onDidDispose: vscode.Event<void>;
-    visible: boolean;
+    visible: boolean = true;
     onDidChangeVisibility: vscode.Event<void>;
     show(preserveFocus?: boolean): void {
         throw new Error('Method not implemented.');
     }
 }
 
+
 class testMocking{
 
     
     context = new MockExtensionContext();
     
+    public updatePostMessageMock(emitter: EventEmitter, mockWebviewView:mockWebviewView, jsonToken?: string){
+        mockWebviewView.webview.postMessage = 
+            function (message: any): Thenable<boolean> {
+                return new Promise((resolve) => resolve(emitter.emit(jsonToken? message[jsonToken]: message)));
+            }
 
+    }
     public workspaceSettingsMocking(fakeConfiguration: { [x: string]: any; }){
         const vscodeWorkspaceStub = sinon.stub();
         vscodeWorkspaceStub.returns({
@@ -119,7 +132,7 @@ class testMocking{
         vscodeWorkspaceFsStub.returns({
                 readFile: (uri :vscode.Uri) => fs.readFileSync(uri.fsPath)
         });
-        sinon.stub(vscode.workspace,'fs').callsFake(vscodeWorkspaceFsStub)
+        sinon.stub(vscode.workspace,'fs').get(vscodeWorkspaceFsStub)
     }
 
 
@@ -138,14 +151,9 @@ class testMocking{
 
     }
 
-    /**
-     * Mocks the postmessage and puts it in a dictionary, so we can see what is send by the webview
-     * @param returnDictionary the dictionary where the message send is put into
-     */
-    public postMessageMocking(webview: vscode.Webview,returnDictionary: {}){
-        sinon.stub(webview, 'postMessage').callsFake((message) => returnDictionary = message)
-        
-    }
+  
+
+    
 
 
     
@@ -159,41 +167,36 @@ suite('Path handling', async () => {
     let testMock: testMocking;
     let webviewViewMock: mockWebviewView;
     let returnDictionary = {};
-    let resolveWebviewViewSpy;
-    let onDidReceiveMessageFunction;
+    let eventEmitter;
+
 
 
     beforeEach(async () => {
 
 
         testMock = new testMocking();
+        eventEmitter = new EventEmitter()
         webviewViewMock = new mockWebviewView();
-        resolveWebviewViewSpy = sinon.spy(webviewViewMock.webview,'onDidReceiveMessage')
         testMock.workspaceSettingsMocking(fakeConfiguration);
         testMock.showFileDialogMocking();
         testMock.fsMocking();
         testMock.WorkspaceFsMocking();
         WebviewViewProvider = new VerCorsWebViewProvider(new MockExtensionContext())
-        await WebviewViewProvider.resolveWebviewView(webviewViewMock, undefined,undefined)
-        onDidReceiveMessageFunction = async (message: string) =>{await new Promise(resolve => {resolveWebviewViewSpy.args[0][0](message);});} 
-        testMock.postMessageMocking(webviewViewMock.webview,returnDictionary)
+        WebviewViewProvider.resolveWebviewView(webviewViewMock,undefined,undefined);
+        
+   
     })
     afterEach(() => {
         mock_fs.restore();
         sinon.restore();
-        vercorsExtension.deactivate()
-        resolveWebviewViewSpy.restore()
+
     })
 
 	test('', async () => {
-
-     await onDidReceiveMessageFunction({command: "add-path"})
-     console.log(returnDictionary)
-     
-     
-       
-
-
+        testMock.updatePostMessageMock(eventEmitter,webviewViewMock,"command")
+        WebviewViewProvider.receiveMessage({ command: "add-path" })
+        await waitFor("cancel-loading", eventEmitter);
+        console.log(returnDictionary)
         //send a message
     });
 });
