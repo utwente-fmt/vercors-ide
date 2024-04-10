@@ -166,12 +166,31 @@
             color: #ffffff;
         }
         .checkbox-pin {
-            width: 21px;
-            height: 21px;
-            vertical-align: middle;
-            margin-right: 5px;
-            color: white;
-            cursor: pointer;
+            display: none;
+        }
+
+        .pin-label {
+            user-select: none;
+            display: inline-block;
+            padding: 2px 4px;
+            cursor: pointer; /* Add cursor pointer to make it clickable */
+            transition: all 0.1s ease;
+        }
+        .pin-label svg {
+            fill: #fff;
+        }
+        .checkbox-pin:checked + .pin-label svg {
+            fill: var(--vscode-button-background);
+            transition: all 0.1s ease;
+        }
+        .checkbox-pin:checked + .pin-label {
+            border-radius: 50%;
+            background: var(--vscode-commandCenter-debuggingBackground);
+            transition: all 0.1s ease;
+        }
+        .checkbox-pin:checked + .pin-label:hover {
+            background: var(--vscode-editorOverviewRuler-modifiedForeground);
+            transition: all 0.1s ease;
         }
         .argument-input {
             margin-left: auto;
@@ -180,6 +199,7 @@
         .option-category {
             display: none;
             margin-top: 10px;
+            user-select: none;
         }
         .option-category.show {
             display: flex;
@@ -387,8 +407,12 @@
                             </div>
                             ${arguments}
                             <div class="checkbox-pin-container">
-                                <input type="checkbox" id="${key}-pin" name="${key}" class="checkbox-pin">
-                                <label class="input-label" for="${key}-pin">Pin</label>
+                                <input type="checkbox" id="${key}-pin" name="${key}" class="checkbox-pin visually-hidden">
+                                <label class="pin-label" for="${key}-pin">
+                                    <svg width="24" height="24" viewBox="0 0 128 128">
+                                        <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" d="M83.88,0.451L122.427,39c0.603,0.601,0.603,1.585,0,2.188l-13.128,13.125 c-0.602,0.604-1.586,0.604-2.187,0l-3.732-3.73l-17.303,17.3c3.882,14.621,0.095,30.857-11.37,42.32 c-0.266,0.268-0.535,0.529-0.808,0.787c-1.004,0.955-0.843,0.949-1.813-0.021L47.597,86.48L0,122.867l36.399-47.584L11.874,50.76 c-0.978-0.98-0.896-0.826,0.066-1.837c0.24-0.251,0.485-0.503,0.734-0.753C24.137,36.707,40.376,32.917,54.996,36.8l17.301-17.3 l-3.733-3.732c-0.601-0.601-0.601-1.585,0-2.188L81.691,0.451C82.295-0.15,83.279-0.15,83.88,0.451L83.88,0.451z"/>
+                                    </svg>
+                                </label>
                             </div>
                         </div>`;
                     form.innerHTML += content;
