@@ -228,10 +228,16 @@
         let checkboxContainers = document.getElementsByClassName('checkbox-container');
 
         for (const checkbox of checkboxContainers) {
-            if (checkbox.querySelector('input[type="checkbox"]').checked) {
+            const checkboxPin = checkbox.querySelector('input[type="checkbox"]');
+            if (checkboxPin.checked) {
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
-                // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
-                optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').name} ${args}`);
+                if (checkboxPin.id === "custom-flags") {
+                    // Only add the arguments for the custom flags option
+                    optionsString.push(`${args}`);
+                } else {
+                    // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
+                    optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').name} ${args}`);
+                }
             }
         }
 
@@ -264,14 +270,29 @@
 
     function loadOptions(options, pinnedOptions, backendOption) {
         //todo: it gives an error for the savedOptions
-        const savedOptions = options.map(option => option.replace(/^--/, '').trim());
+        // ignore the argument value if there is one
+        const regOptions = options.map(option => option.split(" ")[0]);
+        // construct a map between option and argument for the ones that do have them
+        const argOptions = {}
+        options.forEach(option => {
+            const op = option.split(" ");
+            if (op.length > 1) {
+                argOptions[op[0]] = op[1];
+            }
+        });
+
+        const savedOptions = regOptions.map(option => option.replace(/^--/, '').trim());
         const savedPinnedOptions = pinnedOptions.map(option => option.replace(/^--/, '').trim());
 
         // update option checkboxes
         document.querySelectorAll('.checkbox-container')
             .forEach((flagContainer) => flagContainer.querySelectorAll('input[type="checkbox"]')
-                .forEach((checkbox) => checkbox.checked = savedOptions.includes(checkbox.name)
-                )
+                .forEach((checkbox) => {
+                    checkbox.checked = savedOptions.includes(checkbox.name);
+                    // add argument value if there is one
+                    const argumentInput = flagContainer.querySelector('input[type="text"]');
+                    if (argumentInput) argumentInput.value = argOptions["--" + checkbox.name] || "";
+                })
             );
         // update pin checkboxes
         document.querySelectorAll('.checkbox-pin-container')
@@ -281,7 +302,6 @@
             );
         
         document.getElementById("color_mode").checked = !backendOption
-        console.log(backendOption)
         updateCategoryHeaders();
     }
 

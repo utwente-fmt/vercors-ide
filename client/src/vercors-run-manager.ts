@@ -51,7 +51,7 @@ export default class VerCorsRunManager {
         let args = fileOptions ? [inputFile].concat(fileOptions) : [inputFile];
 
         // Check if we have options, don't check file extension if --lang is used
-        if (!fileOptions || (fileOptions && !fileOptions.includes("--lang"))) {
+        if (!fileOptions || (fileOptions && fileOptions.filter(option => option.includes("--lang")).length === 0)) {
             const ext = path.extname(filePath).toLowerCase();
             if (ext !== ".pvl" && ext !== ".java" && ext !== ".c") {
                 console.log(filePath);

@@ -24,6 +24,12 @@
       "name": "Quiet Mode",
       "description": "Instruct VerCors to only log errors.",
       "skip": false
+    },
+    "custom-flags": {
+      "name": "Custom flags",
+      "description": "Include any custom flags.",
+      "arguments": "",
+      "skip": false
     }
   },
 
