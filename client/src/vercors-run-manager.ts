@@ -50,16 +50,16 @@ export default class VerCorsRunManager {
         let inputFile: string = '"' + filePath + '"';
 
         // extract custom options if there are any
-        const customFlagsRegex = /--custom-flags \[([^\]]*)\]/;
+        const customFlagsRegex: RegExp = /--custom-flags \[([^\]]*)]/;
         for (let i = 0; i < fileOptions.length; i++) {
-            const matches = fileOptions[i].match(customFlagsRegex);
+            const matches: RegExpMatchArray = fileOptions[i].match(customFlagsRegex);
             if (matches) {
                 fileOptions[i] = matches[1]; // content between square brackets
             }
         }
 
         // Check if we have options, don't check file extension if --lang is used
-        if (!fileOptions || (fileOptions && fileOptions.filter(option => option.includes("--lang")).length === 0)) {
+        if (!fileOptions || !fileOptions.some(option => option.includes("--lang"))) {
             const ext: string = path.extname(filePath).toLowerCase();
             if (ext !== ".pvl" && ext !== ".java" && ext !== ".c") {
                 console.log(filePath);
