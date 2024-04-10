@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import ProgressReceiver from "./progress-receiver";
-import VerCorsPathsProvider from "./vercors-paths-provider";
+import VerCorsPathsProvider, { VerCorsPath } from "./vercors-paths-provider";
 
 export default class VerCorsVersionWebviewProvider implements vscode.WebviewViewProvider, ProgressReceiver {
     private webview: vscode.Webview | undefined;
@@ -23,7 +23,7 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
         webviewView: vscode.WebviewView,
         _context: vscode.WebviewViewResolveContext,
         _token: vscode.CancellationToken
-    ) {
+    ): Promise<void> {
         this.webviewView = webviewView;
         this.webview = webviewView.webview;
 
@@ -47,7 +47,7 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
         return !(!this.webviewView || !this.webview || !this.webviewView.webview) && this.webviewView.visible;
     }
 
-    private async receiveMessage(message: any) {
+    private async receiveMessage(message: any): Promise<void> {
         switch (message.command) {
             case 'ready':
                 return this.ready();
@@ -60,26 +60,26 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
         }
     }
 
-    private async ready() {
+    private async ready(): Promise<void> {
         return this.sendPathsToWebview();
     }
 
-    public async addPath() {
+    public async addPath(): Promise<void> {
         // Open folder dialog
         return VerCorsPathsProvider.getInstance()
             .selectVersionFromDialog(
-                () => {
+                (): void => {
                     if (this.hasWebview()) {
                         this.webview.postMessage({ command: 'loading' });
                     }
                 },
-                () => {
+                (): void => {
                     if (this.hasWebview()) {
                         this.webview.postMessage({ command: 'cancel-loading' });
                     }
                 }
             )
-            .then(path => {
+            .then((path: VerCorsPath): void => {
                 if (path) {
                     if (!this.hasWebview()) {
                         vscode.window.showInformationMessage("VerCors version added");
@@ -90,16 +90,16 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
             });
     }
 
-    private async selectPath(path: string) {
+    private async selectPath(path: string): Promise<void> {
         return VerCorsPathsProvider.getInstance().selectPath(path)
-            .then(() => {
+            .then((): void => {
                 this.sendPathsToWebview();
             });
     }
 
-    private async removePath(path: string) {
+    private async removePath(path: string): Promise<void> {
         return VerCorsPathsProvider.getInstance().deletePath(path)
-            .then(() => {
+            .then((): void => {
                 this.sendPathsToWebview();
             });
     }
@@ -122,7 +122,7 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
             return;
         }
         return VerCorsPathsProvider.getInstance().getPathList()
-            .then(paths => {
+            .then((paths: VerCorsPath[]):void => {
                 this.webview.postMessage({
                     command: 'add-paths',
                     paths: paths
@@ -132,13 +132,13 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
 
     private async getHtmlForWebview(): Promise<string> {
         // Use a path relative to the extension's installation directory
-        const htmlPath = vscode.Uri.joinPath(this._extensionUri, '/resources/html/vercorsPath.html');
+        const htmlPath: vscode.Uri = vscode.Uri.joinPath(this._extensionUri, '/resources/html/vercorsPath.html');
 
         // Read the file's content
-        const htmlContent = await vscode.workspace.fs.readFile(htmlPath);
+        const htmlContent: Uint8Array = await vscode.workspace.fs.readFile(htmlPath);
 
         // Decode the byte array to a string
-        const htmlString = Buffer.from(htmlContent).toString('utf8');
+        const htmlString: string = Buffer.from(htmlContent).toString('utf8');
 
         this._HTMLContent = htmlString;
 

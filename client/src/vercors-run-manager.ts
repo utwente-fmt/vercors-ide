@@ -15,16 +15,16 @@ export default class VerCorsRunManager {
 
     public async runVerCors(): Promise<any> {
         // Get the currently active text editor
-        const editor = vscode.window.activeTextEditor;
+        const editor: vscode.TextEditor = vscode.window.activeTextEditor;
         if (!editor) {
             return vscode.window.showErrorMessage("No active text editor.");
         }
 
         // Get the URI (Uniform Resource Identifier) of the current file
-        const uri = editor!.document.uri;
-        const filePath = uri.fsPath;
+        const uri: vscode.Uri = editor!.document.uri;
+        const filePath: string = uri.fsPath;
 
-        const paths = await VerCorsPathsProvider.getInstance().getPathList();
+        const paths: VerCorsPath[] = await VerCorsPathsProvider.getInstance().getPathList();
         if (!paths.length) {
             return vscode.window.showErrorMessage("No VerCors paths have been specified yet");
         }
@@ -36,7 +36,7 @@ export default class VerCorsRunManager {
         }
 
         // remove possible double backslash
-        const verCorsPath = path.normalize(binPath.path + path.sep) + "vercors";
+        const verCorsPath: string = path.normalize(binPath.path + path.sep) + "vercors";
 
         if (!fs.existsSync(verCorsPath) || !fs.lstatSync(verCorsPath).isFile()) {
             return vscode.window.showErrorMessage(
@@ -44,10 +44,10 @@ export default class VerCorsRunManager {
             );
         }
 
-        let command = '"' + verCorsPath + '"'; // account for spaces
+        let command: string = '"' + verCorsPath + '"'; // account for spaces
 
-        const fileOptions = VerCorsOptions.getSelectedOptions(filePath);
-        let inputFile = '"' + filePath + '"';
+        const fileOptions: string[] = VerCorsOptions.getSelectedOptions(filePath);
+        let inputFile: string = '"' + filePath + '"';
 
         // extract custom options if there are any
         const customFlagsRegex = /--custom-flags \[([^\]]*)\]/;
@@ -60,7 +60,7 @@ export default class VerCorsRunManager {
 
         // Check if we have options, don't check file extension if --lang is used
         if (!fileOptions || (fileOptions && fileOptions.filter(option => option.includes("--lang")).length === 0)) {
-            const ext = path.extname(filePath).toLowerCase();
+            const ext: string = path.extname(filePath).toLowerCase();
             if (ext !== ".pvl" && ext !== ".java" && ext !== ".c") {
                 console.log(filePath);
                 return vscode.window.showErrorMessage(
@@ -69,7 +69,7 @@ export default class VerCorsRunManager {
             }
         }
 
-        let args = fileOptions ? [inputFile].concat(fileOptions) : [inputFile];
+        let args: string[] = fileOptions ? [inputFile].concat(fileOptions) : [inputFile];
         // Always execute in progress & verbose mode for extension features to work.
         args.push("--progress");
         args.push("--verbose");
@@ -90,7 +90,7 @@ export default class VerCorsRunManager {
         const vercorsProcess = childProcess.spawn(command, args, { shell: true });
         this.processPid = vercorsProcess.pid;
 
-        const outputState = new OutputParser(this.outputChannel, uri, this.diagnosticCollection);
+        const outputState: OutputParser = new OutputParser(this.outputChannel, uri, this.diagnosticCollection);
         outputState.start();
 
         vercorsProcess.stdout.on('data', (data: Buffer | string) => {
@@ -117,7 +117,7 @@ export default class VerCorsRunManager {
         }
 
         const kill = require("tree-kill");
-        kill(this.processPid, "SIGINT", async function (err: string) {
+        kill(this.processPid, "SIGINT", async function (err: string): Promise<void> {
             if (err === null) {
                 await vscode.window.showInformationMessage(
                     "VerCors has been successfully stopped"
