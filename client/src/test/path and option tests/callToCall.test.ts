@@ -8,8 +8,8 @@ import * as mock_fs from 'mock-fs'
 import * as fs from 'fs'
 
 
-const projectStartPath = __dirname + "/../../../.."
-const testStartPath = __dirname + "/../../../src/test"
+const projectStartPath = __dirname + "\\..\\..\\..\\.."
+const testStartPath = __dirname + "\\..\\..\\..\\src\\test"
 
 //This context is created to fake the extension context that is used for starting the extension
 class MockExtensionContext implements vscode.ExtensionContext{
@@ -93,7 +93,7 @@ class testMocking{
     * Goes to a vercors file with the wrong contents
     */
     public showFileDialogBrokenMocking(){
-        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '/brokenVercors')));
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '\\brokenVercors')));
     }
 
     /**
@@ -101,7 +101,7 @@ class testMocking{
     * This way you never access file outside of the test folder.
     */
     public showFileDialogTrueMocking(){
-        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '/fakeVercors')));
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '\\fakeVercors\\bin')));
     }
 
     public createMockUri(path: string): [vscode.Uri] {
@@ -136,11 +136,11 @@ class testMocking{
 
 
     public fsMocking(){
-        const frontendPath = projectStartPath + '/resources/html/'
-        const vercorsPath = testStartPath + '/fakeVercors/vercors';
+        const frontendPath = projectStartPath + '\\resources\\html\\'
+        const vercorsPath = testStartPath + '\\fakeVercors\\bin';
 
         mock_fs({
-            [testStartPath + "/brokenVercors"]:{
+            [testStartPath + "\\brokenVercors"]:{
                 'vercors': 'broken vercors'
             },
             [vercorsPath]: {
@@ -199,6 +199,15 @@ suite('Path handling', async () => {
         testMock.updatePostMessageMock(logger,webviewViewMock)
         await WebviewViewProvider.receiveMessage({ command: "add-path" })
         Assert.failOnEventAbsence("cancel-loading",logger, "command")
+        
+        //send a message
+    });
+
+    test('correct vercors file chosen', async () => {
+        testMock.showFileDialogTrueMocking();
+        testMock.updatePostMessageMock(logger,webviewViewMock)
+        await WebviewViewProvider.receiveMessage({ command: "add-path" })
+        Assert.failOnEventAbsence("add-paths",logger, "command")
         
         //send a message
     });
