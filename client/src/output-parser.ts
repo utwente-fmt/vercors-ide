@@ -63,9 +63,9 @@ export default class OutputParser {
 
         //for each error gather the error parts and assemble it to one error
         for (let err of this.errors) {
-            let errorMessage = "";
-            let file = err[0].file;
-            let relInf = [];
+            let errorMessage: string = "";
+            let file: string = err[0].file;
+            let relInf: vscode.DiagnosticRelatedInformation[] = [];
 
 
             for (let errpart of err) {
@@ -83,7 +83,7 @@ export default class OutputParser {
             }
 
             //create a diagnostic and put it into the collection
-            let diagnostic = new vscode.Diagnostic(new vscode.Range(err[0].line - 1, err[0].col - 1, err[0].line - 1, err[0].col - 1), errorMessage, vscode.DiagnosticSeverity.Error);
+            let diagnostic: vscode.Diagnostic = new vscode.Diagnostic(new vscode.Range(err[0].line - 1, err[0].col - 1, err[0].line - 1, err[0].col - 1), errorMessage, vscode.DiagnosticSeverity.Error);
             diagnostic.relatedInformation = relInf;
             diagnostics.push(diagnostic);
             this.outputChannel.appendLine(file + ":" + errorMessage);
@@ -95,7 +95,7 @@ export default class OutputParser {
         this.currentPercentage = 100;
     }
 
-    public accept(lineRaw: string) {
+    public accept(lineRaw: string): void {
         let line: string = lineRaw.trim();
         switch (Boolean(line)) {
 
@@ -139,16 +139,16 @@ export default class OutputParser {
             /^\[(?<percentage1>\d+)[.,](?<percentage2>\d+)%] \((?<step>\d+\/\d+)\) (?<step_name>[\w\s]+)(?<details>.*)$/g
                 .exec(line);
         if (matchResult) {
-            const percentage1 = matchResult.groups!['percentage1'];
-            const percentage2 = matchResult.groups!['percentage2'];
+            const percentage1: string = matchResult.groups!['percentage1'];
+            const percentage2: string  = matchResult.groups!['percentage2'];
             const newPercentage: number = Number(percentage1 + '.' + percentage2);
             if (newPercentage <= this.currentPercentage) {
                 return;
             }
             this.currentPercentage = newPercentage;
-            const step = matchResult.groups!['step'];
-            const stepName = matchResult.groups!['step_name'].trim();
-            const details = matchResult.groups!['details'].trim();
+            const step: string  = matchResult.groups!['step'];
+            const stepName: string  = matchResult.groups!['step_name'].trim();
+            const details: string  = matchResult.groups!['details'].trim();
             this.outputChannel.appendLine(line);
             this.progressReceiver.updateProgress(this.currentPercentage, step, stepName, details);
         }

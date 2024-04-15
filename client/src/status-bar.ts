@@ -17,7 +17,7 @@ export default class StatusBar implements ProgressReceiver {
         return StatusBar.instance;
     }
 
-    private setupButtons() {
+    private setupButtons(): void {
         this.startButton.text = `$(debug-start) VerCors`;
         this.startButton.tooltip = "Start VerCors";
         this.startButton.color = new vscode.ThemeColor('debugIcon.startForeground');
@@ -28,7 +28,7 @@ export default class StatusBar implements ProgressReceiver {
         this.stopButton.color = new vscode.ThemeColor('debugIcon.stopForeground');
     }
 
-    async updateProgress(percentage: number, _step: string, stepName: string, _details: string) {
+    async updateProgress(percentage: number, _step: string, stepName: string, _details: string): Promise<void> {
         if (percentage === 100) {
             this.statusBarItem.hide();
             this.stopButton.hide();
@@ -36,7 +36,7 @@ export default class StatusBar implements ProgressReceiver {
             return;
         }
         this.statusBarItem.name = "VerCors";
-        let chars = this.getPercentageChars(percentage / 100, 20);
+        let chars: string = this.getPercentageChars(percentage / 100, 20);
         this.statusBarItem.text = `${chars} (${percentage}%): ${stepName}`;
         this.statusBarItem.show();
         this.startButton.hide();

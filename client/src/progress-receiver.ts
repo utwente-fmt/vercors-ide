@@ -15,7 +15,7 @@ class MultiReceiver implements ProgressReceiver {
 
     async updateProgress(percentage: number, step: string, stepName: string, details: string): Promise<void> {
         await Promise.all<void>(
-            this.receivers.map(receiver => receiver.updateProgress(percentage, step, stepName, details))
+            this.receivers.map((receiver: ProgressReceiver): Promise<void> => receiver.updateProgress(percentage, step, stepName, details))
         );
     }
 
