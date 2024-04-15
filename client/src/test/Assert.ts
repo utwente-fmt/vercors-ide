@@ -1,13 +1,23 @@
-import * as assert from "assert";
-import { EventEmitter } from "stream";
-import { waitUntil } from "async-wait-until";
-import { comparing } from "../comparing";
+
 
 /**
  * An extention on the standard node assert 
 */
 
-export class Assert {
+export class Assert extends require("assert") {
+     
+    public static isTrue(condition, message?) {
+        if (!condition) {
+            throw new this.AssertionError({
+                message: message || 'Assertion failed',
+                actual: condition,
+                expected: true,
+                operator: '==',
+                stackStartFn: this.AssertionError,
+            });
+        }
+    }
+    
 
     /**
      * Checks if the actual value is the same as the expected value using an equal method
@@ -22,7 +32,7 @@ export class Assert {
         }
 
         if (!eql_method(actual, expected)) {
-            throw new assert.AssertionError({
+            throw new this.AssertionError({
                 message: message || `Expected ${actual} to equal ${expected}`,
                 actual: actual,
                 expected: expected,
@@ -31,14 +41,6 @@ export class Assert {
             });
         }
     };
-
-    /**
-     * The ok message for assert, for consitancy added. 
-     * Now we only use one assert class
-     */
-    public static ok(value: unknown, message?: string | Error){
-        return assert.ok(value,message)
-    }
 
     /**
      * Fails if an json string event is not emitted 
@@ -56,7 +58,7 @@ export class Assert {
             }
             return
         }
-        throw new assert.AssertionError({
+        throw new this.AssertionError({
             message: `Event '${JSON.stringify(jsonPairs)}' not emitted`,
             actual: JSON.stringify(logger),
             expected: JSON.stringify(jsonPairs),

@@ -1,3 +1,7 @@
+/**
+ * Backend testing
+ */
+
 import * as vscode from 'vscode';
 import * as sinon from 'sinon'
 
@@ -6,6 +10,7 @@ import {Assert} from '../Assert';
 import {beforeEach,afterEach} from 'mocha';
 import * as mock_fs from 'mock-fs'
 import * as fs from 'fs'
+import { comparing } from '../../comparing';
 
 
 const projectStartPath = __dirname + "\\..\\..\\..\\.."
@@ -81,6 +86,10 @@ class testMocking{
             }
 
     }
+
+    public showErrorMessageMocking(isErrorMessageShown){
+        sinon.stub(vscode.window,"showWarningMessage").returns(() => isErrorMessageShown.value = true)
+    }
     public workspaceSettingsMocking(fakeConfiguration: { [x: string]: any; }){
         const vscodeWorkspaceStub = sinon.stub();
         vscodeWorkspaceStub.returns({
@@ -103,7 +112,14 @@ class testMocking{
     * This way you never access file outside of the test folder.
     */
     public showFileDialogTrueMocking(){
-        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '\\fakeVercors\\bin')));
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(vercorsPath)));
+    }
+
+    /**
+     * Goes to a non-vercors file 
+     */
+    public showFileDialogFalseMocking(){
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(frontendPath)));
     }
 
     public createMockUri(path: string): [vscode.Uri] {
@@ -173,11 +189,13 @@ suite('Path handling', async () => {
     let webviewViewMock: mockWebviewView;
     let returnDictionary = {};
     let logger: string[];
+    let isErrorMessageShown;
 
 
 
     beforeEach(async () => {
 
+        isErrorMessageShown = {value: false} // to make it passed by reference
         logger = []
         testMock = new testMocking();
         webviewViewMock = new mockWebviewView();
@@ -187,6 +205,7 @@ suite('Path handling', async () => {
         WebviewViewProvider = new VerCorsWebViewProvider(new MockExtensionContext())
         WebviewViewProvider.resolveWebviewView(webviewViewMock,undefined,undefined);
         testMock.updatePostMessageMock(logger,webviewViewMock)
+        testMock.showErrorMessageMocking(isErrorMessageShown);
         
    
     })
@@ -199,6 +218,7 @@ suite('Path handling', async () => {
 	test('broken vercors file chosen', async () => {
         testMock.showFileDialogBrokenMocking();
         await WebviewViewProvider.receiveMessage({ command: "add-path" })
+        Assert.failOnJsonEventAbsence([["command","loading"]],logger)
         Assert.failOnJsonEventAbsence([["command","cancel-loading"]], logger )
 
     });
@@ -207,8 +227,25 @@ suite('Path handling', async () => {
         testMock.showFileDialogTrueMocking();
         const path = `{ path: ${vercorsPath}, selected:true, version: 'Vercors 2.0.0'}`
         await WebviewViewProvider.receiveMessage({ command: "add-path" })
+        Assert.failOnJsonEventAbsence([["command","loading"]],logger)
         Assert.failOnJsonEventAbsence([["command","add-paths"],["paths",path]],logger)    
     });
+
+    test('same vercors file chosen twice', async () => {
+        testMock.showFileDialogTrueMocking();
+        await WebviewViewProvider.receiveMessage({ command: "add-path" })
+        await WebviewViewProvider.receiveMessage({ command: "add-path" })
+        Assert.equals([],logger,comparing.compareLists) // a duplicate path should send no message to the frontend  
+        Assert.isTrue(isErrorMessageShown) 
+    });
+
+    test('non-vercors file chosen', async () => {
+        testMock.showFileDialogFalseMocking();
+        await WebviewViewProvider.receiveMessage({ command: "add-path" })
+        Assert.equals([],logger,comparing.compareLists) // a non-vercors path should send no message to the frontend  
+        Assert.isTrue(isErrorMessageShown) 
+    });
+
 
 
 });

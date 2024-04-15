@@ -1,3 +1,7 @@
+/**
+ * Information saving testing
+ */
+
 import * as vscode from 'vscode';
 import * as sinon from 'sinon'
 import {VerCorsOptions,OptionFields} from "../../VerCors-CLI-UI"
@@ -8,7 +12,7 @@ import {Assert} from '../Assert';
 import {comparing} from '../../comparing';
 import {beforeEach,afterEach} from 'mocha';
 
-    
+
 suite('Optionmap Tests', async () => {
 
     let fakeConfiguration;
