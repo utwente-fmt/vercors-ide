@@ -50,18 +50,29 @@ export class Assert extends require("assert") {
     public static failOnJsonEventAbsence(jsonPairs: [string,string][], logger: string[]){
 
         const jsonLogger = logger.map((l) => JSON.parse(JSON.stringify(l)));
-        for(let logged of jsonLogger){
+    log: for(let logged of jsonLogger){
             for(let [token,value] of jsonPairs){
-                if(logged[token] !== value){
-                    continue;
+                try{ 
+                    let jsonLog = JSON.parse(JSON.stringify(logged[token]))
+                    let jsonValue = JSON.parse(JSON.stringify(value))
+                    for(let key of jsonLog){
+                        if(jsonValue[key] != jsonLog[key]){
+                            continue log;
+                        }
+                    }
+                }
+                catch{
+                    if(logged[token] !== value){
+                        continue log;
+                    }
                 }
             }
-            return
+            return;
         }
         throw new this.AssertionError({
             message: `Event '${JSON.stringify(jsonPairs)}' not emitted`,
-            actual: JSON.stringify(logger),
-            expected: JSON.stringify(jsonPairs),
+            actual: JSON.stringify(jsonPairs),
+            expected: JSON.stringify(logger),
             operator: 'call',
             stackStartFn: this.failOnJsonEventAbsence
             });
