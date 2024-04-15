@@ -10,6 +10,8 @@ import * as fs from 'fs'
 
 const projectStartPath = __dirname + "\\..\\..\\..\\.."
 const testStartPath = __dirname + "\\..\\..\\..\\src\\test"
+const frontendPath = projectStartPath + '\\resources\\html\\'
+const vercorsPath = testStartPath + '\\fakeVercors\\bin';
 
 //This context is created to fake the extension context that is used for starting the extension
 class MockExtensionContext implements vscode.ExtensionContext{
@@ -136,8 +138,7 @@ class testMocking{
 
 
     public fsMocking(){
-        const frontendPath = projectStartPath + '\\resources\\html\\'
-        const vercorsPath = testStartPath + '\\fakeVercors\\bin';
+        
 
         mock_fs({
             [testStartPath + "\\brokenVercors"]:{
@@ -185,6 +186,7 @@ suite('Path handling', async () => {
         testMock.WorkspaceFsMocking();
         WebviewViewProvider = new VerCorsWebViewProvider(new MockExtensionContext())
         WebviewViewProvider.resolveWebviewView(webviewViewMock,undefined,undefined);
+        testMock.updatePostMessageMock(logger,webviewViewMock)
         
    
     })
@@ -196,19 +198,17 @@ suite('Path handling', async () => {
 
 	test('broken vercors file chosen', async () => {
         testMock.showFileDialogBrokenMocking();
-        testMock.updatePostMessageMock(logger,webviewViewMock)
         await WebviewViewProvider.receiveMessage({ command: "add-path" })
-        Assert.failOnEventAbsence("cancel-loading",logger, "command")
-        
-        //send a message
+        Assert.failOnJsonEventAbsence([["command","cancel-loading"]], logger )
+
     });
 
     test('correct vercors file chosen', async () => {
         testMock.showFileDialogTrueMocking();
-        testMock.updatePostMessageMock(logger,webviewViewMock)
+        const path = `{ path: ${vercorsPath}, selected:true, version: 'Vercors 2.0.0'}`
         await WebviewViewProvider.receiveMessage({ command: "add-path" })
-        Assert.failOnEventAbsence("add-paths",logger, "command")
-        
-        //send a message
+        Assert.failOnJsonEventAbsence([["command","add-paths"],["paths",path]],logger)    
     });
+
+
 });

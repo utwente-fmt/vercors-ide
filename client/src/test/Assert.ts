@@ -1,6 +1,8 @@
 import * as assert from "assert";
 import { EventEmitter } from "stream";
 import { waitUntil } from "async-wait-until";
+import { comparing } from "../comparing";
+
 /**
  * An extention on the standard node assert 
 */
@@ -39,36 +41,30 @@ export class Assert {
     }
 
     /**
-     * Fails if an event is not emitted within the desired time
-     * @param event The event to listen for
+     * Fails if an json string event is not emitted 
+     * @param jsonPairs The json tokens with their values
      * @param logger The logger that will log the event when it is posted
-     * @param jsonToken If applicable, a json token of the message to evaluate
      */
-    public static failOnEventAbsence(event:string,logger: string[], jsonToken?){
+    public static failOnJsonEventAbsence(jsonPairs: [string,string][], logger: string[]){
 
-        let evaluatedLogger = logger;
-        if(jsonToken){
-            evaluatedLogger = logger.map((l) => JSON.parse(JSON.stringify(l)));
-        }
-        for(let logged of evaluatedLogger){
-            if(jsonToken? logged[jsonToken] == event: logged == event){
-                return
+        const jsonLogger = logger.map((l) => JSON.parse(JSON.stringify(l)));
+        for(let logged of jsonLogger){
+            for(let [token,value] of jsonPairs){
+                if(logged[token] !== value){
+                    continue;
+                }
             }
+            return
         }
         throw new assert.AssertionError({
-            message: `Event '${event}' not emitted`,
-            actual: event,
-            expected: null,
+            message: `Event '${JSON.stringify(jsonPairs)}' not emitted`,
+            actual: JSON.stringify(logger),
+            expected: JSON.stringify(jsonPairs),
             operator: 'call',
-            stackStartFn: this.failOnEventAbsence
+            stackStartFn: this.failOnJsonEventAbsence
             });
-
-
-          
-        
-
-      
     }
+
 
 
 }
