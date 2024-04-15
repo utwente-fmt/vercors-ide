@@ -1,20 +1,12 @@
 import * as vscode from 'vscode';
 import * as sinon from 'sinon'
-import {OptionFields} from "../../VerCors-CLI-UI"
-import { VerCorsOptions } from '../../VerCors-CLI-UI';
-import {VerCorsPath} from '../../vercors-paths-provider'
-import VerCorsPathsProvider from '../../vercors-paths-provider';
+
 import VerCorsWebViewProvider from '../../vercors-version-webview';
 import {Assert} from '../Assert';
 import {beforeEach,afterEach} from 'mocha';
 import * as mock_fs from 'mock-fs'
 import * as fs from 'fs'
-import * as vercorsExtension from "../../extension"
-import { activate } from '../language server tests/helper';
-import { posix } from 'path';
-import { spawn } from 'child_process';
-import {waitFor} from 'wait-for-event';
-import {EventEmitter} from 'events';
+
 
 const projectStartPath = __dirname + "/../../../.."
 const testStartPath = __dirname + "/../../../src/test"
@@ -80,10 +72,10 @@ class testMocking{
     
     context = new MockExtensionContext();
     
-    public updatePostMessageMock(emitter: EventEmitter, mockWebviewView:mockWebviewView, jsonToken?: string){
+    public updatePostMessageMock(logger: string[], mockWebviewView:mockWebviewView){
         mockWebviewView.webview.postMessage = 
-            function (message: any): Thenable<boolean> {
-                return new Promise((resolve) => resolve(emitter.emit(jsonToken? message[jsonToken]: message)));
+            function (message: string): Thenable<boolean> {
+                return new Promise((resolve) => { logger.push(message); resolve(true);});
             }
 
     }
@@ -98,11 +90,18 @@ class testMocking{
     }
 
     /**
+    * Goes to a vercors file with the wrong contents
+    */
+    public showFileDialogBrokenMocking(){
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '/brokenVercors')));
+    }
+
+    /**
     * When trying to open the file dialog, give a Uri that goes to a vercors bin that is in the vercors project.
     * This way you never access file outside of the test folder.
     */
-    public showFileDialogMocking(){
-        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '/fakeVercors/vercors')));
+    public showFileDialogTrueMocking(){
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(this.createMockUri(testStartPath + '/fakeVercors')));
     }
 
     public createMockUri(path: string): [vscode.Uri] {
@@ -139,7 +138,11 @@ class testMocking{
     public fsMocking(){
         const frontendPath = projectStartPath + '/resources/html/'
         const vercorsPath = testStartPath + '/fakeVercors/vercors';
+
         mock_fs({
+            [testStartPath + "/brokenVercors"]:{
+                'vercors': 'broken vercors'
+            },
             [vercorsPath]: {
                 'vercors': 'vercors'
             },
@@ -161,24 +164,23 @@ class testMocking{
 
 
 
+
 suite('Path handling', async () => {
     const fakeConfiguration = {}
     let WebviewViewProvider: VerCorsWebViewProvider;
     let testMock: testMocking;
     let webviewViewMock: mockWebviewView;
     let returnDictionary = {};
-    let eventEmitter;
+    let logger: string[];
 
 
 
     beforeEach(async () => {
 
-
+        logger = []
         testMock = new testMocking();
-        eventEmitter = new EventEmitter()
         webviewViewMock = new mockWebviewView();
         testMock.workspaceSettingsMocking(fakeConfiguration);
-        testMock.showFileDialogMocking();
         testMock.fsMocking();
         testMock.WorkspaceFsMocking();
         WebviewViewProvider = new VerCorsWebViewProvider(new MockExtensionContext())
@@ -192,11 +194,12 @@ suite('Path handling', async () => {
 
     })
 
-	test('', async () => {
-        testMock.updatePostMessageMock(eventEmitter,webviewViewMock,"command")
-        WebviewViewProvider.receiveMessage({ command: "add-path" })
-        await waitFor("cancel-loading", eventEmitter);
-        console.log(returnDictionary)
+	test('broken vercors file chosen', async () => {
+        testMock.showFileDialogBrokenMocking();
+        testMock.updatePostMessageMock(logger,webviewViewMock)
+        await WebviewViewProvider.receiveMessage({ command: "add-path" })
+        Assert.failOnEventAbsence("cancel-loading",logger, "command")
+        
         //send a message
     });
 });

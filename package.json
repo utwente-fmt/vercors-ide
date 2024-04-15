@@ -219,6 +219,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "async-wait-until": "^2.0.12",
     "eventemitter3": "^5.0.1",
     "expect.js": "^0.3.1",
     "mock-fs": "^5.2.0",

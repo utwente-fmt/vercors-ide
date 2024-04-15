@@ -1,4 +1,6 @@
 import * as assert from "assert";
+import { EventEmitter } from "stream";
+import { waitUntil } from "async-wait-until";
 /**
  * An extention on the standard node assert 
 */
@@ -35,5 +37,38 @@ export class Assert {
     public static ok(value: unknown, message?: string | Error){
         return assert.ok(value,message)
     }
+
+    /**
+     * Fails if an event is not emitted within the desired time
+     * @param event The event to listen for
+     * @param logger The logger that will log the event when it is posted
+     * @param jsonToken If applicable, a json token of the message to evaluate
+     */
+    public static failOnEventAbsence(event:string,logger: string[], jsonToken?){
+
+        let evaluatedLogger = logger;
+        if(jsonToken){
+            evaluatedLogger = logger.map((l) => JSON.parse(JSON.stringify(l)));
+        }
+        for(let logged of evaluatedLogger){
+            if(jsonToken? logged[jsonToken] == event: logged == event){
+                return
+            }
+        }
+        throw new assert.AssertionError({
+            message: `Event '${event}' not emitted`,
+            actual: event,
+            expected: null,
+            operator: 'call',
+            stackStartFn: this.failOnEventAbsence
+            });
+
+
+          
+        
+
+      
+    }
+
 
 }
