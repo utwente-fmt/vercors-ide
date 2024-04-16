@@ -47,24 +47,23 @@ export default class VerCorsPathsProvider {
 
     public async selectVersionFromDialog(beforeDetection?: () => void, onError?: () => void): Promise<VerCorsPath | undefined> {
         return vscode.window.showOpenDialog({
-            canSelectFiles: false,
-            canSelectFolders: true,
+            canSelectFiles: true,
+            canSelectFolders: false,
             canSelectMany: false
         })
-            .then(async (folderUri: vscode.Uri[]): Promise<VerCorsPath> => {
-                if (!folderUri || !folderUri[0]) {
+            .then(async (fileUri: vscode.Uri[]): Promise<VerCorsPath> => {
+                if (!fileUri || !fileUri[0]) {
                     return;
                 }
 
-                const binPath: string = folderUri![0].fsPath;
-                const vercorsPath: string = binPath + path.sep + "vercors";
+                const vercorsPath: string = fileUri![0].fsPath;
                 if (!fs.existsSync(vercorsPath) || !fs.lstatSync(vercorsPath).isFile()) {
-                    vscode.window.showErrorMessage("Could not find VerCors at the given path");
+                    vscode.window.showErrorMessage("Could not find the given file");
                     return;
                 }
 
                 const vercorsPaths: VerCorsPath[] = await this.getPathList();
-                if (vercorsPaths.find((vercorsPath: VerCorsPath): boolean => vercorsPath.path === binPath)) {
+                if (vercorsPaths.find((p: VerCorsPath): boolean => p.path === vercorsPath)) {
                     vscode.window.showWarningMessage("VerCors version already added");
                     return;
                 }
@@ -82,7 +81,7 @@ export default class VerCorsPathsProvider {
                 }
 
                 const pathObject: VerCorsPath = {
-                    path: binPath,
+                    path: vercorsPath,
                     version: version,
                     selected: vercorsPaths.length === 0
                 };
