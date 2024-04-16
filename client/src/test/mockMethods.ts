@@ -18,6 +18,8 @@ export const mockedPaths = {
         frontendFolder: frontendPath
 }
 
+type webviewViewProviderTypes = VerCorsVersionWebviewProvider | VerCorsWebViewProvider
+
 //This context is created to fake the extension context that is used for starting the extension
 class MockExtensionContext implements vscode.ExtensionContext{
     subscriptions: { dispose(): any; }[];
@@ -82,15 +84,17 @@ export class testMocking{
     webviewViewMock: mockWebviewView
     isErrorMessageShown: boolean;
     isWarningMessageShown: boolean;
-    WebviewViewProvider: VerCorsVersionWebviewProvider;
-    constructor(){
+    WebviewViewProvider: VerCorsVersionWebviewProvider | VerCorsWebViewProvider;
+
+
+    constructor(WebviewViewProvider: new (arg0: vscode.ExtensionContext) => VerCorsVersionWebviewProvider | VerCorsWebViewProvider){
         this.context = new MockExtensionContext();
         this.fakeConfiguration = {};
         this.logger = [];
         this.webviewViewMock = new mockWebviewView();
         this.isErrorMessageShown = false;
         this.isWarningMessageShown = false;
-        this.WebviewViewProvider = new VerCorsVersionWebviewProvider(this.context);
+        this.WebviewViewProvider = new WebviewViewProvider(this.context);
 
     }
 
@@ -101,6 +105,10 @@ export class testMocking{
                 return new Promise((resolve) => { self.logger.push(message); resolve(true);});
             }
 
+    }
+
+    public sendDataToBackend(){
+        
     }
 
     public showErrorMessageMocking(){

@@ -1,6 +1,6 @@
 /**
  * Backend testing
- */
+*/
 
 
 import * as sinon from 'sinon'
@@ -18,9 +18,6 @@ import {mockWebviewView, mockedPaths, testMocking} from '../mockMethods'
 
 
 suite('Path handling', async () => {
-    
-
-
     let testMock: testMocking;
     beforeEach(async () => {
         testMock = new testMocking()
@@ -28,7 +25,6 @@ suite('Path handling', async () => {
     })
     afterEach(() => {
         testMock.stopFrontendMocking();
-        testMock = undefined
     })
 
 	test('broken vercors file chosen', async () => {
@@ -62,6 +58,29 @@ suite('Path handling', async () => {
         Assert.equals([],testMock.logger,comparing.compareLists) // a non-vercors path should send no message to the frontend  
         Assert.isTrue(testMock.isErrorMessageShown) 
     });
+
+
+
+});
+
+suite('Path handling', async () => {
+    let testMock: testMocking;
+    beforeEach(async () => {
+        testMock = new testMocking()
+        testMock.mockFrontend()
+    })
+    afterEach(() => {
+        testMock.stopFrontendMocking();
+    })
+
+    test('broken vercors file chosen', async () => {
+        testMock.showFileDialogMocking("brokenVercorsFolder");
+        await testMock.WebviewViewProvider.receiveMessage({ command: "add-path" })
+        Assert.failOnJsonEventAbsence([["command","loading"]],testMock.logger)
+        Assert.failOnJsonEventAbsence([["command","cancel-loading"]], testMock.logger )
+
+    });
+
 
 
 
