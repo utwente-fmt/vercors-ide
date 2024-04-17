@@ -25,7 +25,7 @@ import {
 
 
 import PVLsyntax from '../../syntaxes/languageServerPVLMatches.json';
-import JAVAsyntax from '../../syntaxes/languageServerJAVAMatches.json'; 
+import JAVAsyntax from '../../syntaxes/languageServerJAVA&CMatches.json'; 
 
 
 const supportedLanguages = {pvl:[], java:[], c:[]}
@@ -50,20 +50,23 @@ function generateCompletionArrayPVL(){
 		label: item.match,
 		kind: CompletionItemKind.Text,
 		data: index,
+		detail: 'pvl',
+		documentation: 'pvl autocompletion'
 	  };
 	  supportedLanguages.pvl.push(output);
 	}
 
-	for (const item of javaSyntax) {
+	for (const item of JAVAsyntax) {
 	  let output = {
 		label: item.match,
 		kind: CompletionItemKind.Text,
 		data: index,
+		detail: 'java',
+		documentation: 'java autocompletion'
 	  };
-	  supportedLanguages.pvl.push(output);
+	  supportedLanguages.java.push(output);
 	}
 }
-
 generateCompletionArrayPVL()
 
 connection.onInitialize((params: InitializeParams) => {
@@ -168,9 +171,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 
 documents.onDidChangeContent(e =>{
 
-
-
-	console.log(e.document.languageId);
+	completionArray = supportedLanguages[e.document.languageId]
 })
 
 // Only keep settings for open documents
@@ -267,10 +268,6 @@ connection.onCompletion(
 // the completion list.
 connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
-		if (item.data >= 0 && item.data <= completionArray.length) {	
-			item.detail = "PVL";
-			item.documentation = "PVL autocompletion";
-		}
 		return item;
 	}
 );
