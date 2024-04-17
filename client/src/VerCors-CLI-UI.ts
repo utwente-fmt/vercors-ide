@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { comparing } from './comparing';
+import { webviewConnector } from './webviewConnector';
 
 export type OptionFields = flagType & pinnedType & backendType;
 
@@ -115,8 +116,7 @@ export class VerCorsOptions {
 
 
 }
-
-export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
+export class VerCorsWebViewProvider implements webviewConnector {
     private _view?: vscode.WebviewView;
 
     private readonly _extensionUri: vscode.Uri;
@@ -140,19 +140,21 @@ export class VerCorsWebViewProvider implements vscode.WebviewViewProvider {
         webviewView.webview.html = await this.getHtmlForWebview(webviewView.webview);
 
         // Handle messages from the webview
-        webviewView.webview.onDidReceiveMessage(async message => {
-            if (message.command === 'updateOptions') {
-                const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-                await VerCorsOptions.updateOptions(filePath!, message.options, message.pinnedOptions, message.backendOption);
-            } else if (message.command === 'viewLoaded') {
-                const data = await this.fetchCommandLineOptions();
-                this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
-                if (vscode.window.activeTextEditor !== undefined) {
-                    this.updateView();
-                }
-            }
-        });
+        webviewView.webview.onDidReceiveMessage(async message => this.receiveMessage(message))
     }
+
+    public async receiveMessage(message: any): Promise<void> {
+        if (message.command === 'updateOptions') {
+            const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+            await VerCorsOptions.updateOptions(filePath!, message.options, message.pinnedOptions, message.backendOption);
+        } else if (message.command === 'viewLoaded') {
+            const data = await this.fetchCommandLineOptions();
+            this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
+            if (vscode.window.activeTextEditor !== undefined) {
+                this.updateView();
+            }
+        }
+    };
 
     private async getHtmlForWebview(_webview: vscode.Webview) {
         // Use a path relative to the extension's installation directory
