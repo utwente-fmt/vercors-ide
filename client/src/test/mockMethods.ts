@@ -211,7 +211,7 @@ export class testMocking{
                         // remove newlines
                         resolve(str.trim());
                     } else {
-                        reject('Vercors (for testing) is not properly installed at ' + vercorsPath + "\\vercors");
+                        reject('Vercors does not exist at: ' + vercorsPath + "\\vercors");
                     }
                 });
 
