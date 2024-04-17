@@ -71,8 +71,8 @@ export class Assert extends require("assert") {
         }
         throw new this.AssertionError({
             message: `Event '${JSON.stringify(jsonPairs)}' not emitted`,
-            actual: JSON.stringify(jsonPairs),
-            expected: JSON.stringify(logger),
+            actual: JSON.stringify(logger),
+            expected: JSON.stringify(jsonPairs),
             operator: 'call',
             stackStartFn: this.failOnJsonEventAbsence
             });
