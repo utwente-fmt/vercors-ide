@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
 import ProgressReceiver from "./progress-receiver";
 import VerCorsPathsProvider, { VerCorsPath } from "./vercors-paths-provider";
+import { webviewConnector } from './webviewConnector';
 
-export default class VerCorsVersionWebviewProvider implements vscode.WebviewViewProvider, ProgressReceiver {
+
+export default class VerCorsVersionWebviewProvider implements webviewConnector, ProgressReceiver {
     private webview: vscode.Webview | undefined;
     private webviewView: vscode.WebviewView | undefined;
     private static instance: VerCorsVersionWebviewProvider;
@@ -47,7 +49,7 @@ export default class VerCorsVersionWebviewProvider implements vscode.WebviewView
         return !(!this.webviewView || !this.webview || !this.webviewView.webview) && this.webviewView.visible;
     }
 
-    private async receiveMessage(message: any): Promise<void> {
+    public async receiveMessage(message: any): Promise<void> {
         switch (message.command) {
             case 'ready':
                 return this.ready();
