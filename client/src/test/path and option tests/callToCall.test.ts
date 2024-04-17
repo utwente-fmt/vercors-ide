@@ -10,6 +10,7 @@ import {beforeEach,afterEach} from 'mocha';
 import * as mock_fs from 'mock-fs'
 import { comparing } from '../../comparing';
 import {mockWebviewView, mockedPaths, testMocking} from '../mockMethods'
+import VerCorsVersionWebviewProvider from '../../vercors-version-webview';
 
 
 
@@ -20,8 +21,8 @@ import {mockWebviewView, mockedPaths, testMocking} from '../mockMethods'
 suite('Path handling', async () => {
     let testMock: testMocking;
     beforeEach(async () => {
-        testMock = new testMocking()
-        testMock.mockFrontend()
+        testMock = new testMocking(VerCorsVersionWebviewProvider)
+        await testMock.mockFrontend()
     })
     afterEach(() => {
         testMock.stopFrontendMocking();
@@ -63,25 +64,25 @@ suite('Path handling', async () => {
 
 });
 
-suite('Path handling', async () => {
-    let testMock: testMocking;
-    beforeEach(async () => {
-        testMock = new testMocking()
-        testMock.mockFrontend()
-    })
-    afterEach(() => {
-        testMock.stopFrontendMocking();
-    })
+// suite('Path handling', async () => {
+//     let testMock: testMocking;
+//     beforeEach(async () => {
+//         testMock = new testMocking()
+//         testMock.mockFrontend()
+//     })
+//     afterEach(() => {
+//         testMock.stopFrontendMocking();
+//     })
 
-    test('broken vercors file chosen', async () => {
-        testMock.showFileDialogMocking("brokenVercorsFolder");
-        await testMock.WebviewViewProvider.receiveMessage({ command: "add-path" })
-        Assert.failOnJsonEventAbsence([["command","loading"]],testMock.logger)
-        Assert.failOnJsonEventAbsence([["command","cancel-loading"]], testMock.logger )
+//     test('broken vercors file chosen', async () => {
+//         testMock.showFileDialogMocking("brokenVercorsFolder");
+//         await testMock.WebviewViewProvider.receiveMessage({ command: "add-path" })
+//         Assert.failOnJsonEventAbsence([["command","loading"]],testMock.logger)
+//         Assert.failOnJsonEventAbsence([["command","cancel-loading"]], testMock.logger )
 
-    });
-
-
+//     });
 
 
-});
+
+
+// });

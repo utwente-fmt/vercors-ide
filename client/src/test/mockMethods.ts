@@ -5,6 +5,8 @@ import * as fs from 'fs'
 import { VerCorsWebViewProvider } from '../VerCors-CLI-UI'
 import { log } from 'console'
 import VerCorsVersionWebviewProvider from '../vercors-version-webview'
+import { webviewConnector } from '../webviewConnector'
+import kill = require('tree-kill');
 
 const projectStartPath = __dirname + "\\..\\..\\..\\.."
 const testStartPath = __dirname + "\\..\\..\\src\\test"
@@ -84,10 +86,10 @@ export class testMocking{
     webviewViewMock: mockWebviewView
     isErrorMessageShown: boolean;
     isWarningMessageShown: boolean;
-    WebviewViewProvider: VerCorsVersionWebviewProvider | VerCorsWebViewProvider;
+    WebviewViewProvider: webviewConnector;
 
 
-    constructor(WebviewViewProvider: new (arg0: vscode.ExtensionContext) => VerCorsVersionWebviewProvider | VerCorsWebViewProvider){
+    constructor(WebviewViewProvider: new (arg0: vscode.ExtensionContext) => webviewConnector){
         this.context = new MockExtensionContext();
         this.fakeConfiguration = {};
         this.logger = [];
@@ -98,7 +100,7 @@ export class testMocking{
 
     }
 
-    public setPostMessageMock(){
+    private setPostMessageMock(){
         var self = this; // because this is used in another async function it doesn't work otherwise
         self.webviewViewMock.webview.postMessage = 
             function (message: string): Thenable<boolean> {
@@ -111,16 +113,16 @@ export class testMocking{
         
     }
 
-    public showErrorMessageMocking(){
+    private showErrorMessageMocking(){
         
         sinon.stub(vscode.window,"showErrorMessage").callsFake(() => this.isErrorMessageShown = true)
     }
 
-    public showWarningMessageMocking(){
+    private showWarningMessageMocking(){
         
         sinon.stub(vscode.window,"showWarningMessage").callsFake(() => this.isWarningMessageShown = true)
     }
-    public workspaceSettingsMocking(){
+    private workspaceSettingsMocking(){
        
         const vscodeWorkspaceStub = sinon.stub();
         vscodeWorkspaceStub.returns({
@@ -142,7 +144,7 @@ export class testMocking{
     }
 
 
-    public createMockUri(path: string): [vscode.Uri] {
+    private createMockUri(path: string): [vscode.Uri] {
 
     
         const mockFolderUri: vscode.Uri = {
@@ -165,7 +167,7 @@ export class testMocking{
     }
 
     //mock the vscode api file call by redirecting it to the fs call, because fs goes now to our own fake filesystem
-    public WorkspaceFsMocking(){
+    private WorkspaceFsMocking(){
         const vscodeWorkspaceFsStub = sinon.stub();
         vscodeWorkspaceFsStub.returns({
                 readFile: (uri :vscode.Uri) => fs.readFileSync(uri.fsPath)
@@ -174,7 +176,7 @@ export class testMocking{
     }
 
 
-    public fsMocking(){
+    private fsMocking(){
         mock_fs({
             [testStartPath + "\\brokenVercors"]:{
                 'vercors': 'broken vercors'
@@ -190,12 +192,47 @@ export class testMocking{
 
     }
 
-    public startMockWebviewViewProvider(){
+    private startMockWebviewViewProvider(){
         this.WebviewViewProvider.resolveWebviewView(this.webviewViewMock,undefined,undefined);
     }
 
+    private async isFakeVercorsCreatedProperly(){
+        await new Promise<string>((resolve, reject): void => {
+            try {
+                const childProcess = require('child_process');
+                let command: string = '"' + vercorsPath + "\\vercors" + '"';
+                const process = childProcess.spawn(command, ["--version"], { shell: true });
+                const pid: number = process.pid;
 
-    public mockFrontend() {
+                process.stdout.on('data', (data: Buffer | string): void => {
+                    const str: string = data.toString();
+                    kill(pid, 'SIGINT');
+                    if (str.startsWith("Vercors")) {
+                        // remove newlines
+                        resolve(str.trim());
+                    } else {
+                        reject('Vercors (for testing) is not properly installed at ' + vercorsPath + "\\vercors");
+                    }
+                });
+
+                process.stderr.on('data', (data: Buffer | string): void => {
+                    const str: string = data.toString();
+                    kill(pid, 'SIGINT');
+                    reject('Vercors (for testing) is not properly installed at ' + vercorsPath + "\\vercors. \n This errormessage is given: " + str);
+                });
+            } catch (_e) {
+                reject('Vercors (for testing) is not properly installed at ' + vercorsPath + "\\vercors. \n This errormessage is given: " + _e);
+            }
+        })
+            .catch(reason => {
+                throw new Error(reason.toString());
+            });
+
+    }
+
+
+    public async mockFrontend() {
+        await this.isFakeVercorsCreatedProperly();
         this.workspaceSettingsMocking();
         this.fsMocking();
         this.WorkspaceFsMocking();
