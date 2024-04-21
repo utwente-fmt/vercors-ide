@@ -10,15 +10,31 @@ import kill = require('tree-kill');
 
 const projectStartPath = __dirname + "\\..\\..\\..\\.."
 const testStartPath = __dirname + "\\..\\..\\src\\test"
-const frontendPath = projectStartPath + '\\resources\\html\\'
+const resourcesPath = projectStartPath + '\\resources'
+const frontendPath = resourcesPath + '\\html\\'
 const vercorsPath = testStartPath + '\\fakeVercors\\bin';
+
+
 
 
 export const mockedPaths = {
         brokenVercorsFolder: testStartPath + '\\brokenVercors',
         workingVercorsFolder: vercorsPath,
-        frontendFolder: frontendPath
+        resourcesFolder: resourcesPath
 }
+export const mockCommandLineOptions = JSON.stringify(
+        {"General" : {
+            "quiet": {
+                "name": "Quiet Mode",
+                "description": "Instruct VerCors to only log errors.",
+                "skip": false
+          }},
+          "Advanced" : {
+            "more": {
+                "name": "More Errors",
+                "description": "Always print the maximum amount of information about errors."
+          }}
+        });
 
 type webviewViewProviderTypes = VerCorsVersionWebviewProvider | VerCorsWebViewProvider
 
@@ -177,17 +193,22 @@ export class testMocking{
 
 
     private fsMocking(){
+
+        
         mock_fs({
-            [testStartPath + "\\brokenVercors"]:{
+            [mockedPaths.brokenVercorsFolder]:{
                 'vercors': 'broken vercors'
             },
-            [vercorsPath]: {
+            [mockedPaths.workingVercorsFolder]: {
                 'vercors': 'vercors'
             },
-            [frontendPath]:{
-                'vercorsPath.html': 'vercorsPath.html',
-                'vercorsOptions.html': 'vercorsOption.html'
-            }
+            [mockedPaths.resourcesFolder]:{
+                'html':{
+                    'vercorsPath.html': 'vercorsPath.html',
+                    'vercorsOptions.html': 'vercorsOption.html'
+                },
+                'command-line-options.json': mockCommandLineOptions
+            },
         });
 
     }
@@ -196,43 +217,10 @@ export class testMocking{
         this.WebviewViewProvider.resolveWebviewView(this.webviewViewMock,undefined,undefined);
     }
 
-    private async isFakeVercorsCreatedProperly(){
-        await new Promise<string>((resolve, reject): void => {
-            try {
-                const childProcess = require('child_process');
-                let command: string = '"' + vercorsPath + "\\vercors" + '"';
-                const process = childProcess.spawn(command, ["--version"], { shell: true });
-                const pid: number = process.pid;
 
-                process.stdout.on('data', (data: Buffer | string): void => {
-                    const str: string = data.toString();
-                    kill(pid, 'SIGINT');
-                    if (str.startsWith("Vercors")) {
-                        // remove newlines
-                        resolve(str.trim());
-                    } else {
-                        reject('Vercors does not exist at: ' + vercorsPath + "\\vercors");
-                    }
-                });
-
-                process.stderr.on('data', (data: Buffer | string): void => {
-                    const str: string = data.toString();
-                    kill(pid, 'SIGINT');
-                    reject('Vercors (for testing) is not properly installed at ' + vercorsPath + "\\vercors. \n This errormessage is given: " + str);
-                });
-            } catch (_e) {
-                reject('Vercors (for testing) is not properly installed at ' + vercorsPath + "\\vercors. \n This errormessage is given: " + _e);
-            }
-        })
-            .catch(reason => {
-                throw new Error(reason.toString());
-            });
-
-    }
 
 
     public async mockFrontend() {
-        await this.isFakeVercorsCreatedProperly();
         this.workspaceSettingsMocking();
         this.fsMocking();
         this.WorkspaceFsMocking();

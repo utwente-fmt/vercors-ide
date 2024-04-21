@@ -5,8 +5,9 @@
 import * as path from 'path';
 import * as Mocha from 'mocha';
 import * as glob from 'glob';
-
-export function run(): Promise<void> {
+import {mockedPaths} from './mockMethods'
+import { checkForCorrectSetup } from './testSetup';
+export async function run(): Promise<void> {
 	// Create the mocha test
 	const mocha = new Mocha({
 		ui: 'tdd',
@@ -15,7 +16,7 @@ export function run(): Promise<void> {
 	mocha.timeout(100000);
 
 	const testsRoot = __dirname + "/path and option tests";
-
+	await checkForCorrectSetup(mockedPaths.workingVercorsFolder);
 	return new Promise((resolve, reject) => {
 		// @ts-ignore
 		glob('**.test.js', { cwd: testsRoot }, (err, files) => {
