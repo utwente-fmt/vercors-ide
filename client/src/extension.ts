@@ -93,14 +93,17 @@ async function startClient(context: vscode.ExtensionContext) {
         debug: {
             module: serverModule,
             transport: TransportKind.ipc,
+            options:{
+                execArgv: ['--nolazy', '--inspect=6009']
+            }
         },
     };
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
-        // Register the server for plain text documents
         documentSelector: [
             { scheme: "file", language: "pvl" },
+            { scheme: "file", language: "java" },
             { scheme: "file", language: "plaintext" },
         ],
         synchronize: {

@@ -30,21 +30,21 @@ export default class VerCorsRunManager {
         }
 
         // get selected VerCors version
-        const binPath: VerCorsPath = paths.find((p) => p.selected);
-        if (!binPath) {
+        let vercorsPath: VerCorsPath = paths.find((p) => p.selected);
+        if (!vercorsPath) {
             return vscode.window.showErrorMessage("No VerCors version has been selected");
         }
 
         // remove possible double backslash
-        const verCorsPath: string = path.normalize(binPath.path + path.sep) + "vercors";
+        const binPath: string = path.normalize(vercorsPath.path);
 
-        if (!fs.existsSync(verCorsPath) || !fs.lstatSync(verCorsPath).isFile()) {
+        if (!fs.existsSync(binPath) || !fs.lstatSync(binPath).isFile()) {
             return vscode.window.showErrorMessage(
-                "Could not find VerCors but expected at the given path: " + verCorsPath
+                "Could not find VerCors but expected at the given path: " + binPath
             );
         }
 
-        let command: string = '"' + verCorsPath + '"'; // account for spaces
+        let command: string = '"' + binPath + '"'; // account for spaces
 
         const fileOptions: string[] = VerCorsOptions.getSelectedOptions(filePath);
         let inputFile: string = '"' + filePath + '"';
