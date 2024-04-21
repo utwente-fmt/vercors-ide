@@ -39,7 +39,7 @@ suite('Path handling', async () => {
 
     test('correct vercors file chosen', async () => {
         testMock.showFileDialogMocking("workingVercorsFolder");
-        const path = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder}`, selected: true, version: 'Vercors 2.0.0'}])
+        const path = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder + "\\vercors"}`, selected: true, version: 'Vercors 2.0.0'}])
         await testMock.WebviewViewProvider.receiveMessage({ command: "add-path" })
         Assert.failOnJsonEventAbsence([["command","loading"]],testMock.logger)
         Assert.failOnJsonEventAbsence([["command","add-paths"],["paths",path]],testMock.logger)    
@@ -63,9 +63,9 @@ suite('Path handling', async () => {
 
     test('remove correct Path', async () => {
         testMock.showFileDialogMocking("workingVercorsFolder");
-        const path = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder}`, selected: true, version: 'Vercors 2.0.0'}])
+        const path = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder + "\\vercors"}`, selected: true, version: 'Vercors 2.0.0'}])
         await testMock.WebviewViewProvider.receiveMessage({ command: "add-path" })
-        await testMock.WebviewViewProvider.receiveMessage({ command: "remove", path: mockedPaths.workingVercorsFolder })
+        await testMock.WebviewViewProvider.receiveMessage({ command: "remove", path: mockedPaths.workingVercorsFolder + "\\vercors" })
         testMock.logger = []
         await testMock.WebviewViewProvider.receiveMessage({ command: "ready" })
         Assert.failOnJsonEventAbsence([["command", "add-paths"],["paths","[]"]],testMock.logger) 
@@ -74,9 +74,9 @@ suite('Path handling', async () => {
 
     test('remove wrong Path', async () => {
         testMock.showFileDialogMocking("workingVercorsFolder");
-        const path = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder}`, selected: true, version: 'Vercors 2.0.0'}])
+        const path = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder + "\\vercors"}`, selected: true, version: 'Vercors 2.0.0'}])
         await testMock.WebviewViewProvider.receiveMessage({ command: "add-path" })
-        await testMock.WebviewViewProvider.receiveMessage({ command: "remove", path: mockedPaths.brokenVercorsFolder })
+        await testMock.WebviewViewProvider.receiveMessage({ command: "remove", path: mockedPaths.brokenVercorsFolder + "\\vercors"})
         testMock.logger = []
         await testMock.WebviewViewProvider.receiveMessage({ command: "ready" })
         Assert.failOnJsonEventAbsence([["command", "add-paths"],["paths",path]],testMock.logger) 
@@ -86,11 +86,11 @@ suite('Path handling', async () => {
 
     test('select correct Path', async () => {
         testMock.showFileDialogMocking("workingVercorsFolder");
-        const selectedPath = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder}`, selected: true, version: 'Vercors 2.0.0'}])
+        const selectedPath = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder + "\\vercors"}`, selected: true, version: 'Vercors 2.0.0'}])
         await testMock.WebviewViewProvider.receiveMessage({ command: "add-path" })
         testMock.logger = []
         testMock.fakeConfiguration["vercorsplugin.vercorsPath"][0].selected = false;
-        await testMock.WebviewViewProvider.receiveMessage({ command: "select", path: mockedPaths.workingVercorsFolder })
+        await testMock.WebviewViewProvider.receiveMessage({ command: "select", path: mockedPaths.workingVercorsFolder + "\\vercors" })
         await testMock.WebviewViewProvider.receiveMessage({ command: "ready" })
         Assert.failOnJsonEventAbsence([["command","add-paths"],["paths",selectedPath]],testMock.logger)
         Assert.isTrue(!testMock.isErrorMessageShown) 
@@ -98,11 +98,11 @@ suite('Path handling', async () => {
 
     test('select wrong Path', async () => {
         testMock.showFileDialogMocking("workingVercorsFolder");
-        const unselectedPath = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder}`, selected: false, version: 'Vercors 2.0.0'}])
+        const unselectedPath = JSON.stringify([{ path: `${mockedPaths.workingVercorsFolder + "\\vercors"}`, selected: false, version: 'Vercors 2.0.0'}])
         await testMock.WebviewViewProvider.receiveMessage({ command: "add-path" })
         testMock.fakeConfiguration["vercorsplugin.vercorsPath"][0].selected = false;
         testMock.logger = []
-        await testMock.WebviewViewProvider.receiveMessage({ command: "select", path: mockedPaths.brokenVercorsFolder })
+        await testMock.WebviewViewProvider.receiveMessage({ command: "select", path: mockedPaths.brokenVercorsFolder + "\\vercors"})
         Assert.failOnJsonEventAbsence([["command","add-paths"],["paths",unselectedPath]],testMock.logger)
         Assert.isTrue(!testMock.isErrorMessageShown) 
     });

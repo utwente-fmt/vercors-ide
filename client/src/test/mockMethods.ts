@@ -156,7 +156,7 @@ export class testMocking{
     public showFileDialogMocking<M extends keyof typeof mockedPaths>(folderPath: M ){
         var self = this; // because this is used in another function it doesn't work otherwise
         vscode.window.showOpenDialog = () => {return null} // to be able to stub it if it is already stubbed
-        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(self.createMockUri(mockedPaths[folderPath])));
+        sinon.stub(vscode.window, 'showOpenDialog').callsFake(() => Promise.resolve(self.createMockUri(mockedPaths[folderPath] + "\\vercors")));
     }
 
 
