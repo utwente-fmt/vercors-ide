@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import ProgressReceiver from "./progress-receiver";
 import VerCorsPathsProvider, { VerCorsPath } from "./vercors-paths-provider";
-import { webviewConnector } from './webviewConnector';
+import { webviewConnector } from './webview-connector';
 
 
 export default class VerCorsVersionWebviewProvider implements webviewConnector, ProgressReceiver {
@@ -81,7 +81,7 @@ export default class VerCorsVersionWebviewProvider implements webviewConnector, 
                     }
                 }
             )
-            .then((path: VerCorsPath): void => {
+            .then((path: VerCorsPath | undefined): void => {
                 if (path) {
                     if (!this.hasWebview()) {
                         vscode.window.showInformationMessage("VerCors version added");

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as sinon from 'sinon'
-import {VerCorsOptions,OptionFields} from "../VerCors-CLI-UI"
+import {VerCorsOptions,OptionFields} from "../vercors-options-webview"
 import VerCorsPathsProvider, { VerCorsPath, isEqualPath } from '../vercors-paths-provider';
 import {Assert} from './Assert';
 import {comparing} from '../comparing';

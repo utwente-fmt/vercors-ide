@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { comparing } from './comparing';
-import { webviewConnector } from './webviewConnector';
+import { webviewConnector } from './webview-connector';
 
 export type OptionFields = flagType & pinnedType & backendType;
 
