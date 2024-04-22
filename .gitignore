@@ -1,11 +1,13 @@
 out
 dist
 node_modules
+client/out
+client/node_modules
+server/out
+server/node_modules
 .vscode-test/
 *.vsix
-*.vsix
 .idea
-vercorsplugin-0.0.1.vsix
-client/tsconfig.tsbuildinfo
-server/tsconfig.tsbuildinfo
+.vscode
+*.tsbuildinfo
 .wdio-vscode-service

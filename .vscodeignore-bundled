@@ -16,3 +16,10 @@ README.md
 **/*.java
 **/*.pvl
 **/*.vsix
+
+node_modules/**
+client/node_modules/**
+client/src/**
+server/node_modules/**
+server/src/**
+scripts/**

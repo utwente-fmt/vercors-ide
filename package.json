@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/utwente-fmt/vercors-ide/"
   },
-  "publisher": "vscode-samples",
+  "publisher": "VerCors",
   "categories": [],
   "keywords": [
     "multi-root ready"
@@ -18,16 +18,22 @@
   "activationEvents": [
     "onLanguage:plaintext"
   ],
-  "main": "./client/out/extension.js",
+  "main": "./client/out/extension",
   "contributes": {
-      "snippets": [
-        {"language": "pvl",
-         "path": "./snippets.json"},
-         {"language": "java",
-         "path": "./snippets.json"},
-        {"language": "c",
-         "path": "./snippets.json"}
-      ],
+    "snippets": [
+      {
+        "language": "pvl",
+        "path": "./snippets.json"
+      },
+      {
+        "language": "java",
+        "path": "./snippets.json"
+      },
+      {
+        "language": "c",
+        "path": "./snippets.json"
+      }
+    ],
     "configuration": {
       "properties": {
         "languageServerExample.maxNumberOfProblems": {
@@ -110,7 +116,7 @@
         ]
       }
     ],
-    "keybindings":[
+    "keybindings": [
       {
         "command": "extension.runVercors",
         "key": "ctrl+shift+l",
@@ -192,21 +198,26 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "npm run client && npm run server",
+    "build": "npm run clean && vsce package --ignoreFile .vscodeignore-bundled",
+    "clean": "git clean -xfd client/out client/tsconfig.tsbuildinfo && git clean -xfd server/out client/tsconfig.tsbuildinfo",
+    "vscode:prepublish": "npm run esbuild",
+    "esbuild": "npm run esbuild-base -- --minify && npm run esbuild-server -- --minify",
+    "esbuild-base": "esbuild ./client/src/extension.ts --bundle --outfile=./client/out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild-server": "esbuild ./server/src/server.ts --bundle --outfile=./server/out/server.js --external:vscode --format=cjs --platform=node",
+    "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-    "test": "sh ./scripts/e2e.sh",
-    "client": "cd client && git clean -xfd out tsconfig.tsbuildinfo && npm run compile",
-    "server": "cd server && git clean -xfd out tsconfig.tsbuildinfo && npm run compile"
+    "test": "sh ./scripts/e2e.sh"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
     "@types/node": "^18.14.6",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
+    "@vscode/vsce": "^2.26.0",
     "chai": "^5.1.0",
+    "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
     "glob": "^10.3.10",
     "mocha": "^10.3.0",
