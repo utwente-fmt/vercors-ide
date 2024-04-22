@@ -5,8 +5,6 @@
 .gitignore
 .yarnrc
 vsc-extension-quickstart.md
-CHANGELOG.md
-README.md
 
 **/tsconfig.json
 **/.eslintrc.json
