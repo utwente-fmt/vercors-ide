@@ -4,7 +4,7 @@
 
 
 import * as sinon from 'sinon'
-import {VerCorsWebViewProvider} from '../../VerCors-CLI-UI';
+import {VerCorsWebViewProvider} from '../../vercors-options-webview';
 import {Assert} from '../Assert';
 import {beforeEach,afterEach} from 'mocha';
 import * as mock_fs from 'mock-fs'

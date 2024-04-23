@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from "fs";
-import { VerCorsOptions } from "./VerCors-CLI-UI";
+import { VerCorsOptions } from "./vercors-options-webview";
 import OutputParser from './output-parser';
 import VerCorsPathsProvider, { VerCorsPath } from "./vercors-paths-provider";
 

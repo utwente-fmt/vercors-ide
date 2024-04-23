@@ -4,7 +4,7 @@
  * An extention on the standard node assert 
 */
 
-import { OptionFields } from "../VerCors-CLI-UI";
+import { OptionFields } from "../vercors-options-webview";
 import { VerCorsPath } from "../vercors-paths-provider";
 
 export class Assert extends require("assert") {

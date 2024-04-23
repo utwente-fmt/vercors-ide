@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.84.0"
+    "node": "*"
   },
   "repository": {
     "type": "git",
@@ -15,7 +15,5 @@
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11"
   },
-  "scripts": {
-    "compile": "tsc -p ./"
-  }
+  "scripts": {}
 }

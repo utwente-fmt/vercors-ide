@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import { ExtensionContext, StatusBarAlignment, workspace } from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
 
-import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './VerCors-CLI-UI';
+import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './vercors-options-webview';
 import VerCorsVersionWebviewProvider from './vercors-version-webview';
 import StatusBar from "./status-bar";
 import VerCorsRunManager from "./vercors-run-manager";

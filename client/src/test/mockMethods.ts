@@ -2,10 +2,10 @@ import * as vscode from 'vscode'
 import * as sinon from 'sinon'
 import * as mock_fs from 'mock-fs'
 import * as fs from 'fs'
-import { VerCorsWebViewProvider } from '../VerCors-CLI-UI'
+import { VerCorsWebViewProvider } from '../vercors-options-webview'
 import { log } from 'console'
 import VerCorsVersionWebviewProvider from '../vercors-version-webview'
-import { webviewConnector } from '../webviewConnector'
+import { webviewConnector } from '../webview-connector'
 import kill = require('tree-kill');
 
 const projectStartPath = __dirname + "\\..\\..\\..\\.."

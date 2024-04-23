@@ -4,7 +4,7 @@
 
 import * as vscode from 'vscode';
 import * as sinon from 'sinon'
-import {VerCorsOptions,OptionFields} from "../../VerCors-CLI-UI"
+import {VerCorsOptions,OptionFields} from "../../vercors-options-webview"
 import {VerCorsPath} from '../../vercors-paths-provider';
 import VerCorsPathsProvider from '../../vercors-paths-provider';
 import { isEqualPath } from '../../vercors-paths-provider';

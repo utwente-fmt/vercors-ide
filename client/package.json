@@ -23,8 +23,5 @@
     "glob": "^8.0.3",
     "tree-kill": "^1.2.2",
     "glob-promise": "^6.0.5"
-  },
-  "scripts": {
-    "compile": "tsc -p ./"
   }
 }
