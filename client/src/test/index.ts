@@ -15,7 +15,7 @@ export async function run(): Promise<void> {
 	});
 	mocha.timeout(100000);
 
-	const testsRoot = __dirname + "/path and option tests";
+	const testsRoot = __dirname + "\\path and option tests";
 	await checkForCorrectSetup(mockedPaths.workingVercorsFolder);
 	return new Promise((resolve, reject) => {
 		// @ts-ignore
