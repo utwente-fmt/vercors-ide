@@ -265,8 +265,8 @@
                     // Only add the arguments for the custom flags option
                     optionsString.push(`--custom-flags [${args}]`);
                 } else if (checkboxPin.id === "backend-file-base") {
-                    // Only add the arguments for the custom flags option
-                    optionsString.push(`--backend-file-base ${backendFileBasePath + "\\" + args}`);
+                    // add selected path to the argument
+                    optionsString.push(`--backend-file-base [${backendFileBasePath ?? ""}](${args})`);
                 } else {
                     // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
                     optionsString.push(`--${checkbox.querySelector('input[type="checkbox"]').name} ${args}`);
@@ -325,8 +325,14 @@
                     // add argument value if there is one
                     const argumentInput = flagContainer.querySelector('input[type="text"]');
                     const argumentValue = argOptions["--" + checkbox.name];
-                    if (argumentInput) argumentInput.value =
-                        argumentValue ? argumentValue.replace(/[\[\]]/g, '') : "";
+                    if (argumentInput) {
+                        if (checkbox.name === "backend-file-base") {
+                            argumentInput.value = argumentValue ? argumentValue.match(/\(([^)]+)\)/)[1] : "";
+                        } else {
+                            argumentInput.value =
+                                argumentValue ? argumentValue.replace(/[\[\]]/g, '') : "";
+                        }
+                    }
                 })
             );
         // update pin checkboxes
@@ -404,7 +410,7 @@
             loadOptions(message.options, message.pinnedOptions,message.backendOption);
         } else if (message.command === 'setBackendFileBasePath') {
             backendFileBasePath = message.data;
-            console.log(backendFileBasePath);
+            generateOptionsMessage();
         }
     });
 
