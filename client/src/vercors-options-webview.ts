@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { comparing } from './comparing';
 import { webviewConnector } from './webview-connector';
+import { VerCorsPath } from "./vercors-paths-provider";
 
 export type OptionFields = flagType & pinnedType & backendType;
 
@@ -144,17 +145,43 @@ export class VerCorsWebViewProvider implements webviewConnector {
     }
 
     public async receiveMessage(message: any): Promise<void> {
-        if (message.command === 'updateOptions') {
-            const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
-            await VerCorsOptions.updateOptions(filePath!, message.options, message.pinnedOptions, message.backendOption);
-        } else if (message.command === 'viewLoaded') {
-            const data = await this.fetchCommandLineOptions();
-            this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
-            if (vscode.window.activeTextEditor !== undefined) {
-                this.updateView();
-            }
+        switch (message.command) {
+            case 'updateOptions':
+                const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;
+                await VerCorsOptions.updateOptions(filePath!, message.options, message.pinnedOptions, message.backendOption);
+                break;
+            case 'viewLoaded':
+                const data = await this.fetchCommandLineOptions();
+                this._view!.webview.postMessage({ command: 'loadAllOptions', data: data });
+                if (vscode.window.activeTextEditor !== undefined) {
+                    this.updateView();
+                }
+                break;
+            case 'setBackendFileBasePath':
+                await this.setBackendFileBasePath();
+                break;
         }
     };
+
+    public async setBackendFileBasePath(): Promise<void> {
+        return vscode.window.showOpenDialog({
+            canSelectFiles: false,
+            canSelectFolders: true,
+            canSelectMany: false
+        })
+            .then(async (fileUri: vscode.Uri[]): Promise<void> => {
+                if (!fileUri || !fileUri[0]) {
+                    return;
+                }
+
+                this._view!.webview.postMessage({
+                    command: 'setBackendFileBasePath',
+                    data: fileUri![0].fsPath
+                });
+            });
+    }
+
+
 
     private async getHtmlForWebview(_webview: vscode.Webview) {
         // Use a path relative to the extension's installation directory
