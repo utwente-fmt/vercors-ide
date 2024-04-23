@@ -200,7 +200,7 @@
   "scripts": {
     "build": "npm run clean && vsce package --ignoreFile .vscodeignore-bundled",
     "clean": "git clean -xfd client/out client/tsconfig.tsbuildinfo && git clean -xfd server/out server/tsconfig.tsbuildinfo",
-    "vscode:prepublish": "npm run esbuild",
+    "vscode:prepublish": "npm run compile",
     "esbuild": "npm run esbuild-base -- --minify && npm run esbuild-server -- --minify",
     "esbuild-base": "esbuild ./client/src/extension.ts --bundle --outfile=./client/out/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild-server": "esbuild ./server/src/server.ts --bundle --outfile=./server/out/server.js --external:vscode --format=cjs --platform=node",

@@ -47,6 +47,7 @@ export default class VerCorsPathsProvider {
 
     public async selectVersionFromDialog(beforeDetection?: () => void, onError?: () => void): Promise<VerCorsPath | undefined> {
         return vscode.window.showOpenDialog({
+            title: "Select VerCors executable",
             canSelectFiles: true,
             canSelectFolders: false,
             canSelectMany: false
