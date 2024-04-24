@@ -119,6 +119,7 @@
             background-color: var(--vscode-input-background);
             color: var(--vscode-input-foreground);
             border: 1px solid var(--vscode-input-border, transparent);
+            border-radius: 2px;
         }
 
         input[type="text"]:focus {
@@ -208,6 +209,14 @@
             flex-grow: 1;
         }
 
+        .arguments-input-container {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+
         .option-pin-container {
             height: 100%;
             box-sizing: border-box;
@@ -261,9 +270,11 @@
         }
 
         .argument-input {
-            max-width: 100px;
+            max-width: 130px;
             margin: 4px;
             box-sizing: border-box !important;
+            height: 24px;
+            padding: 3px;
         }
 
         .option-category {
@@ -277,9 +288,16 @@
         }
 
         .dir-input-button {
-            height: 20px;
-            padding: 1px 2px;
-            margin-right: -5px;
+            display: inline;
+            margin: 4px;
+            height: 24px;
+            padding: 3px;
+            box-sizing: border-box !important;
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border: 1px solid var(--vscode-input-border, transparent);
+            border-radius: 2px;
+            cursor: pointer;
         }
 
         .showAll {
@@ -482,8 +500,11 @@
     function updateBackendFileBaseButton(path = null) {
         backendFileBasePath = path;
         const button = document.getElementsByClassName("dir-input-button")[0];
+        const buttonSvg = button.querySelector("svg");
         button.title = path;
-        button.style.background = backendFileBasePath ? "var(--vscode-focusBorder)" : "#ffffff"
+        button.style.background = backendFileBasePath ? "var(--vscode-inputOption-activeBackground)" : "var(--vscode-input-background)";
+        buttonSvg.style.fill = "var(--vscode-input-foreground)";
+        button.style.outline = backendFileBasePath ? "1px solid var(--vscode-focusBorder)" : "none";
     }
 
     // Listen for messages from the extension
@@ -533,7 +554,7 @@
                             </div>
                             <div class="arguments-container">
                                 <div style="margin:4px">${value.name}</div>
-                                <div>
+                                <div class="arguments-input-container">
                                     ${input}
                                     ${arguments}
                                 </div>
