@@ -1,0 +1,23 @@
+{
+    "vercorsplugin.optionsMap": {
+        "c:\\Users\\jaron\\OneDrive - University of Twente\\Documenten\\Design Project\\vscode stuff\\vercors-ide-1\\examples\\arrays\\.vscode\\settings.json": {
+            "pinned": [
+                "--more"
+            ],
+            "flags": [
+                "--quiet",
+                "--backend-file-base"
+            ]
+        }
+    },
+    "vercorsplugin.vercorsPath": [
+        {
+            "path": "c:\\Users\\jaron\\OneDrive - University of Twente\\Documenten\\Design Project\\vercors-2.0.0-windows\\vercors-2.0.0\\bin",
+            "version": "Vercors 2.0.0",
+            "selected": true
+        }
+    ]
+
+
+
+}

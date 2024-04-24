@@ -11,3 +11,5 @@ server/node_modules
 .vscode
 *.tsbuildinfo
 .wdio-vscode-service
+client/src/test/fakeVercors
+
