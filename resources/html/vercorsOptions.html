@@ -25,7 +25,7 @@
             border-radius: 26px;
             overflow: hidden;
             position: relative;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             /*box-shadow: 0px 0px 8px 0px rgba(17, 17, 17, 0.34) inset;*/
             display: block;
             cursor: pointer;
@@ -50,7 +50,7 @@
             left: 2px;
             top: 2px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             box-shadow: 0 0 6px -2px #333333;
             padding: 5px 0;
         }
@@ -115,104 +115,180 @@
             color: #000;
         }
 
+        input[type="text"] {
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border: 1px solid var(--vscode-input-border, transparent);
+        }
+
+        input[type="text"]:focus {
+            outline-color: var(--vscode-focusBorder);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--vscode-input-placeholderForeground);
+        }
+
         /*checkbox styles*/
         .custom-checkbox {
-            /* Adjust width and height as needed */
+            -webkit-appearance: none;
             width: 21px;
             height: 21px;
             vertical-align: middle;
-            margin-right: 5px;
+            margin: 4px;
             box-sizing: border-box;
+            cursor: pointer;
+            background-color: var(--vscode-checkbox-background);
+            accent-color: var(--vscode-checkbox-foreground);
+            border: 1px solid var(--vscode-checkbox-border);
+            border-radius: 2px;
         }
 
-        .checkbox-container {
-            box-sizing: border-box;
-            margin-bottom: 10px;
-            display: none;
-            align-items: center;
-            cursor: pointer;
-        }
-        .checkbox-container:has(.custom-checkbox:checked) {
-            background-color: var(--vscode-checkbox-background) !important;
-            border-left: 5px solid #4CAF50 !important;
-            display: flex;
-        }
-        .checkbox-container:has(.checkbox-pin:checked) {
-            display: flex;
+        .custom-checkbox:checked {
+            /*background-color: var(--vscode-checkbox-foreground);*/
+            /*color: var(--vscode-checkbox-background);*/
+            -webkit-appearance: checkbox;
         }
 
         .option-container {
             box-sizing: border-box;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
+            margin: 0;
+            padding: 6px 0;
+            display: none;
+            /*min-height: 24px;*/
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--vscode-button-secondaryBackground);
         }
+
+        .option-container:has(.custom-checkbox:checked) {
+            background-color: var(--vscode-selection-background) !important;
+            display: flex;
+        }
+
+        .option-container:has(.option-pin:checked) {
+            display: flex;
+        }
+
+        .option-container:hover .pin-label svg {
+            fill: var(--vscode-input-placeholderForeground);
+            transition-duration: 0s;
+        }
+
+        .checkbox-container {
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
         .input-label {
             user-select: none;
             cursor: pointer;
         }
 
         .custom-checkbox:checked {
-            /* Styles when the checkbox is checked */
-            color: #e4e4e4; /* Change font color */
         }
-        .checkbox-pin-container {
+
+        .custom-checkbox:focus {
+            outline: none;
+        }
+
+        .arguments-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: row;
+            flex-grow: 1;
+        }
+
+        .option-pin-container {
+            height: 100%;
             box-sizing: border-box;
             display: none;
             align-items: center;
-            margin-left: auto; /* Align pin container to the right */
             cursor: pointer;
-            color: #ffffff;
+            flex-grow: 0;
+            flex-shrink: 0;
         }
-        .checkbox-pin {
+
+        .option-pin {
             display: none;
         }
 
-        .pin-label {
+        .pin-label{
             user-select: none;
             display: inline-block;
-            padding: 2px 4px;
+            padding: 2px;
+            margin: 2px;
             cursor: pointer; /* Add cursor pointer to make it clickable */
             transition: all 0.1s ease;
+            border-radius: 2px;
         }
+
         .pin-label svg {
-            fill: #fff;
+            fill: transparent;
+            float: right;
+            transition-duration: 0.2s;
         }
-        .checkbox-pin:checked + .pin-label svg {
-            fill: var(--vscode-button-background);
+
+        .option-pin:focus {
+            outline: none;
+        }
+
+        .option-pin:hover + .pin-label {
+            background-color: var(--vscode-inputOption-hoverBackground);
+        }
+
+        .option-pin:checked + .pin-label svg {
+            fill: var(--vscode-inputOption-activeForeground);
             transition: all 0.1s ease;
         }
-        .checkbox-pin:checked + .pin-label {
-            border-radius: 50%;
-            background: var(--vscode-commandCenter-debuggingBackground);
+
+        .option-pin:checked + .pin-label {
+            background-color: var(--vscode-inputOption-activeBackground);
+            transition: all 0.1s ease;
+            outline: 1px solid var(--vscode-focusBorder);
+        }
+
+        .option-pin:checked + .pin-label:hover {
+            /*background: var(--vscode-editorOverviewRuler-modifiedForeground);*/
             transition: all 0.1s ease;
         }
-        .checkbox-pin:checked + .pin-label:hover {
-            background: var(--vscode-editorOverviewRuler-modifiedForeground);
-            transition: all 0.1s ease;
-        }
+
         .argument-input {
-            margin-left: auto;
-            width: 55%;
+            max-width: 100px;
+            margin: 4px;
+            box-sizing: border-box !important;
         }
+
         .option-category {
             display: none;
             margin-top: 10px;
             user-select: none;
         }
+
         .option-category.show {
             display: flex;
         }
+
         .dir-input-button + .argument-input {
-            margin-left: auto;
-            width: calc(55% - 42px);
+            /*margin-left: auto;*/
+            width: calc(100px - 42px);
         }
+
         .dir-input-button {
             width: 35px;
             padding: 0 4px;
             box-sizing: border-box;
         }
+
         .showAll {
             display: flex !important;
         }
@@ -220,10 +296,19 @@
         #edit-options-button {
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
-            border: none;
+            border: 1px solid var(--vscode-button-background);
+            border-radius: 2px;
             cursor: pointer;
             width: 100%;
-            min-height: 30px;
+            max-width: 300px;
+            /*min-height: 30px;*/
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 18px;
+            padding: 4px;
+            text-align: center;
+            margin: 0 auto;
         }
     </style>
     <meta charset="UTF-8">
@@ -231,8 +316,7 @@
     <!-- You can add style here or link to an external stylesheet -->
 </head>
 <body>
-<h1>VerCors Options</h1>
-<form id="options-form" style="min-width: 355px">
+<form id="options-form">
     <div style="display:table; margin-bottom: 15px;" title="Set the backend to verify with (default: silicon)">
             <span class="backend-label"
                   style="padding-right: 15px; display: table-cell; vertical-align: middle;">Backend: </span>
@@ -241,8 +325,10 @@
             <label for="color_mode" data-on="Carbon" data-off="Silicon" class="btn-color-mode-switch-inner"></label>
         </label>
     </div>
+    <button id="edit-options-button" onclick="toggleAllOptions(this)" type="button" data-ishideoptions="true">
+        See all options
+    </button>
 </form>
-<button id="edit-options-button" onclick="toggleAllOptions(this)" data-ishideoptions = "true">See all options</button>
 </body>
 <script>
 
@@ -255,7 +341,7 @@
         let optionsPinString = [];
         let optionBackendString = "";
 
-        let checkboxContainers = document.getElementsByClassName('checkbox-container');
+        let checkboxContainers = document.getElementsByClassName('option-container');
 
         for (const checkbox of checkboxContainers) {
             const checkboxPin = checkbox.querySelector('input[type="checkbox"]');
@@ -274,7 +360,7 @@
             }
         }
 
-        let pinContainers = document.getElementsByClassName('checkbox-pin-container');
+        let pinContainers = document.getElementsByClassName('option-pin-container');
         for (const checkbox of pinContainers) {
             if (checkbox.querySelector('input[type="checkbox"]').checked) {
                 // Append the ID of the checkbox to the options string, we've set the ID to be the actual CLI option
@@ -284,10 +370,9 @@
 
         let backendOptionBox = document.getElementById("color_mode")
         let backendOptionLabel = document.querySelector('.btn-color-mode-switch-inner')
-        if(backendOptionBox.checked){
+        if (backendOptionBox.checked) {
             optionBackendString = backendOptionLabel.dataset.on.toLowerCase();
-        }
-        else{
+        } else {
             optionBackendString = backendOptionLabel.dataset.off.toLowerCase();
         }
         console.log(optionBackendString)
@@ -318,7 +403,7 @@
         const savedPinnedOptions = pinnedOptions.map(option => option.replace(/^--/, '').trim());
 
         // update option checkboxes
-        document.querySelectorAll('.checkbox-container')
+        document.querySelectorAll('.option-container')
             .forEach((flagContainer) => flagContainer.querySelectorAll('input[type="checkbox"]')
                 .forEach((checkbox) => {
                     checkbox.checked = savedOptions.includes(checkbox.name);
@@ -336,12 +421,12 @@
                 })
             );
         // update pin checkboxes
-        document.querySelectorAll('.checkbox-pin-container')
+        document.querySelectorAll('.option-pin-container')
             .forEach((pinContainer) => pinContainer.querySelectorAll('input[type="checkbox"]')
                 .forEach((checkbox) => checkbox.checked = savedPinnedOptions.includes(checkbox.name)
                 )
             );
-        
+
         document.getElementById("color_mode").checked = !backendOption
         updateCategoryHeaders();
     }
@@ -349,16 +434,16 @@
 
     function toggleAllOptions(button) {
         // Show all option checkboxes or hide all unchecked & unpinned
-        document.querySelectorAll(".checkbox-container").forEach((category) => category.classList.toggle("showAll"));
+        document.querySelectorAll(".option-container").forEach((category) => category.classList.toggle("showAll"));
         // Toggle pin boxes
-        document.querySelectorAll(".checkbox-pin-container").forEach((category) => category.classList.toggle("showAll"));
+        document.querySelectorAll(".option-pin-container").forEach((category) => category.classList.toggle("showAll"));
         // Show all headers
         document.querySelectorAll(".option-category").forEach((category) => category.classList.toggle("showAll"));
         this.updateCategoryHeaders();
 
         // flip button text
         button.dataset.ishideoptions = button.dataset.ishideoptions === "false";
-        button.textContent = button.dataset.ishideoptions === "true" ? "See all options": "Hide options";
+        button.textContent = button.dataset.ishideoptions === "true" ? "See all options" : "Hide options";
     }
 
 
@@ -407,7 +492,7 @@
     window.addEventListener('message', event => {
         const message = event.data;
         if (message.command === 'loadOptions') {
-            loadOptions(message.options, message.pinnedOptions,message.backendOption);
+            loadOptions(message.options, message.pinnedOptions, message.backendOption);
         } else if (message.command === 'setBackendFileBasePath') {
             backendFileBasePath = message.data;
             generateOptionsMessage();
@@ -423,7 +508,9 @@
             for (const [category, options] of Object.entries(message.data)) {
                 form.innerHTML += `<h2 class="option-category" id="${category}">${category}</h2>`;
                 for (const [key, value] of Object.entries(options)) {
-                    if (value.skip === true) continue;
+                    if (value.skip === true) {
+                        continue;
+                    }
                     const tooltip = value.description + (value.requirements && value.requirements.length > 0 ? `\nRequires ${value.requirements.toString()}` : ``);
                     const arguments = value.arguments !== undefined ? `<input type="text" name="${key}" placeholder="${value.arguments}" class="argument-input">` : ``;
                     const input = value.input !== undefined ?
@@ -434,17 +521,22 @@
                             </svg>
                         </button>` : ``;
                     const content =
-                        `<div class="checkbox-container ${category}" title="${tooltip}">
-                            <div class="option-container">
+                        `<div class="option-container ${category}" title="${tooltip}">
+                            <div class="checkbox-container">
                                 <input type="checkbox" id="${key}" name="${key}" class="custom-checkbox">
-                                <label class="input-label" for="${key}">${value.name}</label>
+                                <label class="input-label" for="${key}"></label>
                             </div>
-                            ${input}
-                            ${arguments}
-                            <div class="checkbox-pin-container">
-                                <input type="checkbox" id="${key}-pin" name="${key}" class="checkbox-pin visually-hidden">
-                                <label class="pin-label" for="${key}-pin">
-                                    <svg width="24" height="24" viewBox="0 0 128 128">
+                            <div class="arguments-container">
+                                <div style="margin:4px">${value.name}</div>
+                                <div>
+                                    ${input}
+                                    ${arguments}
+                                </div>
+                            </div>
+                            <div class="option-pin-container">
+                                <input type="checkbox" id="${key}-pin" name="${key}" class="option-pin visually-hidden">
+                                <label class="pin-label" for="${key}-pin" title="Pin">
+                                    <svg width="15" height="15" viewBox="0 0 128 128">
                                         <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" d="M83.88,0.451L122.427,39c0.603,0.601,0.603,1.585,0,2.188l-13.128,13.125 c-0.602,0.604-1.586,0.604-2.187,0l-3.732-3.73l-17.303,17.3c3.882,14.621,0.095,30.857-11.37,42.32 c-0.266,0.268-0.535,0.529-0.808,0.787c-1.004,0.955-0.843,0.949-1.813-0.021L47.597,86.48L0,122.867l36.399-47.584L11.874,50.76 c-0.978-0.98-0.896-0.826,0.066-1.837c0.24-0.251,0.485-0.503,0.734-0.753C24.137,36.707,40.376,32.917,54.996,36.8l17.301-17.3 l-3.733-3.732c-0.601-0.601-0.601-1.585,0-2.188L81.691,0.451C82.295-0.15,83.279-0.15,83.88,0.451L83.88,0.451z"/>
                                     </svg>
                                 </label>
@@ -456,7 +548,7 @@
             loaded = true;
 
             // On-change for option checkbox + label
-            document.querySelectorAll('.option-container').forEach(container => {
+            document.querySelectorAll('.checkbox-container').forEach(container => {
                 container.addEventListener('click', function (event) {
                     // Find the checkbox inside this container
                     const checkbox = this.querySelector('.custom-checkbox');
@@ -491,7 +583,7 @@
             });
 
             // On-change for the pin checkboxes.
-            document.querySelectorAll('.checkbox-pin').forEach(checkbox => {
+            document.querySelectorAll('.option-pin').forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
                     // Post new settings after change
                     generateOptionsMessage();
@@ -499,9 +591,9 @@
             });
             // On-change for the backend button
             document.getElementById('color_mode').addEventListener('change', function () {
-                    // Post new settings after change
-                    generateOptionsMessage();
-                });
+                // Post new settings after change
+                generateOptionsMessage();
+            });
         }
     });
 </script>

@@ -83,13 +83,13 @@
             padding: 4px;
             margin: 0 0 1px 0;
             line-height: 18px;
-            background-color: var(--vscode-input-background);
-            color: var(--vscode-input-foreground);
+            background-color: var(--vscode-dropdown-background);
+            color: var(--vscode-dropdown-foreground);
             border: 1px solid var(--vscode-input-border, transparent);
         }
 
         .option:hover {
-            background-color: var(--vscode-button-secondaryHoverBackground);
+            background-color: var(--vscode-inputOption-hoverBackground);
         }
 
         .option--content {
@@ -97,7 +97,7 @@
         }
 
         .option--button {
-            color: var(--vscode-button-secondaryForeground);
+            color: var(--vscode-inputOption-activeForeground);
             display: flex;
             flex-grow: 0;
             flex-shrink: 0;
@@ -109,7 +109,7 @@
         }
 
         .option--button:hover {
-            color: #f43131;
+            color: var(--vscode-debugIcon-stopForeground);
         }
 
         .option--version {
