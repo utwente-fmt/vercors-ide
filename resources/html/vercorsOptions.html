@@ -258,7 +258,6 @@
         }
 
         .option-pin:checked + .pin-label:hover {
-            /*background: var(--vscode-editorOverviewRuler-modifiedForeground);*/
             transition: all 0.1s ease;
         }
 
@@ -278,15 +277,10 @@
             display: flex;
         }
 
-        .dir-input-button + .argument-input {
-            /*margin-left: auto;*/
-            width: calc(100px - 42px);
-        }
-
         .dir-input-button {
-            width: 35px;
-            padding: 0 4px;
-            box-sizing: border-box;
+            height: 20px;
+            padding: 1px 2px;
+            margin-right: -5px;
         }
 
         .showAll {
@@ -401,6 +395,7 @@
 
         const savedOptions = regOptions.map(option => option.replace(/^--/, '').trim());
         const savedPinnedOptions = pinnedOptions.map(option => option.replace(/^--/, '').trim());
+        let resetBackendFileBaseButton = true;
 
         // update option checkboxes
         document.querySelectorAll('.option-container')
@@ -412,7 +407,13 @@
                     const argumentValue = argOptions["--" + checkbox.name];
                     if (argumentInput) {
                         if (checkbox.name === "backend-file-base") {
-                            argumentInput.value = argumentValue ? argumentValue.match(/\(([^)]+)\)/)[1] : "";
+                            const backendFileBaseRegex = /\[([^\]]*)]\(([^)]+)\)/;
+                            if (argumentValue) {
+                                const arguments = argumentValue.match(backendFileBaseRegex)
+                                this.updateBackendFileBaseButton(arguments[1]);
+                                argumentInput.value = arguments[2];
+                                resetBackendFileBaseButton = false;
+                            }
                         } else {
                             argumentInput.value =
                                 argumentValue ? argumentValue.replace(/[\[\]]/g, '') : "";
@@ -420,6 +421,7 @@
                     }
                 })
             );
+        if (resetBackendFileBaseButton) this.updateBackendFileBaseButton();
         // update pin checkboxes
         document.querySelectorAll('.option-pin-container')
             .forEach((pinContainer) => pinContainer.querySelectorAll('input[type="checkbox"]')
@@ -480,6 +482,13 @@
             command: 'setBackendFileBasePath'
         });
     }
+    function updateBackendFileBaseButton(path = null) {
+        backendFileBasePath = path;
+        const button = document.getElementsByClassName("dir-input-button")[0];
+        button.title = path;
+        button.style.background = backendFileBasePath ? "var(--vscode-focusBorder)" : "#ffffff"
+        generateOptionsMessage();
+    }
 
     // Listen for messages from the extension
     window.addEventListener('DOMContentLoaded', () => {
@@ -494,8 +503,7 @@
         if (message.command === 'loadOptions') {
             loadOptions(message.options, message.pinnedOptions, message.backendOption);
         } else if (message.command === 'setBackendFileBasePath') {
-            backendFileBasePath = message.data;
-            generateOptionsMessage();
+            updateBackendFileBaseButton(message.data);
         }
     });
 
@@ -515,7 +523,7 @@
                     const arguments = value.arguments !== undefined ? `<input type="text" name="${key}" placeholder="${value.arguments}" class="argument-input">` : ``;
                     const input = value.input !== undefined ?
                         `<button type="button" class="dir-input-button" onclick="openDirectoryPicker()">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="100%" width="100%" id="Capa_1" viewBox="0 0 374.116 374.116" xml:space="preserve">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="100%" width="100%" id="upload_svg" viewBox="0 0 374.116 374.116" xml:space="preserve">
                                     <path d="M344.058,207.506c-16.568,0-30,13.432-30,30v76.609h-254v-76.609c0-16.568-13.432-30-30-30c-16.568,0-30,13.432-30,30   v106.609c0,16.568,13.432,30,30,30h314c16.568,0,30-13.432,30-30V237.506C374.058,220.938,360.626,207.506,344.058,207.506z"/>
                                     <path d="M123.57,135.915l33.488-33.488v111.775c0,16.568,13.432,30,30,30c16.568,0,30-13.432,30-30V102.426l33.488,33.488   c5.857,5.858,13.535,8.787,21.213,8.787c7.678,0,15.355-2.929,21.213-8.787c11.716-11.716,11.716-30.71,0-42.426L208.271,8.788   c-11.715-11.717-30.711-11.717-42.426,0L81.144,93.489c-11.716,11.716-11.716,30.71,0,42.426   C92.859,147.631,111.855,147.631,123.57,135.915z"/>
                             </svg>
@@ -593,6 +601,15 @@
             document.getElementById('color_mode').addEventListener('change', function () {
                 // Post new settings after change
                 generateOptionsMessage();
+            });
+
+            // On-change for the backend button
+            document.getElementById('backend-file-base').addEventListener('change', function () {
+                if (this.checked) {
+                    updateBackendFileBaseButton(backendFileBasePath)
+                } else {
+                    updateBackendFileBaseButton()
+                }
             });
         }
     });
