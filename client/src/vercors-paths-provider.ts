@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 import path = require('path');
 import { comparing } from './comparing';
-
+import kill = require('tree-kill');
 export type VerCorsPath = {
     path: string,
     version: string,
@@ -47,6 +47,7 @@ export default class VerCorsPathsProvider {
 
     public async selectVersionFromDialog(beforeDetection?: () => void, onError?: () => void): Promise<VerCorsPath | undefined> {
         return vscode.window.showOpenDialog({
+            title: "Select VerCors executable",
             canSelectFiles: true,
             canSelectFolders: false,
             canSelectMany: false
@@ -148,7 +149,7 @@ export default class VerCorsPathsProvider {
 }
 
 function killPid(pid: number): void {
-    const kill = require('tree-kill');
+
     kill(pid, 'SIGINT');
 }
 

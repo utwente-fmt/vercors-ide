@@ -200,16 +200,16 @@
   },
   "scripts": {
     "build": "npm run clean && vsce package --ignoreFile .vscodeignore-bundled",
-    "clean": "git clean -xfd client/out client/tsconfig.tsbuildinfo && git clean -xfd server/out client/tsconfig.tsbuildinfo",
-    "vscode:prepublish": "npm run esbuild",
+    "clean": "git clean -xfd client/out client/tsconfig.tsbuildinfo && git clean -xfd server/out server/tsconfig.tsbuildinfo",
+    "vscode:prepublish": "npm run compile",
     "esbuild": "npm run esbuild-base -- --minify && npm run esbuild-server -- --minify",
     "esbuild-base": "esbuild ./client/src/extension.ts --bundle --outfile=./client/out/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild-server": "esbuild ./server/src/server.ts --bundle --outfile=./server/out/server.js --external:vscode --format=cjs --platform=node",
-    "compile": "tsc -b",
-    "watch": "tsc -b -w",
+    "compile": "npm run clean && tsc -b",
+    "watch": "npm run clean && tsc -b -w",
     "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
     "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-    "test": "sh ./scripts/e2e.sh"
+    "test": "npm run clean && npm run compile && sh ./scripts/e2e.sh"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
@@ -225,7 +225,12 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "async-wait-until": "^2.0.12",
+    "eventemitter3": "^5.0.1",
     "expect.js": "^0.3.1",
-    "sinon": "^17.0.1"
+    "mock-fs": "^5.2.0",
+    "sinon": "^17.0.1",
+    "wait-for-event": "^2.0.1",
+    "wdio": "^6.0.1"
   }
 }

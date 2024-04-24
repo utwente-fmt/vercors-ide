@@ -2,6 +2,11 @@
 <html lang="end">
 <head>
     <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
         #progress-bar-container {
             width: 100%;
             opacity: 0;
@@ -14,7 +19,7 @@
             width: 0;
             box-sizing: border-box;
             margin: 0;
-            background-color: #4CAF50;
+            background-color: var(--vscode-debugIcon-startForeground);
             text-align: right;
             color: var(--vscode-editor-background);
             line-height: 20px;
@@ -27,13 +32,29 @@
             font-style: italic;
         }
 
+        #container {
+            align-items: center;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            padding: 0 20px 1em;
+        }
+
         button {
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
-            border: none;
+            border: 1px solid var(--vscode-button-background);
+            border-radius: 2px;
             cursor: pointer;
             width: 100%;
-            min-height: 30px;
+            max-width: 300px;
+            /*min-height: 30px;*/
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 18px;
+            padding: 4px;
+            text-align: center;
         }
 
         button:hover {
@@ -43,20 +64,28 @@
         ul {
             list-style: none;
             padding: 0;
+            /*margin: 0;*/
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             width: 100%;
         }
 
         .option {
+            /*font-size: 13px;*/
             cursor: pointer;
             display: flex;
             justify-content: flex-start;
             align-items: center;
             width: 100%;
             box-sizing: border-box;
-            padding: 0;
+            padding: 4px;
             margin: 0 0 1px 0;
-            background-color: var(--vscode-button-secondaryBackground);
-            color: var(--vscode-button-secondaryForeground);
+            line-height: 18px;
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border: 1px solid var(--vscode-input-border, transparent);
         }
 
         .option:hover {
@@ -64,15 +93,11 @@
         }
 
         .option--content {
-            padding: 5px 5px 5px 0;
             word-break: break-all;
         }
 
         .option--button {
-            font-size: 15px;
             color: var(--vscode-button-secondaryForeground);
-            height: 25px;
-            width: 25px;
             display: flex;
             flex-grow: 0;
             flex-shrink: 0;
@@ -80,6 +105,7 @@
             align-items: center;
             justify-content: center;
             padding: 0;
+            margin-right: 4px;
         }
 
         .option--button:hover {
@@ -87,8 +113,8 @@
         }
 
         .option--version {
-            font-weight: bold;
-            color: var(--vscode-foreground);
+            /*font-weight: bold;*/
+            /*color: var(--vscode-foreground);*/
         }
 
         .option--path {
@@ -169,30 +195,32 @@
     <title></title>
 </head>
 <body>
-<div id="progress-bar-container">
-    <div id="progress-bar"></div>
-    <div id="loading2" style="display:none;">
+<div id="container">
+    <div id="progress-bar-container">
+        <div id="progress-bar"></div>
+        <div id="loading2" style="display:none;">
+            <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        <span id="progress-step"></span>
+    </div>
+    <p>
+        Add a VerCors version by selecting the VerCors binary executable using the button below.
+    </p>
+    <button id="button">Add VerCors Version</button>
+    <ul id="path-list">
+    </ul>
+    <div id="loading" style="display:none;">
         <div class="lds-ellipsis">
             <div></div>
             <div></div>
             <div></div>
             <div></div>
         </div>
-    </div>
-    <span id="progress-step"></span>
-</div>
-<p>
-    Add a VerCors version by selecting the VerCors binary executable using the button below.
-</p>
-<button id="button">Add VerCors Version</button>
-<ul id="path-list">
-</ul>
-<div id="loading" style="display:none;">
-    <div class="lds-ellipsis">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
     </div>
 </div>
 </body>
@@ -256,7 +284,9 @@
                 progressBarContainer.style.opacity = '0';
                 progressBar.innerText = '';
                 progressStep.innerText = '';
-                setTimeout(function() { progressBar.style.width = '0'; }, 300);
+                setTimeout(function () {
+                    progressBar.style.width = '0';
+                }, 300);
 
             } else {
                 progressBar.innerText = value;
@@ -302,7 +332,7 @@
             let displayedPath;
             if (versionSet.has(entry.version)) {
                 const split = path.split(/\\\\|\\|\//);
-                const shortPath = '.../' + split.slice(split.length - 3, split.length).join('/');
+                const shortPath = '.../' + split.slice(Math.max(0, split.length - 4), split.length).join('/');
                 displayedPath = `<br>${shortPath}`;
             } else {
                 displayedPath = '';
