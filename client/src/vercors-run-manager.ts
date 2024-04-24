@@ -73,8 +73,6 @@ export default class VerCorsRunManager {
         // Always execute in progress & verbose mode for extension features to work.
         args.push("--progress");
         args.push("--verbose");
-        args.push("--more");
-
 
         // Create the output channel if it doesn't exist
         if (!this.outputChannel) {

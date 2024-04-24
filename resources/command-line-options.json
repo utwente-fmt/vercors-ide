@@ -39,6 +39,10 @@
       "description": "Instruct VerCors to verify the given files (default)",
       "skip": true
     },
+    "more": {
+      "name": "More Errors",
+      "description": "Always print the maximum amount of information about errors."
+    },
     "lang": {
       "name": "Language",
       "description": "{silver, pvl, llvm, i, java, c, systemc} Do not detect the language from the file extension, but force a specific language parser for all files",
