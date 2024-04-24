@@ -1,5 +1,3 @@
-
-
 /**
  * An extention on the standard node assert 
 */

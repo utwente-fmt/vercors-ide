@@ -1,12 +1,11 @@
 import * as kill from 'tree-kill'
 
-export async function checkForCorrectSetup(vercorsBinPath: string){
+export async function checkForCorrectSetup(vercorsBinPath: string) {
     await isFakeVercorsCreatedProperly(vercorsBinPath);
 }
 
 
-
-async function isFakeVercorsCreatedProperly(vercorsBinPath: string){
+async function isFakeVercorsCreatedProperly(vercorsBinPath: string) {
     await new Promise<string>((resolve, reject): void => {
         try {
             const childProcess = require('child_process');

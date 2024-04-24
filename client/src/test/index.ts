@@ -5,8 +5,8 @@
 import * as path from 'path';
 import * as Mocha from 'mocha';
 import * as glob from 'glob';
-import {mockedPaths} from './mockMethods'
-import { checkForCorrectSetup } from './testSetup';
+import {mockedPaths} from './mock-methods'
+import { checkForCorrectSetup } from './test-setup';
 export async function run(): Promise<void> {
 	// Create the mocha test
 	const mocha = new Mocha({
