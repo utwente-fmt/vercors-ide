@@ -76,7 +76,8 @@
         "id": "pvl",
         "extensions": [
           ".pvl"
-        ]
+        ],
+        "configuration": "./language-configuration.json"
       },
       {
         "id": "java",
