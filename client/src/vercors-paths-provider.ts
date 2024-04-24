@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 import path = require('path');
 import { comparing } from './comparing';
-
+import kill = require('tree-kill');
 export type VerCorsPath = {
     path: string,
     version: string,
@@ -149,7 +149,7 @@ export default class VerCorsPathsProvider {
 }
 
 function killPid(pid: number): void {
-    const kill = require('tree-kill');
+
     kill(pid, 'SIGINT');
 }
 

@@ -127,7 +127,7 @@ async function startClient(context: vscode.ExtensionContext) {
 /**
  * Method called when the extension is deactivated
  */
-function deactivate() {
+export function deactivate() {
 }
 
 module.exports = {
