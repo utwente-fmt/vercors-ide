@@ -407,13 +407,11 @@
                     const argumentValue = argOptions["--" + checkbox.name];
                     if (argumentInput) {
                         if (checkbox.name === "backend-file-base") {
-                            const backendFileBaseRegex = /\[([^\]]*)]\(([^)]+)\)/;
-                            if (argumentValue) {
-                                const arguments = argumentValue.match(backendFileBaseRegex)
-                                this.updateBackendFileBaseButton(arguments[1]);
-                                argumentInput.value = arguments[2];
-                                resetBackendFileBaseButton = false;
-                            }
+                            const args1 = argumentValue ? argumentValue.match(/\[([^\]]*)]/) : null; // match path from inside []
+                            const args2 = argumentValue ? argumentValue.match(/\(([^)]+)\)/) : null; // match file extension from inside ()
+                            updateBackendFileBaseButton(args1 ? args1[1] : null);
+                            argumentInput.value = args2 ? args2[1] : "";
+                            resetBackendFileBaseButton = false;
                         } else {
                             argumentInput.value =
                                 argumentValue ? argumentValue.replace(/[\[\]]/g, '') : "";
@@ -487,7 +485,6 @@
         const button = document.getElementsByClassName("dir-input-button")[0];
         button.title = path;
         button.style.background = backendFileBasePath ? "var(--vscode-focusBorder)" : "#ffffff"
-        generateOptionsMessage();
     }
 
     // Listen for messages from the extension
@@ -504,6 +501,7 @@
             loadOptions(message.options, message.pinnedOptions, message.backendOption);
         } else if (message.command === 'setBackendFileBasePath') {
             updateBackendFileBaseButton(message.data);
+            generateOptionsMessage();
         }
     });
 
