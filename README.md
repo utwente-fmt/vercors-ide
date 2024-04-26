@@ -2,8 +2,6 @@
 
 This is a plugin for the verification tool VerCors. It supports basic functionality such as syntax highlighting for PVL and executing the tool directly from VSCode.
 
-## Features
-
 ## Featues
 This plugin allows has the following features:
 - Select and switch VerCors versions from installed versions
