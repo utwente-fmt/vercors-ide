@@ -61,10 +61,12 @@ function generateCompletionArrayPVL(){
 		label: item.match,
 		kind: CompletionItemKind.Text,
 		data: index,
-		detail: 'java',
-		documentation: 'java autocompletion'
+		detail: 'specification',
+		documentation: 'specification autocompletion'
 	  };
+	  supportedLanguages.pvl.push(output);
 	  supportedLanguages.java.push(output);
+	  supportedLanguages.c.push(output);
 	}
 }
 generateCompletionArrayPVL()
