@@ -77,7 +77,7 @@
         "extensions": [
           ".pvl"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./syntaxes/language-configuration.json"
       },
       {
         "id": "java",
