@@ -1,6 +1,6 @@
 # VerCors VS Code integration
 
-## Featues
+## Features
 This plugin allows has the following features:
 - Select and switch VerCors versions from installed versions
 - Execute the vercors command on the currently focused file
@@ -14,4 +14,3 @@ This plugin allows has the following features:
 ## Quick start
 1. Open a PVL, java or C file with method contracts (more info on VerCors can be found on https://vercors.ewi.utwente.nl/wiki/)
 2. Open the VerCors plugin window in the activity bar and press ▷ (`Ctrl+Shift+L`)
-

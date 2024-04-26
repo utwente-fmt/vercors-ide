@@ -1,8 +1,6 @@
-# vercorsplugin README
-
 This is a plugin for the verification tool VerCors. It supports basic functionality such as syntax highlighting for PVL and executing the tool directly from VSCode.
 
-## Featues
+## Features
 This plugin allows has the following features:
 - Select and switch VerCors versions from installed versions
 - Execute the vercors command on the currently focused file
@@ -17,30 +15,22 @@ This plugin allows has the following features:
 
 The only requirement is having `npm` installed. The plugin is known to work with `npm` version 10.2.4. For installing `npm` one option is `nvm`: <https://github.com/nvm-sh/nvm>.
 
-## Known Issues
+## Running/building the plugin
 
-## Building and Running instructions
+Running the plugin can be done from within VS Code or by installing the vsix file.
 
-First execute:
+### Running from VS Code
 
-### `npm install`
+1. Execute `npm install`
+2. Press ▷ to run the launch config (F5).
 
-Then
-- Press ▷ to run the launch config (F5).
+### Building and installing the plugin
 
-## Installing the plugin 
-
-### `code --install-extension vercorsplugin-0.0.1.vsix`
-
-
-## To export a .vsix file:
-
-### `npm install @vscode/vsce`
-Then use
-### `vsce package`
-
+1. Execute `npm install`
+2. Run `npm run build`
+3. Run `code --install-extension vercorsplugin-0.0.1.vsix`
 
 ## Testing
 
-To test the plugin, go to VS Code's 'Run and Debug' window and select `Extension Tests` from the dropdown menu
+To run all tests, go to VS Code's 'Run and Debug' window and select `Extension Tests` from the dropdown menu
 
