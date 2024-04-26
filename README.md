@@ -4,20 +4,22 @@ This is a plugin for the verification tool VerCors. It supports basic functional
 
 ## Features
 
+## Featues
 This plugin allows has the following features:
-- Set the path to their local vercors binary
+- Select and switch VerCors versions from installed versions
 - Execute the vercors command on the currently focused file
-- Provides syntax highlighting for `.pvl` files (tmLanguage file generation was done semi-automatically with a module of VerCors, which is currently on the text=mate-generator branch of the VerCors Repo)
-- Hyper links to sources of errors in error messages
-- Partial support for providing cli options, unique to each open pvl file
+- Provides syntax highlighting for `.pvl` files 
+- Provides syntax highlighting for verification language (method contracts) in java & C files
+- Provides autocomplete and snippets for verification language
+- Graphically selecting CLI options, unique to each open file
+- Sources of errors are displayed in the file and in the problem
+- Display progress of verification and manually stop
 
 ## Requirements
 
 The only requirement is having `npm` installed. The plugin is known to work with `npm` version 10.2.4. For installing `npm` one option is `nvm`: <https://github.com/nvm-sh/nvm>.
 
 ## Known Issues
-
-### CLI Options functionality is only partially implemented. The "Backend silicon/carbon" option is currently only in the UI. Numerous other options are not included. The configuration is not saved in the workspace and thus does not persist after shutting down VSCode.
 
 ## Building and Running instructions
 
@@ -42,5 +44,5 @@ Then use
 
 ## Testing
 
-There are currently no automatic tests for this plugin.
+To test the plugin, go to VS Code's 'Run and Debug' window and select `Extension Tests` from the dropdown menu
 
