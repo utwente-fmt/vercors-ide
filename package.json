@@ -23,15 +23,15 @@
     "snippets": [
       {
         "language": "pvl",
-        "path": "./snippets.json"
+        "path": "./syntaxes/snippets.json"
       },
       {
         "language": "java",
-        "path": "./snippets.json"
+        "path": "./syntaxes/snippets.json"
       },
       {
         "language": "c",
-        "path": "./snippets.json"
+        "path": "./syntaxes/snippets.json"
       }
     ],
     "configuration": {
