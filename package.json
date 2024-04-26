@@ -77,7 +77,7 @@
         "extensions": [
           ".pvl"
         ],
-        "configuration": "./syntaxes/language-configuration.json"
+        "configuration": "./syntaxes/pvl-language-configuration.json"
       },
       {
         "id": "java",
@@ -102,14 +102,14 @@
         "path": "./syntaxes/pvl.tmLanguage.json"
       },
       {
-        "path": "./syntaxes/spec_injection_grammar.tmLanguage.json",
+        "path": "./syntaxes/spec-injection-grammar.tmLanguage.json",
         "scopeName": "source.specification",
         "injectTo": [
           "source.pvl"
         ]
       },
       {
-        "path": "syntaxes/comment_injection_java_c.tmLanguage.json",
+        "path": "syntaxes/comment-injection-java-c.tmLanguage.json",
         "scopeName": "java-comment-spec.injection",
         "injectTo": [
           "source.java",

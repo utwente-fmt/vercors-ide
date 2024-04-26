@@ -24,8 +24,8 @@ import {
 } from 'vscode-languageserver-textdocument';
 
 
-import PVLsyntax from '../../syntaxes/languageServerPVLMatches.json';
-import JAVAsyntax from '../../syntaxes/languageServerJAVA&CMatches.json'; 
+import PVLsyntax from '../../syntaxes/language-server-pvl-matches.json';
+import JAVAsyntax from '../../syntaxes/language-server-java-c-matches.json';
 
 
 const supportedLanguages = {pvl:[], java:[], c:[]}
