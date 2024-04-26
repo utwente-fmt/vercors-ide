@@ -198,7 +198,7 @@
     }
   },
   "scripts": {
-    "build": "npm run clean && vsce package --ignoreFile .vscodeignore-bundled",
+    "build": "npm run clean && vsce package --ignoreFile .vscodeignore-bundled --readme-path INFO.md",
     "clean": "git clean -xfd client/out client/tsconfig.tsbuildinfo && git clean -xfd server/out server/tsconfig.tsbuildinfo",
     "vscode:prepublish": "npm run compile",
     "esbuild": "npm run esbuild-base -- --minify && npm run esbuild-server -- --minify",
