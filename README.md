@@ -32,5 +32,8 @@ Running the plugin can be done from within VS Code or by installing the vsix fil
 
 ## Testing
 
-To run all tests, go to VS Code's 'Run and Debug' window and select `Extension Tests` from the dropdown menu
+To run all tests, go to VS Code's 'Run and Debug' window and select `Extension Tests` from the dropdown menu.
+
+The tests require VerCors to be installed in  `client/src/test/fakeVercors`.
+This can also be done using a symlink.
 
