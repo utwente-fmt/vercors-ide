@@ -52,6 +52,8 @@
     },
     "backend-file-base": {
       "name": "Backend File Base",
+      "input": "path",
+      "arguments": "<file name prefix>",
       "description": "In addition to verification, output the resulting ASTs for the backend to files, appended with -<number>.<extension>"
     },
     "backend-debug": {

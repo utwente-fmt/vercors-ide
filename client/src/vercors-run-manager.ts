@@ -50,11 +50,19 @@ export default class VerCorsRunManager {
         let inputFile: string = '"' + filePath + '"';
 
         // extract custom options if there are any
+        const backendFileBaseRegex: RegExp = /--backend-file-base \[([^\]]*)]\(([^)]+)\)/;
         const customFlagsRegex: RegExp = /--custom-flags \[([^\]]*)]/;
         for (let i = 0; i < fileOptions.length; i++) {
-            const matches: RegExpMatchArray = fileOptions[i].match(customFlagsRegex);
-            if (matches) {
-                fileOptions[i] = matches[1]; // content between square brackets
+            const customFlagsMatcher: RegExpMatchArray = fileOptions[i].match(customFlagsRegex);
+            if (customFlagsMatcher) {
+                fileOptions[i] = customFlagsMatcher[1]; // content between square brackets
+            }
+            const backendFileBaseMatcher: RegExpMatchArray = fileOptions[i].match(backendFileBaseRegex);
+            if (backendFileBaseMatcher) {
+                const arg1: string = backendFileBaseMatcher[1].trim();
+                const arg2: string = backendFileBaseMatcher[2].trim();
+                const arg: string = arg1 ? `${arg1}\\${arg2}` : arg2;
+                fileOptions[i] = `--backend-file-base "${arg}"`;
             }
         }
 
