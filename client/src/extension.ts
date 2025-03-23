@@ -81,23 +81,17 @@ async function activate(context: vscode.ExtensionContext): Promise<void> {
 }
 
 async function startClient(context: vscode.ExtensionContext) {
-    // The server is implemented in node
-    const serverModule = context.asAbsolutePath(
-        path.join("server", "out", "server.js")
-    );
-
-    // If the extension is launched in debug mode then the debug server options are used
-    // Otherwise the run options are used
+    // Running lsp server)
     const serverOptions: ServerOptions = {
-        run: { module: serverModule, transport: TransportKind.ipc },
-        debug: {
-            module: serverModule,
-            transport: TransportKind.ipc,
-            options:{
-                execArgv: ['--nolazy', '--inspect=6009']
-            }
+        run: {
+          command: "\\\\wsl$\\Ubuntu-24.04\\home\\ysuof\\vercors\\out\\vercors\\main\\runScript.dest\\vercors",
+          args: ["--lsp"]
         },
-    };
+        debug: {
+          command: "\\\\wsl$\\Ubuntu-24.04\\home\\ysuof\\vercors\\out\\vercors\\main\\runScript.dest\\vercors",
+          args: ["--lsp", "--debug"]
+        }
+      };      
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
@@ -112,10 +106,10 @@ async function startClient(context: vscode.ExtensionContext) {
         },
     };
 
-    // Create the language client and start the client.
+    // Create the language client and start it
     const client = new LanguageClient(
-        "languageServerExample",
-        "Language Server Example",
+        "scalaLanguageServer",
+        "Scala Language Server",
         serverOptions,
         clientOptions
     );
