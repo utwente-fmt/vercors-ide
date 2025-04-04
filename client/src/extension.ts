@@ -84,11 +84,11 @@ async function startClient(context: vscode.ExtensionContext) {
     // Running lsp server)
     const serverOptions: ServerOptions = {
         run: {
-          command: "\\\\wsl$\\Ubuntu-24.04\\home\\ysuof\\vercors\\out\\vercors\\main\\runScript.dest\\vercors",
-          args: ["--lsp"]
+          command: "java",
+          args: ["-cp", "c:\\project\\out.jar;c:\\project\\vercors\\res\\universal\\res;c:\\project\\vercors\\res\\universal\\deps", "vct.main.Main", "--lsp"]
         },
         debug: {
-          command: "\\\\wsl$\\Ubuntu-24.04\\home\\ysuof\\vercors\\out\\vercors\\main\\runScript.dest\\vercors",
+          command: "\\\\wsl.localhost\\Ubuntu-24.04\\home\\ysuof\\IdeaProjects\\vercors\\out\\vercors\\main\\runScript.dest\\vercors",
           args: ["--lsp", "--debug"]
         }
       };      
