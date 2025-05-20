@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import ProgressReceiver from "./progress-receiver";
 import VerCorsPathsProvider, { VerCorsPath } from "./vercors-paths-provider";
 import { webviewConnector } from './webview-connector';
+import * as fs from 'fs';
+import * as path from 'path';
 
 
 export default class VerCorsVersionWebviewProvider implements webviewConnector, ProgressReceiver {
@@ -66,31 +68,59 @@ export default class VerCorsVersionWebviewProvider implements webviewConnector, 
         return this.sendPathsToWebview();
     }
 
-    public async addPath(): Promise<void> {
-        // Open folder dialog
-        return VerCorsPathsProvider.getInstance()
-            .selectVersionFromDialog(
-                (): void => {
-                    if (this.hasWebview()) {
-                        this.webview.postMessage({ command: 'loading' });
-                    }
-                },
-                (): void => {
-                    if (this.hasWebview()) {
-                        this.webview.postMessage({ command: 'cancel-loading' });
-                    }
-                }
-            )
-            .then((path: VerCorsPath | undefined): void => {
-                if (path) {
-                    if (!this.hasWebview()) {
-                        vscode.window.showInformationMessage("VerCors version added");
-                    } else {
-                        this.sendPathsToWebview();
-                    }
-                }
-            });
+     public async addPath(): Promise<void> {
+        const selection = await vscode.window.showOpenDialog({
+            canSelectFolders: true,
+            canSelectFiles: false,
+            openLabel: "Select VerCors Server Folder"
+        });
+
+        if (!selection || selection.length === 0) {
+            return;
+        }
+
+        const folder = selection[0].fsPath;
+        const jar = path.join(folder, "out.jar");
+        const res = path.join(folder, "res");
+        const deps = path.join(folder, "deps");
+
+        if (fs.existsSync(jar) && fs.existsSync(res) && fs.existsSync(deps)) {
+            await vscode.workspace.getConfiguration("vercors").update(
+                "serverPath",
+                folder,
+                vscode.ConfigurationTarget.Global
+            );
+            vscode.window.showInformationMessage(`VerCors server path set to: ${folder}`);
+        } else {
+            vscode.window.showErrorMessage("Selected folder is not a valid VerCors server (missing out.jar or res/universal).");
+        }
     }
+
+    // public async addPath(): Promise<void> {
+    //     // Open folder dialog
+    //     return VerCorsPathsProvider.getInstance()
+    //         .selectVersionFromDialog(
+    //             (): void => {
+    //                 if (this.hasWebview()) {
+    //                     this.webview.postMessage({ command: 'loading' });
+    //                 }
+    //             },
+    //             (): void => {
+    //                 if (this.hasWebview()) {
+    //                     this.webview.postMessage({ command: 'cancel-loading' });
+    //                 }
+    //             }
+    //         )
+    //         .then((path: VerCorsPath | undefined): void => {
+    //             if (path) {
+    //                 if (!this.hasWebview()) {
+    //                     vscode.window.showInformationMessage("VerCors version added");
+    //                 } else {
+    //                     this.sendPathsToWebview();
+    //                 }
+    //             }
+    //         });
+    // }
 
     private async selectPath(path: string): Promise<void> {
         return VerCorsPathsProvider.getInstance().selectPath(path)

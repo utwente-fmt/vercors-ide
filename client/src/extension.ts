@@ -7,6 +7,7 @@
  import { ExtensionContext, StatusBarAlignment, workspace } from 'vscode';
  import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
  import { ProgressType } from 'vscode-languageclient';
+ import * as fs from 'fs';
  
  
  import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './vercors-options-webview';
@@ -22,13 +23,6 @@
   */
  export async function activate(context: vscode.ExtensionContext): Promise<void> {
      await startClient(context);
-     // Check if the VerCors path is set
-     const vercorsPaths: VerCorsPath[] = await VerCorsPathsProvider.getInstance().getPathList();
-     if (!vercorsPaths.length) {
-         vscode.window.showWarningMessage(
-             "No VerCors binary paths are provided. Please provide one to run the tool."
-         );
-     }
  
      const vercorsStatusBarStartButton: vscode.StatusBarItem = vscode.window.createStatusBarItem(StatusBarAlignment.Left, 100);
      vercorsStatusBarStartButton.command = 'clientVerify';
@@ -122,20 +116,63 @@
  }
  
  async function startClient(context: vscode.ExtensionContext) {
+ const config = vscode.workspace.getConfiguration("vercors");
+ const vercorsRoot = config.get<string>("serverPath");
+ 
+ if (!vercorsRoot) {
+    vscode.window.showWarningMessage("VerCors server path is not set or invalid. Use 'Add VerCors Version' to set it.");
+    return;
+  }
+
+const jarPath = path.join(vercorsRoot, "out.jar");
+const resPath = path.join(vercorsRoot, "res");
+const depsPath = path.join(vercorsRoot, "deps");
+
+if (!fs.existsSync(jarPath) || !fs.existsSync(resPath) || !fs.existsSync(depsPath)) {
+    vscode.window.showWarningMessage("VerCors folder is incomplete. Must contain out.jar, res/, and deps/.");
+    return;
+}
+
+const classpath = [jarPath, resPath, depsPath].join(path.delimiter);
+
+
+    // // Resolve subpaths
+    // const jarPath = path.resolve(vercorsRoot, "out/vercors/main/assembly.dest/out.jar");
+    // const resPath = path.resolve(vercorsRoot, "res/universal/res");
+    // const depsPath = path.resolve(vercorsRoot, "res/universal/deps");
+
+    // // Optional safety check
+    // if (!fs.existsSync(jarPath)) {
+    //     vscode.window.showErrorMessage(`Could not find VerCors JAR at: ${jarPath}`);
+    //     return;
+    // }
+
+    // const classpath = [jarPath, resPath, depsPath].join(path.delimiter);
+    
      // Running lsp server)
-     const serverOptions: ServerOptions = {
-         run: {
-           command: "java",
-           args: ["-Xms1G","-Xss512m","-cp","/home/ysuof/IdeaProjects/vercors/out/vercors/main/assembly.dest/out.jar:/home/ysuof/IdeaProjects/vercors/res/universal/res:/home/ysuof/IdeaProjects/vercors/res/universal/deps",
-             "vct.main.Main",
-             "--lsp"
-           ]
-         },
-         debug: {
-           command: "/home/ysuof/IdeaProjects/vercors/out/vercors/main/runScript.dest/vercors",
-           args: ["--lsp", "--debug"]
-         }
-       };      
+    //  const serverOptions: ServerOptions = {
+    //      run: {
+    //        command: "java",
+    //        args: ["-Xms1G","-Xss512m","-cp","/home/ysuof/IdeaProjects/vercors/out/vercors/main/assembly.dest/out.jar:/home/ysuof/IdeaProjects/vercors/res/universal/res:/home/ysuof/IdeaProjects/vercors/res/universal/deps",
+    //          "vct.main.Main",
+    //          "--lsp"
+    //        ]
+    //      },
+    //      debug: {
+    //        command: "/home/ysuof/IdeaProjects/vercors/out/vercors/main/runScript.dest/vercors",
+    //        args: ["--lsp", "--debug"]
+    //      }
+    //    };      
+      const serverOptions: ServerOptions = {
+        run: {
+            command: "java",
+            args: ["-Xms1G", "-Xss512m", "-cp", classpath, "vct.main.Main", "--lsp"]
+        },
+        debug: {
+            command: "java",
+            args: ["-Xms1G", "-Xss512m", "-cp", classpath, "vct.main.Main", "--lsp", "--debug"]
+        }
+    };
  
      // Options to control the language client
      const clientOptions: LanguageClientOptions = {

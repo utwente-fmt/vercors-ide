@@ -16,9 +16,11 @@
     "vscode": "^1.84.0"
   },
   "activationEvents": [
-    "onLanguage:plaintext"
+    "onLanguage:plaintext",
+    "onLanguage:java",
+    "onCommand:vercors.lspVerify"
   ],
-  "main": "./client/out/extension",
+  "main": "./client/out/extension.js",
   "contributes": {
     "snippets": [
       {
@@ -35,39 +37,13 @@
       }
     ],
     "configuration": {
+      "type": "object",
+      "title": "VerCors Configuration",
       "properties": {
-        "languageServerExample.maxNumberOfProblems": {
-          "scope": "resource",
-          "type": "number",
-          "default": 100,
-          "description": "Controls the maximum number of problems produced by the server."
-        },
-        "languageServerExample.trace.server": {
-          "scope": "window",
+        "vercors.serverPath": {
           "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "verbose",
-          "description": "Traces the communication between VS Code and the language server."
-        },
-        "vercorsplugin.vercorsPath": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "default": [],
-          "description": "Paths to the VerCors bin directory"
-        },
-        "vercorsplugin.optionsMap": {
-          "type": [
-            "object",
-            "null"
-          ],
-          "default": {},
-          "description": "Options map for my extension."
+          "default": "",
+          "description": "Absolute path to the VerCors server folder (should contain the out.jar and res folders)."
         }
       }
     },
@@ -136,28 +112,13 @@
     ],
     "commands": [
       {
-        "command": "extension.runVercors",
-        "title": "Run Vercors",
-        "icon": {
-          "light": "resources\\run.svg",
-          "dark": "resources\\run.svg"
-        }
+        "command": "clientVerify",
+        "title": "VerCors: Verify via LSP"
       },
       {
-        "command": "extension.stopVercors",
-        "title": "Stop Vercors",
-        "icon": {
-          "light": "resources\\stop.svg",
-          "dark": "resources\\stop.svg"
-        }
-      },
-      {
-        "command": "extension.setVercorsPath",
-        "title": "Set VerCors Path"
-      },
-      {
-        "command": "extension.refreshEntry",
-        "title": "Refresh"
+        "command": "stopVerification",
+        "title": "Cancel VerCors Verification",
+        "category": "VerCors"
       }
     ],
     "viewsContainers": {

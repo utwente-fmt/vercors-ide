@@ -104,8 +104,7 @@ export default class VerCorsPathsProvider {
                 process.stdout.on('data', (data: Buffer | string): void => {
                     const str: string = data.toString();
                     killPid(pid);
-                    if (str.startsWith("Vercors")) {
-                        // remove newlines
+                    if (/vercors/i.test(str)) {
                         resolve(str.trim());
                     } else {
                         reject('Could not get VerCors version: ' + str);
