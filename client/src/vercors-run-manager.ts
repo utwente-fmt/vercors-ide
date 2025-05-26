@@ -49,22 +49,22 @@ export default class VerCorsRunManager {
         const fileOptions: string[] = VerCorsOptions.getSelectedOptions(filePath);
         let inputFile: string = '"' + filePath + '"';
 
-        // extract custom options if there are any
-        const backendFileBaseRegex: RegExp = /--backend-file-base \[([^\]]*)]\(([^)]+)\)/;
-        const customFlagsRegex: RegExp = /--custom-flags \[([^\]]*)]/;
-        for (let i = 0; i < fileOptions.length; i++) {
-            const customFlagsMatcher: RegExpMatchArray = fileOptions[i].match(customFlagsRegex);
-            if (customFlagsMatcher) {
-                fileOptions[i] = customFlagsMatcher[1]; // content between square brackets
-            }
-            const backendFileBaseMatcher: RegExpMatchArray = fileOptions[i].match(backendFileBaseRegex);
-            if (backendFileBaseMatcher) {
-                const arg1: string = backendFileBaseMatcher[1].trim();
-                const arg2: string = backendFileBaseMatcher[2].trim();
-                const arg: string = arg1 ? `${arg1}\\${arg2}` : arg2;
-                fileOptions[i] = `--backend-file-base "${arg}"`;
-            }
-        }
+        // // extract custom options if there are any
+        // const backendFileBaseRegex: RegExp = /--backend-file-base \[([^\]]*)]\(([^)]+)\)/;
+        // const customFlagsRegex: RegExp = /--custom-flags \[([^\]]*)]/;
+        // for (let i = 0; i < fileOptions.length; i++) {
+        //     const customFlagsMatcher: RegExpMatchArray = fileOptions[i].match(customFlagsRegex);
+        //     if (customFlagsMatcher) {
+        //         fileOptions[i] = customFlagsMatcher[1]; // content between square brackets
+        //     }
+        //     const backendFileBaseMatcher: RegExpMatchArray = fileOptions[i].match(backendFileBaseRegex);
+        //     if (backendFileBaseMatcher) {
+        //         const arg1: string = backendFileBaseMatcher[1].trim();
+        //         const arg2: string = backendFileBaseMatcher[2].trim();
+        //         const arg: string = arg1 ? `${arg1}\\${arg2}` : arg2;
+        //         fileOptions[i] = `--backend-file-base "${arg}"`;
+        //     }
+        // }
 
         // Check if we have options, don't check file extension if --lang is used
         if (!fileOptions || !fileOptions.some(option => option.includes("--lang"))) {

@@ -5,7 +5,7 @@ import { VerCorsPath } from "./vercors-paths-provider";
 
 export type OptionFields = flagType & pinnedType & backendType;
 
-enum backend { silicon = "--backend silicon", carbon = "--backend carbon"}
+enum backend { silicon = "silicon", carbon = "carbon"}
 
 type backendType = { backend: string };
 type pinnedType = { pinned: string[] };
@@ -14,6 +14,11 @@ type Options = pinnedType & backendType & Record<string, flagType>;
 
 export class VerCorsOptions {
 
+    // public static getSelectedOptions(filePath: string): Array<string> {
+    //     const selected = this.getFlagedOptions(filePath);
+    //     selected.push(this.getBackendOption());
+    //     return selected;
+    // }
     public static getSelectedOptions(filePath: string): Array<string> {
         const selected = this.getFlagedOptions(filePath);
         selected.push(this.getBackendOption());
@@ -42,8 +47,14 @@ export class VerCorsOptions {
         currentVercorsOptions[filePath] = { flags: vercorsOptions.map(e => e.trim()) };
         currentVercorsOptions["backend"] = backendOption;
         currentVercorsOptions["pinned"] = pinnedOptions;
-        console.log({ file: filePath, ...currentVercorsOptions[filePath] });
+        console.log({ file: filePath, ...currentVercorsOptions[filePath] }, "her");
+        console.log(vscode.workspace.getConfiguration(), "ochko");
+        console.log(currentVercorsOptions, "oh");
+       // const arr = currentVercorsOptions["path"]
+        //await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions[filePath] as any , true);
         await vscode.workspace.getConfiguration().update('vercorsplugin.optionsMap', currentVercorsOptions, true);
+        const updated = vscode.workspace.getConfiguration().get('vercorsplugin.optionsMap');
+console.log("[VerCors] Successfully updated optionsMap. Current value:", updated);
     }
 
     public static isSilicon() {
@@ -145,6 +156,8 @@ export class VerCorsWebViewProvider implements webviewConnector {
     }
 
     public async receiveMessage(message: any): Promise<void> {
+        //  vscode.window.showInformationMessage(`Message ${JSON.parse(message)}:`);
+         console.log(message,"Message");
         switch (message.command) {
             case 'updateOptions':
                 const filePath = vscode.window.activeTextEditor?.document.uri.fsPath;

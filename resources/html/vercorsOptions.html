@@ -360,7 +360,11 @@
                 const args = checkbox.querySelector('input[type="text"]') ? checkbox.querySelector('input[type="text"]').value : "";
                 if (checkboxPin.id === "custom-flags") {
                     // Only add the arguments for the custom flags option
-                    optionsString.push(`--custom-flags [${args}]`);
+                    //optionsString.push(`--custom-flags [${args}]`);
+                    const customArgs = args.trim().split(/\s+/);
+                    for (const arg of customArgs) {
+                        optionsString.push(arg);
+                    }
                 } else if (checkboxPin.id === "backend-file-base") {
                     // add selected path to the argument
                     optionsString.push(`--backend-file-base [${backendFileBasePath ?? ""}](${args})`);

@@ -44,7 +44,12 @@
           "type": "string",
           "default": "",
           "description": "Absolute path to the VerCors server folder (should contain the out.jar and res folders)."
-        }
+        },
+        "vercorsplugin.optionsMap": {
+      "type": "object",
+      "default": {},
+      "description": "Stores custom VerCors options per file or context."
+    }
       }
     },
     "languages": [

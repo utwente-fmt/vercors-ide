@@ -10,7 +10,7 @@
  import * as fs from 'fs';
  
  
- import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider } from './vercors-options-webview';
+ import { VerCorsWebViewProvider as VerCorsCLIWebViewProvider, VerCorsOptions } from './vercors-options-webview';
  import VerCorsVersionWebviewProvider from './vercors-version-webview';
  import StatusBar from "./status-bar";
  import VerCorsRunManager from "./vercors-run-manager";
@@ -43,12 +43,15 @@
        return;
      }
      const uri = editor.document.uri.toString();
- 
+     
+     const filePath = editor.document.uri.fsPath;
+     const options = VerCorsOptions.getAllFileOptions(filePath);
+     
      try {
        // Send the executeCommand request with the URI as the argument.
        await languageClient.sendRequest('workspace/executeCommand', {
          command: 'vercors.lspVerify',
-         arguments: [uri],
+         arguments: [uri, options],
          workDoneToken: "vercors-progress-token"
        } as any);
        //vscode.window.showInformationMessage("Verification command sent.");
