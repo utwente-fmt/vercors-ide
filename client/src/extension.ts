@@ -183,6 +183,8 @@ const classpath = [jarPath, resPath, depsPath].join(path.delimiter);
              { scheme: "file", language: "pvl" },
              { scheme: "file", language: "java" },
              { scheme: "file", language: "plaintext" },
+             { scheme: "file", language: "c" },         
+             { scheme: "file", language: "cpp" },
          ],
          synchronize: {
              // Notify the server about file changes to '.clientrc files contained in the workspace
