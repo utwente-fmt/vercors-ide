@@ -140,7 +140,7 @@ export class VerCorsWebViewProvider implements webviewConnector {
         webviewView.webview.html = await this.getHtmlForWebview(webviewView.webview);
 
         // Handle messages from the webview
-        webviewView.webview.onDidReceiveMessage(async message => this.receiveMessage(message))
+        webviewView.webview.onDidReceiveMessage(async message => this.receiveMessage(message));
     }
 
     public async receiveMessage(message: any): Promise<void> {

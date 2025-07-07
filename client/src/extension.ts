@@ -17,6 +17,33 @@
  import VerCorsPathsProvider, { VerCorsPath } from "./vercors-paths-provider";
  
  let languageClient: LanguageClient;
+ const verifiedRangesMap: Map<string, vscode.Range[]> = new Map();
+
+//  const verifiedDecorationType = vscode.window.createTextEditorDecorationType({
+//     isWholeLine: false,
+//     overviewRulerColor: 'green',
+//     overviewRulerLane: vscode.OverviewRulerLane.Left,
+//     light: {
+//         backgroundColor: 'rgba(0,255,0,0.1)'
+//     },
+//     dark: {
+//         backgroundColor: 'rgba(0,128,0,0.3)'
+//     },
+//     borderWidth: '1px',
+//     borderStyle: 'solid',
+//     borderColor: 'green',
+//     before: {
+//         contentText: '✓',
+//         margin: '0 0.5em 0 0',
+//         color: 'green'
+//     }
+// });
+
+const verifiedDecorationType = vscode.window.createTextEditorDecorationType({
+  backgroundColor: 'rgba(0, 255, 0, 0.2)',
+  isWholeLine: false
+});
+
  /**
   * Method called when the extension is activated
   * @param {vscode.ExtensionContext} context
@@ -116,6 +143,15 @@
      context.subscriptions.push(disposableVersionCommand);
  
      context.subscriptions.push(documentLinkProviderDisposable);
+
+     context.subscriptions.push(
+      vscode.workspace.onDidSaveTextDocument(doc => {
+        const uri = doc.uri.toString();
+        vscode.window.visibleTextEditors
+        .filter(ed => ed.document.uri.toString() === uri)
+        .forEach(ed => ed.setDecorations(verifiedDecorationType, []));
+    })
+  );
  }
  
  async function startClient(context: vscode.ExtensionContext) {
@@ -202,6 +238,58 @@ const classpath = [jarPath, resPath, depsPath].join(path.delimiter);
  
      // Start the client. This will also launch the server
      await languageClient.start();
+
+     
+// languageClient.onNotification('vercors/verifiedRange', (params: any) => {
+//     const uri = params.uri;
+//     const ranges = params.ranges;
+
+//     const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === uri);
+//     if (!editor) {
+//         console.warn(`No visible editor for ${uri}`);
+//         return;
+//     }
+
+//     const vscodeRanges = ranges.map((r: any) =>
+//         new vscode.Range(
+//             new vscode.Position(r.start.line, r.start.character),
+//             new vscode.Position(r.end.line, r.end.character)
+//         )
+//     );
+    
+//     if (!verifiedRangesMap.has(uri)) {
+//       verifiedRangesMap.set(uri, []);
+//     }
+//     const existing = verifiedRangesMap.get(uri)!;
+//     verifiedRangesMap.set(uri, existing.concat(vscodeRanges));
+//     // Apply the full set of verified ranges
+//     editor.setDecorations(verifiedDecorationType, verifiedRangesMap.get(uri)!);
+
+//     //editor.setDecorations(verifiedDecorationType, vscodeRanges);
+    
+// });
+
+languageClient.onNotification('vercors/verifiedRange', (params: any) => {
+  const uri = params.uri;
+  const ranges = params.ranges.map((r: any) =>
+    new vscode.Range(
+      new vscode.Position(r.start.line, r.start.character),
+      new vscode.Position(r.end.line, r.end.character)
+    )
+  );
+
+  const editor = vscode.window.visibleTextEditors.find(
+    e => e.document.uri.toString() === uri
+  );
+  if (!editor) {
+    console.warn(`No visible editor for ${uri}`);
+    return;
+  }
+
+  // **Clear any old** and **apply only the new** decorations:
+  editor.setDecorations(verifiedDecorationType, ranges);
+});
+
  
      languageClient.onProgress(
          new ProgressType<any>(),
@@ -210,6 +298,10 @@ const classpath = [jarPath, resPath, depsPath].join(path.delimiter);
            const statusBar = StatusBar.getInstance();
        
            if (progress.kind === 'begin') {
+             vscode.window.visibleTextEditors.forEach(ed =>
+              ed.setDecorations(verifiedDecorationType, [])
+            );
+             //verifiedRangesMap.clear();
              statusBar.updateProgress(0, '', progress.title ?? 'Verifying', '');
            } else if (progress.kind === 'report') {
              const percentage = progress.percentage ?? 0;
