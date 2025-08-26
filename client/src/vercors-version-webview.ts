@@ -69,32 +69,54 @@ export default class VerCorsVersionWebviewProvider implements webviewConnector, 
     }
 
      public async addPath(): Promise<void> {
-        const selection = await vscode.window.showOpenDialog({
-            canSelectFolders: true,
-            canSelectFiles: false,
-            openLabel: "Select VerCors Server Folder"
-        });
-
-        if (!selection || selection.length === 0) {
-            return;
-        }
-
-        const folder = selection[0].fsPath;
-        const jar = path.join(folder, "out.jar");
-        const res = path.join(folder, "res");
-        const deps = path.join(folder, "deps");
-
-        if (fs.existsSync(jar) && fs.existsSync(res) && fs.existsSync(deps)) {
-            await vscode.workspace.getConfiguration("vercors").update(
-                "serverPath",
-                folder,
-                vscode.ConfigurationTarget.Global
-            );
-            vscode.window.showInformationMessage(`VerCors server path set to: ${folder}`);
-        } else {
-            vscode.window.showErrorMessage("Selected folder is not a valid VerCors server (missing out.jar or res/universal).");
-        }
+    // 1) Pick a folder
+    const selection = await vscode.window.showOpenDialog({
+      canSelectFolders: true,
+      canSelectFiles: false,
+      canSelectMany: false,
+      openLabel: "Select VerCors Server Folder"
+    });
+    if (!selection?.[0]) {
+      return;
     }
+    const folder = selection[0].fsPath;
+
+    // 2) Your existing jar/res/deps checks
+    const jar  = path.join(folder, "out.jar");
+    const res  = path.join(folder, "res");
+    const deps = path.join(folder, "deps");
+    if (!fs.existsSync(jar) || !fs.existsSync(res) || !fs.existsSync(deps)) {
+      vscode.window.showErrorMessage(
+        "Selected folder is not a valid VerCors server (missing out.jar or res/deps)."
+      );
+      return;
+    }
+
+    // 3) Keep your LSP-startup setting
+    await vscode.workspace
+      .getConfiguration("vercors")
+      .update("serverPath", folder, vscode.ConfigurationTarget.Global);
+
+    // 4) Also push into vercorsplugin.vercorsPath so the webview list isn’t empty
+    const prov     = VerCorsPathsProvider.getInstance();
+    const existing = await prov.getPathList();
+
+    // un-select all, then add the new one as selected
+    existing.forEach(e => e.selected = false);
+    existing.push({
+      path:     folder,
+      version:  path.basename(folder),    // ← or call your detectVersion here
+      selected: true
+    });
+    await prov.storePathList(existing);
+
+    // 5) Rerender the webview (or show a notice if it’s not visible)
+    if (this.hasWebview()) {
+      this.sendPathsToWebview();
+    } else {
+      vscode.window.showInformationMessage(`VerCors server path set to: ${folder}`);
+    }
+  }
 
     // public async addPath(): Promise<void> {
     //     // Open folder dialog
@@ -149,17 +171,32 @@ export default class VerCorsVersionWebviewProvider implements webviewConnector, 
         });
     }
 
+    // private async sendPathsToWebview(): Promise<void> {
+    //     if (!this.hasWebview()) {
+    //         return;
+    //     }
+    //     return VerCorsPathsProvider.getInstance().getPathList()
+    //         .then((paths: VerCorsPath[]):void => {
+    //             this.webview.postMessage({
+    //                 command: 'add-paths',
+    //                 paths: paths
+    //             });
+    //         });
+    // }
     private async sendPathsToWebview(): Promise<void> {
         if (!this.hasWebview()) {
             return;
         }
-        return VerCorsPathsProvider.getInstance().getPathList()
-            .then((paths: VerCorsPath[]):void => {
-                this.webview.postMessage({
-                    command: 'add-paths',
-                    paths: paths
-                });
-            });
+
+        const allPaths = await VerCorsPathsProvider.getInstance().getPathList();
+        let toShow = allPaths.find(p => p.selected);
+        if (!toShow && allPaths.length) {
+            toShow = allPaths[allPaths.length - 1];
+        }
+        this.webview.postMessage({
+            command: 'add-paths',
+            paths: toShow ? [ toShow ] : []
+        });
     }
 
     private async getHtmlForWebview(): Promise<string> {

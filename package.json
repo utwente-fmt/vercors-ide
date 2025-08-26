@@ -40,6 +40,11 @@
       "type": "object",
       "title": "VerCors Configuration",
       "properties": {
+         "vercorsplugin.vercorsPath": {
+          "type": "array",
+          "default": [],
+          "description": "Keeps track of all added VerCors server folders (path + version + selected)."
+        },
         "vercors.serverPath": {
           "type": "string",
           "default": "",
