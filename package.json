@@ -113,7 +113,10 @@
         "scopeName": "java-comment-spec.injection",
         "injectTo": [
           "source.java",
-          "source.c"
+          "source.c",
+          "source.opencl",
+          "source.cuda-cpp",
+          "source.cpp"
         ]
       }
     ],
@@ -218,7 +221,7 @@
     "@typescript-eslint/parser": "^7.1.0",
     "@vscode/vsce": "^2.26.0",
     "chai": "^5.1.0",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.27.0",
     "eslint": "^8.57.0",
     "glob": "^10.3.10",
     "mocha": "^10.3.0",

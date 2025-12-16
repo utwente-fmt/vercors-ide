@@ -1,11 +1,11 @@
 {
   "scopeName": "java-comment-spec.injection",
-  "injectionSelector": "L:source.java,L:source.c",
+  "injectionSelector": "L:source.java,L:source.c,L:source.opencl,L:source.cuda,L:source.cpp",
   
   "patterns": [
       {
-        "begin": "\\/\\*[^@]*@",
-        "end": "\\*\\/",
+        "begin": "\\s*\\/\\*[^@]*@",
+        "end": "\\s*\\*\\/",
         "patterns": [
           {
             "name": "constant.character.escape.untitled",
@@ -17,7 +17,7 @@
         ]
       },
       {
-        "begin": "\\/\\/@",
+        "begin": "\\s*\\/\\/@",
         "end": "\\\n",
         "patterns": [
           {
