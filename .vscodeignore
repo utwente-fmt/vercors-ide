@@ -4,6 +4,10 @@
 
 .gitignore
 .yarnrc
+readme.md
+**/readme.md
+README.md
+**/README.md
 
 **/tsconfig.json
 **/.eslintrc.json
