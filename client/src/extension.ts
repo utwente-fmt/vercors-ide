@@ -184,14 +184,16 @@ async function startClient(context: vscode.ExtensionContext) {
 
   const classpath = [jarPath, resPath, depsPath].join(path.delimiter);
 
+  // TODO: We need a way to set the path to a specific Java version
+
   const serverOptions: ServerOptions = {
     run: {
       command: "java",
-      args: ["-Xms1G", "-Xss512m", "-cp", classpath, "vct.main.Main", "--lsp"],
+      args: ["--enable-native-access=ALL-UNNAMED", "-Xms1G", "-Xss512m", "-cp", classpath, "vct.main.Main", "--lsp"],
     },
     debug: {
       command: "java",
-      args: ["-Xms1G", "-Xss512m", "-cp", classpath, "vct.main.Main", "--lsp"],
+      args: ["--enable-native-access=ALL-UNNAMED", "-Xms1G", "-Xss512m", "-cp", classpath, "vct.main.Main", "--lsp"],
     },
   };
 
@@ -220,35 +222,6 @@ async function startClient(context: vscode.ExtensionContext) {
 
   // Start the client. This will also launch the server
   await languageClient.start();
-
-  // languageClient.onNotification('vercors/verifiedRange', (params: any) => {
-  //     const uri = params.uri;
-  //     const ranges = params.ranges;
-
-  //     const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === uri);
-  //     if (!editor) {
-  //         console.warn(`No visible editor for ${uri}`);
-  //         return;
-  //     }
-
-  //     const vscodeRanges = ranges.map((r: any) =>
-  //         new vscode.Range(
-  //             new vscode.Position(r.start.line, r.start.character),
-  //             new vscode.Position(r.end.line, r.end.character)
-  //         )
-  //     );
-
-  //     if (!verifiedRangesMap.has(uri)) {
-  //       verifiedRangesMap.set(uri, []);
-  //     }
-  //     const existing = verifiedRangesMap.get(uri)!;
-  //     verifiedRangesMap.set(uri, existing.concat(vscodeRanges));
-  //     // Apply the full set of verified ranges
-  //     editor.setDecorations(verifiedDecorationType, verifiedRangesMap.get(uri)!);
-
-  //     //editor.setDecorations(verifiedDecorationType, vscodeRanges);
-
-  // });
 
   languageClient.onNotification("vercors/verifiedRange", (params: any) => {
     const uri = params.uri;
