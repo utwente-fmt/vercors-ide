@@ -99,7 +99,10 @@
         "scopeName": "java-comment-spec.injection",
         "injectTo": [
           "source.java",
-          "source.c"
+          "source.c",
+          "source.opencl",
+          "source.cuda-cpp",
+          "source.cpp"
         ]
       }
     ],
