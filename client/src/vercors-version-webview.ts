@@ -124,32 +124,6 @@ export default class VerCorsVersionWebviewProvider
     }
   }
 
-  // public async addPath(): Promise<void> {
-  //     // Open folder dialog
-  //     return VerCorsPathsProvider.getInstance()
-  //         .selectVersionFromDialog(
-  //             (): void => {
-  //                 if (this.hasWebview()) {
-  //                     this.webview.postMessage({ command: 'loading' });
-  //                 }
-  //             },
-  //             (): void => {
-  //                 if (this.hasWebview()) {
-  //                     this.webview.postMessage({ command: 'cancel-loading' });
-  //                 }
-  //             }
-  //         )
-  //         .then((path: VerCorsPath | undefined): void => {
-  //             if (path) {
-  //                 if (!this.hasWebview()) {
-  //                     vscode.window.showInformationMessage("VerCors version added");
-  //                 } else {
-  //                     this.sendPathsToWebview();
-  //                 }
-  //             }
-  //         });
-  // }
-
   private async selectPath(path: string): Promise<void> {
     return VerCorsPathsProvider.getInstance()
       .selectPath(path)
@@ -176,7 +150,7 @@ export default class VerCorsVersionWebviewProvider
       return;
     }
 
-    this.webview.postMessage({
+    this.webview?.postMessage({
       command: "progress",
       percentage: percentage,
       step: step,
@@ -184,18 +158,6 @@ export default class VerCorsVersionWebviewProvider
     });
   }
 
-  // private async sendPathsToWebview(): Promise<void> {
-  //     if (!this.hasWebview()) {
-  //         return;
-  //     }
-  //     return VerCorsPathsProvider.getInstance().getPathList()
-  //         .then((paths: VerCorsPath[]):void => {
-  //             this.webview.postMessage({
-  //                 command: 'add-paths',
-  //                 paths: paths
-  //             });
-  //         });
-  // }
   private async sendPathsToWebview(): Promise<void> {
     if (!this.hasWebview()) {
       return;
@@ -206,7 +168,7 @@ export default class VerCorsVersionWebviewProvider
     if (!toShow && allPaths.length) {
       toShow = allPaths[allPaths.length - 1];
     }
-    this.webview.postMessage({
+    this.webview?.postMessage({
       command: "add-paths",
       paths: toShow ? [toShow] : [],
     });

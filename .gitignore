@@ -8,7 +8,9 @@ server/node_modules
 .vscode-test/
 *.vsix
 .idea
-.vscode
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
 *.tsbuildinfo
 .wdio-vscode-service
 client/src/test/fakeVercors
