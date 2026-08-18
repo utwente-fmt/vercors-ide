@@ -16,7 +16,6 @@
     "vscode": "^1.84.0"
   },
   "activationEvents": [
-    "onLanguage:plaintext",
     "onLanguage:java",
     "onCommand:vercors.lspVerify"
   ],
