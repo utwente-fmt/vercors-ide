@@ -1,8 +1,5 @@
-import * as vscode from 'vscode'
+import * as vscode from "vscode";
 
-export interface webviewConnector extends vscode.WebviewViewProvider{
-
-    receiveMessage(message: any): Promise<void>;
-
-
+export interface webviewConnector extends vscode.WebviewViewProvider {
+  receiveMessage(message: any): Promise<void>;
 }

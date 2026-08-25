@@ -16,9 +16,10 @@
     "vscode": "^1.84.0"
   },
   "activationEvents": [
-    "onLanguage:plaintext"
+    "onLanguage:java",
+    "onCommand:vercors.lspVerify"
   ],
-  "main": "./client/out/extension",
+  "main": "./client/out/extension.js",
   "contributes": {
     "snippets": [
       {
@@ -35,39 +36,23 @@
       }
     ],
     "configuration": {
+      "type": "object",
+      "title": "VerCors Configuration",
       "properties": {
-        "languageServerExample.maxNumberOfProblems": {
-          "scope": "resource",
-          "type": "number",
-          "default": 100,
-          "description": "Controls the maximum number of problems produced by the server."
-        },
-        "languageServerExample.trace.server": {
-          "scope": "window",
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "verbose",
-          "description": "Traces the communication between VS Code and the language server."
-        },
         "vercorsplugin.vercorsPath": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": "array",
           "default": [],
-          "description": "Paths to the VerCors bin directory"
+          "description": "Keeps track of all added VerCors server folders (path + version + selected)."
+        },
+        "vercors.serverPath": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the VerCors server folder (should contain the vercors.jar and res folders)."
         },
         "vercorsplugin.optionsMap": {
-          "type": [
-            "object",
-            "null"
-          ],
+          "type": "object",
           "default": {},
-          "description": "Options map for my extension."
+          "description": "Stores custom VerCors options per file or context."
         }
       }
     },
@@ -122,12 +107,12 @@
     ],
     "keybindings": [
       {
-        "command": "extension.runVercors",
+        "command": "vercors.verify",
         "key": "ctrl+shift+l",
         "mac": "cmd+shift+l"
       },
       {
-        "command": "extension.stopVercors",
+        "command": "vercors.stop",
         "key": "ctrl+shift+q",
         "mac": "cmd+shift+q"
       },
@@ -139,28 +124,16 @@
     ],
     "commands": [
       {
-        "command": "extension.runVercors",
-        "title": "Run Vercors",
-        "icon": {
-          "light": "resources\\run.svg",
-          "dark": "resources\\run.svg"
-        }
+        "command": "vercors.verify",
+        "title": "VerCors: Verify via LSP",
+        "category": "VerCors",
+        "icon": "resources/run.svg"
       },
       {
-        "command": "extension.stopVercors",
-        "title": "Stop Vercors",
-        "icon": {
-          "light": "resources\\stop.svg",
-          "dark": "resources\\stop.svg"
-        }
-      },
-      {
-        "command": "extension.setVercorsPath",
-        "title": "Set VerCors Path"
-      },
-      {
-        "command": "extension.refreshEntry",
-        "title": "Refresh"
+        "command": "vercors.stop",
+        "title": "Cancel VerCors Verification",
+        "category": "VerCors",
+        "icon": "resources/stop.svg"
       }
     ],
     "viewsContainers": {
@@ -168,7 +141,7 @@
         {
           "id": "vercors-plugin",
           "title": "VerCors Plugin",
-          "icon": "resources\\mountain-icon.svg"
+          "icon": "resources/mountain-icon.svg"
         }
       ]
     },
@@ -189,12 +162,12 @@
     "menus": {
       "view/title": [
         {
-          "command": "extension.runVercors",
+          "command": "vercors.verify",
           "when": "view == vercorsPathView",
           "group": "navigation"
         },
         {
-          "command": "extension.stopVercors",
+          "command": "vercors.stop",
           "when": "view == vercorsPathView",
           "group": "navigation"
         }
@@ -203,37 +176,41 @@
   },
   "scripts": {
     "build": "vsce package --ignoreFile .vscodeignore-bundled --readme-path INFO.md",
-    "clean": "git clean -xfd client/out client/tsconfig.tsbuildinfo && git clean -xfd server/out server/tsconfig.tsbuildinfo",
-    "vscode:prepublish": "npm run clean && npm run esbuild",
-    "esbuild": "npm run esbuild-base -- --minify && npm run esbuild-server -- --minify",
+    "clean": "git clean -xfd client/out client/tsconfig.tsbuildinfo",
+    "vscode:prepublish": "npm run clean && npm run esbuild-base -- --minify",
+    "esbuild": "npm run esbuild-base -- --minify",
     "esbuild-base": "esbuild ./client/src/extension.ts --bundle --outfile=./client/out/extension.js --external:vscode --format=cjs --platform=node",
-    "esbuild-server": "esbuild ./server/src/server.ts --bundle --outfile=./server/out/server.js --external:vscode --format=cjs --platform=node",
     "compile": "npm run clean && tsc -b",
     "watch": "npm run clean && tsc -b -w",
-    "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "lint": "eslint ./client/src --ext .ts,.tsx",
+    "postinstall": "cd client && npm install",
     "test": "npm run clean && npm run compile && sh ./scripts/e2e.sh"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^18.14.6",
-    "@typescript-eslint/eslint-plugin": "^7.1.0",
-    "@typescript-eslint/parser": "^7.1.0",
-    "@vscode/vsce": "^2.26.0",
-    "chai": "^5.1.0",
-    "esbuild": "^0.27.0",
-    "eslint": "^8.57.0",
-    "glob": "^10.3.10",
-    "mocha": "^10.3.0",
-    "typescript": "^5.3.3"
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.65.0",
+    "@typescript-eslint/parser": "^8.65.0",
+    "@vscode/vsce": "^3.9.2",
+    "chai": "^6.2.2",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.7.0",
+    "glob": "^13.0.6",
+    "mocha": "^11.7.6",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
-    "async-wait-until": "^2.0.12",
-    "eventemitter3": "^5.0.1",
+    "async-wait-until": "^2.0.31",
+    "eventemitter3": "^5.0.4",
     "expect.js": "^0.3.1",
-    "mock-fs": "^5.2.0",
-    "sinon": "^17.0.1",
+    "mock-fs": "^5.5.0",
+    "sinon": "^22.1.0",
     "wait-for-event": "^2.0.1",
     "wdio": "^6.0.1"
+  },
+  "allowScripts": {
+    "@vscode/vsce-sign@2.0.9": true,
+    "esbuild@0.28.1": true,
+    "keytar@7.9.0": true
   }
 }
